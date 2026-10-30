@@ -3,6 +3,7 @@
 @import "@astrojs/starlight-tailwind";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
+@import "./themes/collected-glass.css";
 
 /* Keep existing theme utilities consistent with the system, including without JavaScript. */
 @custom-variant dark (@media (prefers-color-scheme: dark));
@@ -50,7 +51,7 @@
 @theme {
   --font-sans: "DM Sans", sans-serif;
 
-  /* Seafoam/Teal from character's hair */
+  /* Legacy product-page colors; new components use the selected palette's --sf- roles. */
   --color-seafoam: #2dd4a8;
   --color-seafoam-light: #5eead4;
   --color-seafoam-dark: #14b8a6;
@@ -71,53 +72,21 @@
   --color-border: #334155;
 }
 
-/* The CSS preference also supplies the palette when JavaScript is unavailable. */
+/* Native controls follow the system independently of the selected palette. */
 :root {
   color-scheme: light;
-
-  --sf-canvas: #f3f1ec;
-  --sf-surface: #ccd6dc;
-  --sf-text: #263039;
-  --sf-text-muted: #4c5a64;
-  --sf-action: #252d35;
-  --sf-on-action: #f3f1ec;
-  --sf-action-hover: #35414b;
-  --sf-action-pressed: #18232b;
-  --sf-link: #252d35;
-  --sf-focus: #252d35;
-  --sf-boundary: #64717b;
-
-  --sf-amethyst: #d4c9e0;
-  --sf-honey: #dec395;
-  --sf-rose: #e3c4bf;
-  --sf-card-ink: #263039;
-  --sf-card-action-hover: #263039;
-  --sf-card-action-pressed: #35414b;
-  --sf-on-card-action: #f3f1ec;
-  --sf-font-heading: "Space Grotesk", var(--sl-font-system);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-
-    --sf-canvas: #252d35;
-    --sf-surface: #35414b;
-    --sf-text: #f3f1ec;
-    --sf-text-muted: #c6cdd1;
-    --sf-action: #f0e4cb;
-    --sf-on-action: #263039;
-    --sf-action-hover: #f3f1ec;
-    --sf-action-pressed: #dfd3ba;
-    --sf-link: #f0e4cb;
-    --sf-focus: #f0e4cb;
-    --sf-boundary: #89959c;
   }
 }
 
 /* Map roles once so Starlight and custom components share the same surfaces. */
 :root {
   --sl-font: "DM Sans";
+  --sf-font-heading: "Space Grotesk", var(--sl-font-system);
   --sl-color-accent-low: var(--sf-surface);
   --sl-color-accent: var(--sf-action);
   --sl-color-accent-high: var(--sf-action);

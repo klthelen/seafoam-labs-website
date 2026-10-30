@@ -74,10 +74,44 @@ The site follows the system color preference, including changes while a page is
 open. Light is the fallback. Old `starlight-theme` storage values are ignored;
 there is no manual theme selector in the header or documentation menu.
 
-Collected Glass color roles live in `src/styles/global.css` under the `--sf-`
-prefix and map to Starlight's theme properties. CSS follows the system preference
+The active color palette is imported once at the top of `src/styles/global.css`.
+[Collected Glass](src/styles/themes/collected-glass.css) defines the `--sf-` color
+roles for light and dark appearances. Component styles use those roles, and
+`global.css` maps them to Starlight's properties. Typography, spacing, and layout
+stay outside palette files.
+
+To update colors, edit the active palette. To add an alternative, copy that file
+into `src/styles/themes/`, keep the same role names, and change the palette import
+in `global.css`. Import one palette at a time. Define light/fallback values in
+`:root` and override the roles that change inside
+`@media (prefers-color-scheme: dark)`. No component or theme script changes are
+needed to select a different palette.
+
+| Color roles                                                                                                       | Responsibility                                                |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `--sf-canvas`, `--sf-surface`                                                                                     | Page background and shared panels                             |
+| `--sf-text`, `--sf-text-muted`                                                                                    | Primary and supporting text                                   |
+| `--sf-action`, `--sf-on-action`, `--sf-action-hover`, `--sf-action-pressed`                                       | Action fill, foreground, and interaction states               |
+| `--sf-link`, `--sf-focus`, `--sf-boundary`                                                                        | Links, focus indicators, and control boundaries               |
+| `--sf-shelly-surface`, `--sf-starfish-surface`, `--sf-aqueous-surface`, `--sf-pearl-surface`, `--sf-pori-surface` | Project-card backgrounds, named independently of their colors |
+| `--sf-card-ink`, `--sf-card-action-hover`, `--sf-card-action-pressed`, `--sf-on-card-action`                      | Foregrounds and action states shared by project cards         |
+
+New components must consume these roles rather than hard-coded theme colors or
+project-specific light/dark rules. Keep link and focus roles distinct even when
+they share a value. Check text, action, focus, and boundary contrast in both
+appearances when changing a palette. Collected Glass currently pairs Shelly and
+Pearl with amethyst, Starfish and Pori with honey, and Aqueous with rose; those
+assignments belong to the palette, not the card component.
+
+Palette choice is independent of system appearance. CSS follows the preference
 directly, while the inline `ThemeProvider.astro` keeps Starlight's `data-theme`
-attribute in sync before first paint. Keep both aligned when changing this policy.
+attribute in sync before first paint. Keep that attribute reserved for `light`
+and `dark`.
+
+The older product-page gradients and Devario showcase still use the legacy
+Tailwind colors in `global.css`. They will move to the shared roles as their
+planned components are implemented; changing the palette does not yet recolor
+every existing treatment.
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
 The self-hosted WOFF2 files in `src/assets/fonts/` were converted from the supplied

@@ -1,0 +1,41 @@
+/* Collected Glass palette. Keep component styles and typography in global.css. */
+:root {
+  --sf-canvas: #f3f1ec;
+  --sf-surface: #ccd6dc;
+  --sf-text: #263039;
+  --sf-text-muted: #4c5a64;
+  --sf-action: #252d35;
+  --sf-on-action: #f3f1ec;
+  --sf-action-hover: #35414b;
+  --sf-action-pressed: #18232b;
+  --sf-link: #252d35;
+  --sf-focus: #252d35;
+  --sf-boundary: #64717b;
+
+  /* Project surfaces share these values in both appearances. */
+  --sf-shelly-surface: #d4c9e0;
+  --sf-starfish-surface: #dec395;
+  --sf-aqueous-surface: #e3c4bf;
+  --sf-pearl-surface: #d4c9e0;
+  --sf-pori-surface: #dec395;
+  --sf-card-ink: #263039;
+  --sf-card-action-hover: #263039;
+  --sf-card-action-pressed: #35414b;
+  --sf-on-card-action: #f3f1ec;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sf-canvas: #252d35;
+    --sf-surface: #35414b;
+    --sf-text: #f3f1ec;
+    --sf-text-muted: #c6cdd1;
+    --sf-action: #f0e4cb;
+    --sf-on-action: #263039;
+    --sf-action-hover: #f3f1ec;
+    --sf-action-pressed: #dfd3ba;
+    --sf-link: #f0e4cb;
+    --sf-focus: #f0e4cb;
+    --sf-boundary: #89959c;
+  }
+}
