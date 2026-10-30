@@ -1,16 +1,16 @@
-/* Collected Glass palette. Keep component styles and typography in global.css. */
-:root {
-  --sf-canvas: #f3f1ec;
-  --sf-surface: #ccd6dc;
-  --sf-text: #263039;
-  --sf-text-muted: #4c5a64;
-  --sf-action: #252d35;
-  --sf-on-action: #f3f1ec;
-  --sf-action-hover: #35414b;
-  --sf-action-pressed: #18232b;
-  --sf-link: #252d35;
-  --sf-focus: #252d35;
-  --sf-boundary: #64717b;
+/* The Collected Glass design is labeled Sea Glass in the palette selector. */
+:root[data-palette="sea-glass"] {
+  --sf-canvas: light-dark(#f3f1ec, #252d35);
+  --sf-surface: light-dark(#ccd6dc, #35414b);
+  --sf-text: light-dark(#263039, #f3f1ec);
+  --sf-text-muted: light-dark(#4c5a64, #c6cdd1);
+  --sf-action: light-dark(#252d35, #f0e4cb);
+  --sf-on-action: light-dark(#f3f1ec, #263039);
+  --sf-action-hover: light-dark(#35414b, #f3f1ec);
+  --sf-action-pressed: light-dark(#18232b, #dfd3ba);
+  --sf-link: light-dark(#252d35, #f0e4cb);
+  --sf-focus: light-dark(#252d35, #f0e4cb);
+  --sf-boundary: light-dark(#64717b, #89959c);
 
   /* Project surfaces share these values in both appearances. */
   --sf-shelly-surface: #d4c9e0;
@@ -18,24 +18,12 @@
   --sf-aqueous-surface: #e3c4bf;
   --sf-pearl-surface: #d4c9e0;
   --sf-pori-surface: #dec395;
+  --sf-card-border: transparent;
   --sf-card-ink: #263039;
+  --sf-card-link: #263039;
   --sf-card-action-hover: #263039;
   --sf-card-action-pressed: #35414b;
   --sf-on-card-action: #f3f1ec;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --sf-canvas: #252d35;
-    --sf-surface: #35414b;
-    --sf-text: #f3f1ec;
-    --sf-text-muted: #c6cdd1;
-    --sf-action: #f0e4cb;
-    --sf-on-action: #263039;
-    --sf-action-hover: #f3f1ec;
-    --sf-action-pressed: #dfd3ba;
-    --sf-link: #f0e4cb;
-    --sf-focus: #f0e4cb;
-    --sf-boundary: #89959c;
-  }
+  --sf-hero-seafoam: var(--sf-text);
+  --sf-hero-labs: var(--sf-text);
 }

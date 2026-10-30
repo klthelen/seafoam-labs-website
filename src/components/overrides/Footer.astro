@@ -2,6 +2,7 @@
 import Default from "@astrojs/starlight/components/Footer.astro";
 import { Image } from "astro:assets";
 import shellyChelAvif from "../../assets/images/shelly-chel.avif";
+import SitePreferences from "../SitePreferences.astro";
 
 const { siteTitle } = Astro.locals.starlightRoute;
 
@@ -25,7 +26,7 @@ const links = [
   <slot />
 </Default>
 
-<div class="mt-12 flex flex-col items-center justify-between border-t border-(--sl-color-gray-6) pt-8 text-(length:--sl-text-sm) text-(--sl-color-gray-3) sm:mt-16 sm:flex-row sm:justify-center sm:pt-12">
+<div class="mt-12 flex flex-col items-center justify-between border-t border-(--sl-color-gray-6) pt-8 text-(length:--sl-text-sm) text-(--sl-color-gray-3) sm:mt-16 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:pt-12">
   <span class="mt-6 mb-2 sm:mt-auto sm:mb-auto">
     © {new Date().getFullYear()} {siteTitle}
   </span>
@@ -59,4 +60,5 @@ const links = [
       </>
     ))}
   </nav>
+  <SitePreferences />
 </div>

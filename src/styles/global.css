@@ -3,10 +3,23 @@
 @import "@astrojs/starlight-tailwind";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
+@import "./themes/classic.css";
 @import "./themes/collected-glass.css";
 
-/* Keep existing theme utilities consistent with the system, including without JavaScript. */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Explicit preferences take precedence; without JavaScript, utilities follow the device. */
+@custom-variant dark {
+  &:where(
+    [data-appearance][data-theme="dark"],
+    [data-appearance][data-theme="dark"] *
+  ) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-appearance]), :root:not([data-appearance]) *) {
+      @slot;
+    }
+  }
+}
 
 @font-face {
   font-family: "DM Sans";
@@ -72,15 +85,17 @@
   --color-border: #334155;
 }
 
-/* Native controls follow the system independently of the selected palette. */
+/* Palette colors and native controls resolve the same light/dark preference. */
 :root {
+  color-scheme: light dark;
+}
+
+:root[data-appearance="light"] {
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
+:root[data-appearance="dark"] {
+  color-scheme: dark;
 }
 
 /* Map roles once so Starlight and custom components share the same surfaces. */

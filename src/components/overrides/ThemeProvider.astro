@@ -1,15 +1,80 @@
-{/* Resolve the system preference before the page paints; saved manual choices no longer apply. */}
-<script is:inline>
+---
+import { appearanceOptions, paletteOptions } from "../../data/appearance";
+---
+
+{/* Apply saved preferences before first paint. The footer only handles the controls and disclosures. */}
+<script
+  is:inline
+  define:vars={{
+    appearanceValues: appearanceOptions.map(({ value }) => value),
+    paletteValues: paletteOptions.map(({ value }) => value),
+  }}
+>
   (() => {
+    const root = document.documentElement;
     const darkPreference = window.matchMedia?.("(prefers-color-scheme: dark)");
+    let appearance = "auto";
+    let palette = "classic";
+
+    try {
+      const storedAppearance = localStorage.getItem("seafoam-appearance");
+      const storedPalette = localStorage.getItem("seafoam-palette");
+      if (appearanceValues.includes(storedAppearance))
+        appearance = storedAppearance;
+      if (paletteValues.includes(storedPalette)) palette = storedPalette;
+    } catch {
+      // Blocked browser storage leaves the device theme and Classic defaults usable.
+    }
+
+    root.dataset.appearance = appearance;
+    root.dataset.palette = palette;
 
     function syncTheme() {
-      document.documentElement.dataset.theme = darkPreference?.matches
-        ? "dark"
-        : "light";
+      let resolvedTheme = appearance;
+      if (appearance === "auto") {
+        resolvedTheme = darkPreference?.matches ? "dark" : "light";
+      }
+      root.dataset.theme = resolvedTheme;
     }
 
     syncTheme();
     darkPreference?.addEventListener("change", syncTheme);
+
+    document.addEventListener("change", (event) => {
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement) || !input.checked) return;
+      const controls = input.closest("site-preferences");
+      if (!controls) return;
+
+      let storageKey;
+      if (
+        input.name === "appearance" &&
+        appearanceValues.includes(input.value)
+      ) {
+        appearance = input.value;
+        root.dataset.appearance = appearance;
+        syncTheme();
+        storageKey = "seafoam-appearance";
+      } else if (
+        input.name === "palette" &&
+        paletteValues.includes(input.value)
+      ) {
+        palette = input.value;
+        root.dataset.palette = palette;
+        storageKey = "seafoam-palette";
+      } else {
+        return;
+      }
+
+      let message = "";
+      try {
+        localStorage.setItem(storageKey, input.value);
+      } catch {
+        message =
+          "Your choice applies to this page, but your browser could not save it.";
+      }
+      const status = controls.querySelector("[role='status']");
+      if (status) status.textContent = message;
+    });
   })();
 </script>

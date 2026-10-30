@@ -1,0 +1,358 @@
+---
+import { appearanceOptions, paletteOptions } from "../data/appearance";
+---
+
+<site-preferences hidden>
+  <div class="preference-controls">
+    <details name="site-preferences">
+      <summary aria-label="Choose theme" title="Theme">
+        <span class="preference-icon theme-icon" aria-hidden="true"></span>
+      </summary>
+      <div class="preference-panel" popover="manual">
+        <fieldset>
+          <legend class="sr-only">Theme</legend>
+          {appearanceOptions.map(({ value, label }) => (
+            <label>
+              <input
+                type="radio"
+                name="appearance"
+                value={value}
+                checked={value === "auto"}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    </details>
+    <details name="site-preferences">
+      <summary aria-label="Choose color palette" title="Color palette">
+        <span class="preference-icon palette-icon" aria-hidden="true"></span>
+      </summary>
+      <div class="preference-panel" popover="manual">
+        <fieldset>
+          <legend class="sr-only">Color palette</legend>
+          {paletteOptions.map(({ value, label }) => (
+            <label>
+              <input
+                type="radio"
+                name="palette"
+                value={value}
+                checked={value === "classic"}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    </details>
+  </div>
+  <p class="icon-credit">
+    Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
+  </p>
+  <p class="preference-status" role="status"></p>
+</site-preferences>
+
+<script>
+  class SitePreferences extends HTMLElement {
+    connectedCallback() {
+      const root = document.documentElement;
+      for (const input of this.querySelectorAll<HTMLInputElement>("input")) {
+        const selected =
+          input.name === "appearance"
+            ? root.dataset.appearance
+            : root.dataset.palette;
+        input.checked = input.value === selected;
+      }
+
+      const disclosures = Array.from(this.querySelectorAll("details"));
+
+      const closeDisclosure = (
+        disclosure: HTMLDetailsElement,
+        restoreFocus = false,
+      ) => {
+        disclosure.open = false;
+        if (restoreFocus) disclosure.querySelector("summary")?.focus();
+      };
+
+      const positionPanel = (disclosure: HTMLDetailsElement) => {
+        const trigger = disclosure.querySelector("summary");
+        const panel =
+          disclosure.querySelector<HTMLElement>(".preference-panel");
+        if (!trigger || !panel) return;
+
+        const viewport = window.visualViewport;
+        const viewportTop = viewport?.offsetTop ?? 0;
+        const viewportLeft = viewport?.offsetLeft ?? 0;
+        const viewportHeight = viewport?.height ?? window.innerHeight;
+        const viewportWidth = viewport?.width ?? window.innerWidth;
+        const triggerBounds = trigger.getBoundingClientRect();
+        const gutter = 24;
+        const gap = 12;
+        const spaceAbove = triggerBounds.top - viewportTop - gutter - gap;
+        const spaceBelow =
+          viewportTop + viewportHeight - triggerBounds.bottom - gutter - gap;
+        // Footer menus prefer opening upward; use the roomier side on a short viewport.
+        const openAbove = spaceAbove >= spaceBelow;
+        panel.style.maxHeight = `${Math.max(0, openAbove ? spaceAbove : spaceBelow)}px`;
+        panel.style.maxWidth = `${viewportWidth - gutter * 2}px`;
+        const panelBounds = panel.getBoundingClientRect();
+        const left = Math.max(
+          viewportLeft + gutter,
+          Math.min(
+            triggerBounds.right - panelBounds.width,
+            viewportLeft + viewportWidth - panelBounds.width - gutter,
+          ),
+        );
+        const top = openAbove
+          ? triggerBounds.top - gap - panelBounds.height
+          : triggerBounds.bottom + gap;
+        panel.style.left = `${left}px`;
+        panel.style.top = `${top}px`;
+      };
+
+      // The top layer lets footer menus escape Starlight's isolated content pane.
+      for (const disclosure of disclosures) {
+        const panel =
+          disclosure.querySelector<HTMLElement>(".preference-panel");
+        disclosure.addEventListener("toggle", () => {
+          if (disclosure.open) {
+            panel?.showPopover();
+            positionPanel(disclosure);
+          } else {
+            panel?.hidePopover();
+          }
+        });
+      }
+
+      this.addEventListener("keydown", (event) => {
+        const disclosure = disclosures.find((item) => item.open);
+        if (event.key === "Escape" && disclosure) {
+          event.preventDefault();
+          closeDisclosure(disclosure, true);
+        }
+      });
+
+      document.addEventListener("pointerdown", (event) => {
+        for (const disclosure of disclosures) {
+          if (
+            disclosure.open &&
+            event.target instanceof Node &&
+            !disclosure.contains(event.target)
+          ) {
+            closeDisclosure(disclosure);
+          }
+        }
+      });
+
+      this.addEventListener("focusout", (event) => {
+        for (const disclosure of disclosures) {
+          if (
+            disclosure.open &&
+            (event.relatedTarget === null ||
+              (event.relatedTarget instanceof Node &&
+                !disclosure.contains(event.relatedTarget)))
+          ) {
+            closeDisclosure(disclosure);
+          }
+        }
+      });
+
+      const repositionOpenPanel = () => {
+        for (const disclosure of disclosures) {
+          if (disclosure.open) positionPanel(disclosure);
+        }
+      };
+      window.addEventListener("resize", repositionOpenPanel);
+      window.addEventListener("scroll", repositionOpenPanel, { passive: true });
+      window.visualViewport?.addEventListener("resize", repositionOpenPanel);
+      window.visualViewport?.addEventListener("scroll", repositionOpenPanel);
+      this.hidden = false;
+    }
+  }
+
+  customElements.define("site-preferences", SitePreferences);
+</script>
+
+<style>
+  site-preferences:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block: 1rem;
+    color: var(--sf-text);
+  }
+
+  .preference-controls {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover,
+  details[open] > summary {
+    color: var(--sf-on-action);
+    background: var(--sf-action);
+  }
+
+  summary:active {
+    background: var(--sf-action-pressed);
+    color: var(--sf-on-action);
+  }
+
+  summary:focus-visible,
+  label:has(input:focus-visible),
+  a:focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+  }
+
+  label:has(input:focus-visible) {
+    outline-offset: -2px;
+  }
+
+  .preference-icon {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: currentColor;
+    mask: var(--preference-icon) center / contain no-repeat;
+    mask-mode: alpha;
+  }
+
+  .theme-icon {
+    --preference-icon: url("https://cdn-icons-png.flaticon.com/512/16769/16769239.png");
+  }
+
+  .palette-icon {
+    --preference-icon: url("https://cdn-icons-png.flaticon.com/512/3917/3917392.png");
+  }
+
+  .preference-panel {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    width: 22.5rem;
+    max-width: calc(100vw - 3rem);
+    padding: 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1.5px solid var(--sf-boundary);
+    border-radius: 1.5rem;
+    background: var(--sf-surface);
+    color: var(--sf-text);
+  }
+
+  fieldset {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  label {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    min-height: 3.25rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  label:hover {
+    background: var(--sf-action);
+    color: var(--sf-on-action);
+  }
+
+  label:active {
+    background: var(--sf-action-pressed);
+    color: var(--sf-on-action);
+  }
+
+  input {
+    appearance: none;
+    color: inherit;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    outline: none;
+  }
+
+  input:checked {
+    background: currentColor;
+    box-shadow: inset 0 0 0 3px var(--sf-surface);
+  }
+
+  label:hover input:checked {
+    box-shadow: inset 0 0 0 3px var(--sf-action);
+  }
+
+  label:active input:checked {
+    box-shadow: inset 0 0 0 3px var(--sf-action-pressed);
+  }
+
+  label:has(input:checked) span {
+    font-weight: 600;
+  }
+
+  @media (forced-colors: active) {
+    .preference-icon {
+      forced-color-adjust: none;
+      background-color: ButtonText;
+    }
+
+    input {
+      appearance: auto;
+    }
+  }
+
+  .icon-credit,
+  .preference-status {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--sf-text-muted);
+  }
+
+  .preference-status {
+    max-width: 30ch;
+  }
+
+  .preference-status:empty {
+    display: none;
+  }
+
+  a,
+  a:visited {
+    color: var(--sf-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+</style>

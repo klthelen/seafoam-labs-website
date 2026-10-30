@@ -1,0 +1,29 @@
+/* Classic is the default palette. Each light-dark() pair is light first, dark second. */
+:root {
+  --sf-canvas: light-dark(#ffffff, #0f172a);
+  --sf-surface: light-dark(#f1f5f9, #1e293b);
+  --sf-text: light-dark(#0f172a, #f8fafc);
+  --sf-text-muted: light-dark(#334155, #cbd5e1);
+  --sf-action: light-dark(#0f766e, #5eead4);
+  --sf-on-action: light-dark(#ffffff, #0f172a);
+  /* Functional shades supplement the PDF's resting colors with legible interaction states. */
+  --sf-action-hover: light-dark(#115e59, #2dd4a8);
+  --sf-action-pressed: light-dark(#134e4a, #14b8a6);
+  --sf-link: light-dark(#0f766e, #5eead4);
+  --sf-focus: var(--sf-link);
+  --sf-boundary: #64748b;
+
+  --sf-shelly-surface: var(--sf-canvas);
+  --sf-starfish-surface: var(--sf-canvas);
+  --sf-aqueous-surface: var(--sf-canvas);
+  --sf-pearl-surface: var(--sf-canvas);
+  --sf-pori-surface: var(--sf-canvas);
+  --sf-card-border: light-dark(#cbd5e1, #334155);
+  --sf-card-ink: var(--sf-text);
+  --sf-card-link: var(--sf-link);
+  --sf-card-action-hover: var(--sf-action);
+  --sf-card-action-pressed: var(--sf-action-pressed);
+  --sf-on-card-action: var(--sf-on-action);
+  --sf-hero-seafoam: light-dark(#0d9488, #2dd4a8);
+  --sf-hero-labs: light-dark(#7c3aed, #a78bfa);
+}

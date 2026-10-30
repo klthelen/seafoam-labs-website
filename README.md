@@ -70,22 +70,39 @@ Static assets, like favicons, can be placed in the `public/` directory.
 
 ## Appearance
 
-The site follows the system color preference, including changes while a page is
-open. Light is the fallback. Old `starlight-theme` storage values are ignored;
-there is no manual theme selector in the header or documentation menu.
+The footer offers two independent preferences: **Use device theme** (`auto`),
+**Dark theme**, or **Light theme**; and the **Classic (Default)** or **Sea Glass**
+palette. Device theme follows system changes while the page is open, with light
+as the fallback. Without JavaScript, the site uses Classic and the device theme.
 
-The active color palette is imported once at the top of `src/styles/global.css`.
-[Collected Glass](src/styles/themes/collected-glass.css) defines the `--sf-` color
-roles for light and dark appearances. Component styles use those roles, and
-`global.css` maps them to Starlight's properties. Typography, spacing, and layout
-stay outside palette files.
+Selections are stored under `seafoam-appearance` and `seafoam-palette`.
+Unrecognized values fall back to the defaults; legacy `starlight-theme` values
+are ignored. If browser storage is unavailable, a changed preference still
+applies to the current page and the footer reports that it could not be saved.
 
-To update colors, edit the active palette. To add an alternative, copy that file
-into `src/styles/themes/`, keep the same role names, and change the palette import
-in `global.css`. Import one palette at a time. Define light/fallback values in
-`:root` and override the roles that change inside
-`@media (prefers-color-scheme: dark)`. No component or theme script changes are
-needed to select a different palette.
+[appearance.ts](src/data/appearance.ts) supplies the option labels and allowed
+values to both the provider and controls.
+[ThemeProvider.astro](src/components/overrides/ThemeProvider.astro) restores
+preferences before first paint and owns state updates, persistence, and system
+theme changes. [SitePreferences.astro](src/components/SitePreferences.astro)
+renders the footer controls and handles their disclosure positioning, dismissal,
+and focus behavior. Each disclosure uses a native popover to place its panel
+above Starlight's fixed header and isolated content pane. The default Starlight
+selector remains suppressed.
+
+The root's `data-appearance` stores the choice (`auto`, `light`, or `dark`);
+`data-theme` stores only the resolved `light` or `dark` value for Starlight.
+`data-palette` selects the palette. CSS sets `color-scheme` from the appearance
+choice so palette colors and native controls agree.
+
+[global.css](src/styles/global.css) imports both
+[Classic](src/styles/themes/classic.css) and
+[Collected Glass](src/styles/themes/collected-glass.css), which is labeled
+**Sea Glass** in the selector. Classic defines the fallback roles on `:root`;
+Sea Glass overrides them within `:root[data-palette="sea-glass"]`. Each
+`light-dark(light, dark)` pair follows the active `color-scheme`. Typography,
+spacing, and layout stay outside palette files, and `global.css` maps shared
+color roles to Starlight's properties.
 
 | Color roles                                                                                                       | Responsibility                                                |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
@@ -94,19 +111,23 @@ needed to select a different palette.
 | `--sf-action`, `--sf-on-action`, `--sf-action-hover`, `--sf-action-pressed`                                       | Action fill, foreground, and interaction states               |
 | `--sf-link`, `--sf-focus`, `--sf-boundary`                                                                        | Links, focus indicators, and control boundaries               |
 | `--sf-shelly-surface`, `--sf-starfish-surface`, `--sf-aqueous-surface`, `--sf-pearl-surface`, `--sf-pori-surface` | Project-card backgrounds, named independently of their colors |
-| `--sf-card-ink`, `--sf-card-action-hover`, `--sf-card-action-pressed`, `--sf-on-card-action`                      | Foregrounds and action states shared by project cards         |
+| `--sf-card-ink`, `--sf-card-border`, `--sf-card-link`                                                             | Project-card text, borders, and links                         |
+| `--sf-card-action-hover`, `--sf-card-action-pressed`, `--sf-on-card-action`                                       | Project-card action states                                    |
+| `--sf-hero-seafoam`, `--sf-hero-labs`                                                                             | The two hero-title color roles                                |
 
-New components must consume these roles rather than hard-coded theme colors or
-project-specific light/dark rules. Keep link and focus roles distinct even when
-they share a value. Check text, action, focus, and boundary contrast in both
-appearances when changing a palette. Collected Glass currently pairs Shelly and
-Pearl with amethyst, Starfish and Pori with honey, and Aqueous with rose; those
-assignments belong to the palette, not the card component.
+New components consume these roles rather than hard-coded theme colors. Keep
+link and focus roles distinct even when their values match. Sea Glass assigns
+amethyst to Shelly and Pearl, honey to Starfish and Pori, and rose to Aqueous;
+Classic uses the canvas with a card border. These choices belong to the palette.
+Classic's action hover/pressed shades supplement the supplied resting colors:
+`#115E59` / `#134E4A` in light mode and `#2DD4A8` / `#14B8A6` in dark mode.
+They are implementation choices, not additional values specified by the PDF.
 
-Palette choice is independent of system appearance. CSS follows the preference
-directly, while the inline `ThemeProvider.astro` keeps Starlight's `data-theme`
-attribute in sync before first paint. Keep that attribute reserved for `light`
-and `dark`.
+To add a palette, create a file under `src/styles/themes/` defining the same
+roles within `:root[data-palette="your-palette"]`, import it in `global.css`, and
+add its value and label to `paletteOptions` in `appearance.ts`. The provider and
+controls then accept it without separate value lists. Check text, action, focus,
+and boundary contrast in both appearances, including hover and pressed states.
 
 The older product-page gradients and Devario showcase still use the legacy
 Tailwind colors in `global.css`. They will move to the shared roles as their
@@ -117,6 +138,10 @@ Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/6
 The self-hosted WOFF2 files in `src/assets/fonts/` were converted from the supplied
 brand guide's font files without subsetting. Each family's SIL Open Font License
 is retained alongside the fonts. The website makes no external font requests.
+
+The footer icons load from Flaticon's CDN and retain a visible attribution link.
+Their sources and separate license are recorded in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Commands
 
@@ -130,7 +155,7 @@ All commands are run from the root of the project, from a terminal:
 - `pnpm run format` to format code with Prettier
 - `pnpm run lint` to lint code with ESLint
 - `pnpm run check` to run Astro's type checking diagnostics
-- `pnpm run test:theme` to check system theme initialization and updates
+- `pnpm run test:theme` to check appearance/palette initialization, persistence, and device-theme updates
 
 <!-- Separator -->
 
