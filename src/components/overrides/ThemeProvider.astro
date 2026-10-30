@@ -1,0 +1,15 @@
+{/* Resolve the system preference before the page paints; saved manual choices no longer apply. */}
+<script is:inline>
+  (() => {
+    const darkPreference = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+    function syncTheme() {
+      document.documentElement.dataset.theme = darkPreference?.matches
+        ? "dark"
+        : "light";
+    }
+
+    syncTheme();
+    darkPreference?.addEventListener("change", syncTheme);
+  })();
+</script>

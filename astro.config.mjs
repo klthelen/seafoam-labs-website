@@ -201,6 +201,8 @@ export default defineConfig({
       },
       customCss: ["./src/styles/global.css"],
       components: {
+        ThemeProvider: "./src/components/overrides/ThemeProvider.astro",
+        ThemeSelect: "./src/components/overrides/ThemeSelect.astro",
         Header: "./src/components/overrides/Header.astro",
         PageTitle: "./src/components/overrides/PageTitle.astro",
         SocialIcons: "./src/components/overrides/SocialIcons.astro",

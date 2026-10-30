@@ -68,6 +68,22 @@ makes it easier to manage different types of information.
 
 Static assets, like favicons, can be placed in the `public/` directory.
 
+## Appearance
+
+The site follows the system color preference, including changes while a page is
+open. Light is the fallback. Old `starlight-theme` storage values are ignored;
+there is no manual theme selector in the header or documentation menu.
+
+Collected Glass color roles live in `src/styles/global.css` under the `--sf-`
+prefix and map to Starlight's theme properties. CSS follows the system preference
+directly, while the inline `ThemeProvider.astro` keeps Starlight's `data-theme`
+attribute in sync before first paint. Keep both aligned when changing this policy.
+
+Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
+The self-hosted WOFF2 files in `src/assets/fonts/` were converted from the supplied
+brand guide's font files without subsetting. Each family's SIL Open Font License
+is retained alongside the fonts. The website makes no external font requests.
+
 ## Commands
 
 All commands are run from the root of the project, from a terminal:
@@ -80,6 +96,7 @@ All commands are run from the root of the project, from a terminal:
 - `pnpm run format` to format code with Prettier
 - `pnpm run lint` to lint code with ESLint
 - `pnpm run check` to run Astro's type checking diagnostics
+- `pnpm run test:theme` to check system theme initialization and updates
 
 <!-- Separator -->
 

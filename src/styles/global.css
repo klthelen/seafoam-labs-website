@@ -4,7 +4,52 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/* Keep existing theme utilities consistent with the system, including without JavaScript. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("../assets/fonts/dm-sans-400.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("../assets/fonts/dm-sans-500.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("../assets/fonts/dm-sans-600.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("../assets/fonts/space-grotesk-500.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("../assets/fonts/space-grotesk-600.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
 @theme {
+  --font-sans: "DM Sans", sans-serif;
+
   /* Seafoam/Teal from character's hair */
   --color-seafoam: #2dd4a8;
   --color-seafoam-light: #5eead4;
@@ -26,40 +71,95 @@
   --color-border: #334155;
 }
 
-/* Starlight overrides */
-/* See https://github.com/withastro/starlight/blob/main/packages/starlight/style/props.css */
-
-/* Dark mode colors. */
+/* The CSS preference also supplies the palette when JavaScript is unavailable. */
 :root {
-  --sl-color-accent-low: var(--color-bg-primary);
-  --sl-color-accent: var(--color-seafoam);
-  --sl-color-accent-high: var(--color-seafoam-light);
-  --sl-color-white: #f8fafc;
-  --sl-color-gray-1: #e2e8f0;
-  --sl-color-gray-2: #cbd5e1;
-  --sl-color-gray-3: #94a3b8;
-  --sl-color-gray-4: #64748b;
-  --sl-color-gray-5: #334155;
-  --sl-color-gray-6: #1e293b;
-  --sl-color-black: var(--color-bg-primary);
+  color-scheme: light;
+
+  --sf-canvas: #f3f1ec;
+  --sf-surface: #ccd6dc;
+  --sf-text: #263039;
+  --sf-text-muted: #4c5a64;
+  --sf-action: #252d35;
+  --sf-on-action: #f3f1ec;
+  --sf-action-hover: #35414b;
+  --sf-action-pressed: #18232b;
+  --sf-link: #252d35;
+  --sf-focus: #252d35;
+  --sf-boundary: #64717b;
+
+  --sf-amethyst: #d4c9e0;
+  --sf-honey: #dec395;
+  --sf-rose: #e3c4bf;
+  --sf-card-ink: #263039;
+  --sf-card-action-hover: #263039;
+  --sf-card-action-pressed: #35414b;
+  --sf-on-card-action: #f3f1ec;
+  --sf-font-heading: "Space Grotesk", var(--sl-font-system);
 }
 
-/* Light mode colors. */
-:root[data-theme="light"] {
-  --sl-color-accent-low: var(--color-seafoam-light);
-  --sl-color-accent: var(--color-seafoam-muted);
-  --sl-color-accent-high: var(--color-seafoam-dark);
-  /* Starlight derives this from --sl-color-accent, which is too light for AA text. */
-  --sl-color-text-accent: var(--color-seafoam-deep);
-  --sl-color-white: var(--color-bg-primary);
-  --sl-color-gray-1: #1e293b;
-  --sl-color-gray-2: #334155;
-  --sl-color-gray-3: #64748b;
-  --sl-color-gray-4: #94a3b8;
-  --sl-color-gray-5: #cbd5e1;
-  --sl-color-gray-6: #f1f5f9;
-  --sl-color-gray-7: #f8fafc;
-  --sl-color-black: #ffffff;
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --sf-canvas: #252d35;
+    --sf-surface: #35414b;
+    --sf-text: #f3f1ec;
+    --sf-text-muted: #c6cdd1;
+    --sf-action: #f0e4cb;
+    --sf-on-action: #263039;
+    --sf-action-hover: #f3f1ec;
+    --sf-action-pressed: #dfd3ba;
+    --sf-link: #f0e4cb;
+    --sf-focus: #f0e4cb;
+    --sf-boundary: #89959c;
+  }
+}
+
+/* Map roles once so Starlight and custom components share the same surfaces. */
+:root {
+  --sl-font: "DM Sans";
+  --sl-color-accent-low: var(--sf-surface);
+  --sl-color-accent: var(--sf-action);
+  --sl-color-accent-high: var(--sf-action);
+  --sl-color-white: var(--sf-text);
+  --sl-color-gray-1: var(--sf-text);
+  --sl-color-gray-2: var(--sf-text-muted);
+  --sl-color-gray-3: var(--sf-text-muted);
+  --sl-color-gray-4: var(--sf-boundary);
+  --sl-color-gray-5: var(--sf-boundary);
+  --sl-color-gray-6: var(--sf-surface);
+  --sl-color-gray-7: var(--sf-canvas);
+  --sl-color-black: var(--sf-canvas);
+  --sl-color-text: var(--sf-text);
+  --sl-color-text-accent: var(--sf-link);
+  --sl-color-text-invert: var(--sf-on-action);
+  --sl-color-bg: var(--sf-canvas);
+  --sl-color-bg-nav: var(--sf-surface);
+  --sl-color-bg-sidebar: var(--sf-canvas);
+  --sl-color-bg-inline-code: var(--sf-surface);
+  --sl-color-bg-accent: var(--sf-action);
+  --sl-color-hairline: var(--sf-boundary);
+  --sl-color-hairline-light: var(--sf-boundary);
+  --sl-color-hairline-shade: var(--sf-surface);
+}
+
+:is(h1, h2, h3, h4, h5, h6),
+.card .title {
+  font-family: var(--sf-font-heading);
+  font-weight: 600;
+}
+
+/* Preserve semantic callout colors and labels without decorative side accents. */
+.starlight-aside {
+  border-inline-start: 0;
+  color: var(--sl-color-asides-text-accent);
+}
+
+.sl-markdown-content :is(blockquote, details):not(:where(.not-content *)) {
+  border-inline-start: 0;
+  padding: 1rem;
+  background-color: var(--sf-surface);
+  border-radius: 0.75rem;
 }
 
 :root {
@@ -96,15 +196,6 @@
     @apply dark:bg-bg-primary/15 h-8 max-w-40;
   }
 
-  starlight-theme-select {
-    svg:first-of-type {
-      @apply size-5;
-    }
-    select {
-      @apply w-14 px-1 opacity-0;
-    }
-  }
-
   @apply dark:border-b-border;
 }
 
@@ -123,8 +214,6 @@
     @apply px-0 shadow-none hover:text-(--sl-color-accent) dark:hover:text-(--sl-color-accent-high);
   }
 }
-
-/* End Starlight overrides */
 
 /* Hero page gradient */
 [data-has-hero] {
@@ -210,7 +299,6 @@
   max-width: 36rem;
   color: var(--sl-color-white);
   font-size: clamp(1.55rem, 4vw, 2.35rem);
-  letter-spacing: -0.035em;
   line-height: 1.1;
 }
 
