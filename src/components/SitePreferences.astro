@@ -226,6 +226,11 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
     outline-offset: -2px;
   }
 
+  label:has(input:focus-visible):hover,
+  label:has(input:focus-visible):active {
+    outline-color: var(--sf-on-action);
+  }
+
   .preference-icon {
     display: block;
     width: 1.5rem;
