@@ -125,7 +125,7 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
         });
       }
 
-      this.addEventListener("keydown", (event) => {
+      document.addEventListener("keydown", (event) => {
         const disclosure = disclosures.find((item) => item.open);
         if (event.key === "Escape" && disclosure) {
           event.preventDefault();
@@ -146,12 +146,12 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
       });
 
       this.addEventListener("focusout", (event) => {
+        // Label clicks can briefly blur the trigger before focusing their radio.
         for (const disclosure of disclosures) {
           if (
             disclosure.open &&
-            (event.relatedTarget === null ||
-              (event.relatedTarget instanceof Node &&
-                !disclosure.contains(event.relatedTarget)))
+            event.relatedTarget instanceof Node &&
+            !disclosure.contains(event.relatedTarget)
           ) {
             closeDisclosure(disclosure);
           }
@@ -291,6 +291,7 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
 
   input {
     appearance: none;
+    cursor: inherit;
     color: inherit;
     flex: none;
     width: 1rem;

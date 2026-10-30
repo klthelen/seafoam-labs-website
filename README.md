@@ -90,6 +90,11 @@ and focus behavior. Each disclosure uses a native popover to place its panel
 above Starlight's fixed header and isolated content pane. The default Starlight
 selector remains suppressed.
 
+When checking these controls in a browser, select options by clicking the radio,
+the label text, and the row padding. All three targets must apply and save the
+choice without dismissing the panel, and all use the pointer cursor. Also check
+Tab departure and Escape, including after clicking empty panel padding.
+
 The root's `data-appearance` stores the choice (`auto`, `light`, or `dark`);
 `data-theme` stores only the resolved `light` or `dark` value for Starlight.
 `data-palette` selects the palette. CSS sets `color-scheme` from the appearance
