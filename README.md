@@ -102,8 +102,7 @@ choice so palette colors and native controls agree.
 
 [global.css](src/styles/global.css) imports both
 [Classic](src/styles/themes/classic.css) and
-[Collected Glass](src/styles/themes/collected-glass.css), which is labeled
-**Sea Glass** in the selector. Classic defines the fallback roles on `:root`;
+[Sea Glass](src/styles/themes/sea-glass.css). Classic defines the fallback roles on `:root`;
 Sea Glass overrides them within `:root[data-palette="sea-glass"]`. Each
 `light-dark(light, dark)` pair follows the active `color-scheme`. Typography,
 spacing, and layout stay outside palette files, and `global.css` maps shared

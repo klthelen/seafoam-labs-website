@@ -4,7 +4,7 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 @import "./themes/classic.css";
-@import "./themes/collected-glass.css";
+@import "./themes/sea-glass.css";
 
 /* Explicit preferences take precedence; without JavaScript, utilities follow the device. */
 @custom-variant dark {

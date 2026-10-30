@@ -1,4 +1,4 @@
-/* The Collected Glass design is labeled Sea Glass in the palette selector. */
+/* Sea Glass palette. Each light-dark() pair is light first, dark second. */
 :root[data-palette="sea-glass"] {
   --sf-canvas: light-dark(#f3f1ec, #252d35);
   --sf-surface: light-dark(#ccd6dc, #35414b);
