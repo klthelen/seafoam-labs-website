@@ -1,0 +1,106 @@
+---
+import type { ComponentProps } from "astro/types";
+import { Icon } from "@astrojs/starlight/components";
+
+interface Props {
+  href: string;
+  label: string;
+  description?: string;
+  icon?: ComponentProps<typeof Icon>["name"];
+  current?: boolean;
+  rel?: string;
+}
+
+const { href, label, description, icon, current = false, rel } = Astro.props;
+---
+
+<a
+  class:list={["menu-link", { "has-description": Boolean(description) }]}
+  {href}
+  {rel}
+  aria-current={current ? "page" : undefined}
+>
+  {icon && <Icon name={icon} size="1.25rem" />}
+  <span class="menu-link-text">
+    <span class="menu-link-label">{label}</span>
+    {description && <span class="menu-link-description">{description}</span>}
+  </span>
+</a>
+
+<style>
+  .menu-link {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 3.25rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    color: var(--sf-text);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .menu-link.has-description {
+    min-block-size: 4.5rem;
+    padding-block: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .menu-link-text {
+    display: grid;
+    gap: 0.25rem;
+    min-inline-size: 0;
+  }
+
+  .menu-link-description {
+    color: var(--sf-text-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+  }
+
+  .menu-link :global(svg) {
+    flex: none;
+  }
+
+  .menu-link[aria-current="page"] .menu-link-label {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .menu-link:hover {
+      background: var(--sf-action);
+      color: var(--sf-on-action);
+    }
+
+    .menu-link:hover .menu-link-description {
+      color: inherit;
+    }
+  }
+
+  .menu-link:active {
+    background: var(--sf-action);
+    color: var(--sf-on-action);
+  }
+
+  .menu-link:active .menu-link-description {
+    color: inherit;
+  }
+
+  .menu-link:focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 64rem) {
+    .menu-link.has-description {
+      min-block-size: 4rem;
+    }
+  }
+</style>

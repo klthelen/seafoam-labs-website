@@ -105,6 +105,28 @@ at the call site. Disabled buttons do not receive hover or pressed treatments.
 Navigation links remain usable; do not simulate a disabled link with these styles.
 Unclassed links and buttons keep their existing component or framework styling.
 
+## Menu links
+
+[MenuLink.astro](src/components/navigation/MenuLink.astro) renders one complete
+anchor row for the Projects and Site menus. It requires `href` and `label` and
+accepts an optional `description`, a named Starlight `icon`, `current`, and `rel`.
+The caller supplies the current-page state; only that row's label is underlined
+and its anchor receives `aria-current="page"`. Icons are decorative beside the
+visible label. Links use normal browser navigation without client JavaScript.
+
+Rows with a description use the project treatment: an 18px label, 14px
+description, and minimum height of 72px, reducing to 64px from 64rem wide.
+Ordinary rows have a 16px label and a minimum height of 52px. These dimensions
+are expressed in rem; rows grow with wrapped or enlarged text. The same markup
+serves both arrangements.
+
+Hover-capable pointers and active presses highlight the whole row with the
+palette's action colors. Touch scrolling uses native link behavior; hover-only
+styles do not leave a selected-looking row behind on touch devices. Keyboard
+focus uses the shared 2px outline and 3px offset, independently of the fill.
+The containing menu must leave room around rows for that outline. Popup
+containers own placement, dismissal, and scrolling.
+
 ## Typography and icons
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
