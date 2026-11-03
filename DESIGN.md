@@ -40,6 +40,14 @@ Each `light-dark(light, dark)` pair follows the active `color-scheme`.
 Typography, spacing, and layout stay outside palette files, and `global.css`
 maps shared color roles to Starlight's properties.
 
+Printing resolves the palette's light colors and uses Starlight's print text and
+page-background roles. This keeps documentation legible with or without printed
+background graphics without changing the saved screen preferences. Printed
+Markdown tables wrap within the page width instead of retaining their screen
+scrolling region. Code prints in the same readable ink as body text, including
+when background graphics are disabled. Starlight continues to own semantic
+aside colors.
+
 | Color roles                                                                                                       | Responsibility                                                |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | `--sf-canvas`, `--sf-surface`                                                                                     | Page background and shared panels                             |

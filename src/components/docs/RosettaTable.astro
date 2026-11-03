@@ -52,4 +52,14 @@ const { labelledby } = Astro.props;
   .rosetta-table :global(th:nth-child(4)) {
     width: 32%;
   }
+
+  @media print {
+    .rosetta-table {
+      overflow: visible;
+    }
+
+    .rosetta-table :global(table) {
+      min-width: 0;
+    }
+  }
 </style>
