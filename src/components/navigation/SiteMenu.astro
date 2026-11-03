@@ -1,0 +1,80 @@
+---
+import config from "virtual:starlight/user-config";
+import { Icon } from "@astrojs/starlight/components";
+import MenuLink from "./MenuLink.astro";
+import NavigationDisclosure from "./NavigationDisclosure.astro";
+
+const pages = [
+  { label: "Wiki", href: "/welcome/" },
+  { label: "Blog", href: "/blog/" },
+  { label: "About", href: "/about/" },
+];
+const socialLinks = config.social || [];
+const currentPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+---
+
+<NavigationDisclosure align="end">
+  <Fragment slot="trigger">
+    <span class="open-menu">
+      <Icon name="bars" size="1.25rem" />
+      <span class="sr-only">Open menu</span>
+    </span>
+    <span class="close-menu">
+      <Icon name="close" size="1.25rem" />
+      <span class="sr-only">Close menu</span>
+    </span>
+  </Fragment>
+  <ul class="site-links">
+    {pages.map(({ href, label }) => (
+      <li>
+        <MenuLink {href} {label} current={href === currentPath} />
+      </li>
+    ))}
+  </ul>
+  {socialLinks.length > 0 && (
+    <>
+      <hr class="site-menu-divider" />
+      <ul class="site-links">
+        {socialLinks.map(({ href, label, icon }) => (
+          <li>
+            <MenuLink {href} {label} {icon} rel="me" />
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</NavigationDisclosure>
+
+<style>
+  .open-menu {
+    display: flex;
+  }
+
+  .close-menu {
+    display: none;
+  }
+
+  :global(details[open]) .open-menu {
+    display: none;
+  }
+
+  :global(details[open]) .close-menu {
+    display: flex;
+  }
+
+  .site-links {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-menu-divider {
+    margin: 0.75rem 0;
+    border: 0;
+    border-block-start: 1px solid var(--sf-boundary);
+  }
+</style>

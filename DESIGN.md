@@ -172,6 +172,27 @@ Panel height follows these rows and their content, with scrolling handled by
 the disclosure. The containing header supplies `data-navigation-header` for
 placement below its full height.
 
+## Site menu
+
+[SiteMenu.astro](src/components/navigation/SiteMenu.astro) uses the shared disclosure
+with end alignment. It lists Wiki, Blog, and About, then reads the social links
+from Starlight's `social` configuration. External rows retain the configured
+labels, icons, destinations, normal tab behavior, and `rel="me"`. Only an exact
+internal destination receives `aria-current="page"`, accepting either
+trailing-slash form.
+
+The 20px hamburger and its accessible name, Open menu, become an X and Close menu
+when the native disclosure opens. CSS follows the `open` attribute, so both the
+icon and name also change without JavaScript. The shared trigger supplies the
+44px target, circular open fill, and focus outline.
+
+Rows use the ordinary 52px minimum height with 12px gaps for separate hover and
+focus treatments. One 1px boundary divider, with 12px space above and below,
+separates the internal and social groups. It is omitted when no social links are
+configured. The panel follows its content height. Header integration must control
+compact visibility, close the menu before hiding it, and move any affected focus
+to a visible counterpart when switching to the desktop arrangement.
+
 ## Typography and icons
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
