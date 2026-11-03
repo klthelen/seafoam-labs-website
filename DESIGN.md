@@ -14,6 +14,8 @@ Selections are stored under `seafoam-appearance` and `seafoam-palette`.
 Unrecognized values fall back to the defaults; legacy `starlight-theme` values
 are ignored. If browser storage is unavailable, a changed preference still
 applies to the current page and the footer reports that it could not be saved.
+The empty status region remains exposed before an update, with polite, atomic
+feedback that does not take focus.
 
 [appearance.ts](src/data/appearance.ts) supplies the option labels and allowed
 values to both the provider and controls.

@@ -50,7 +50,7 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
   <p class="icon-credit">
     Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
   </p>
-  <p class="preference-status" role="status"></p>
+  <p class="preference-status" role="status" aria-atomic="true"></p>
 </site-preferences>
 
 <script>
@@ -345,10 +345,6 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
 
   .preference-status {
     max-width: 30ch;
-  }
-
-  .preference-status:empty {
-    display: none;
   }
 
   a,
