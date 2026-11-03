@@ -41,7 +41,11 @@ const { align = "start" } = Astro.props;
         getComputedStyle(panel).getPropertyValue("--viewport-gutter"),
       );
       const headerBounds = header.getBoundingClientRect();
-      const anchorBounds = desktop.matches
+      const layout = getComputedStyle(header)
+        .getPropertyValue("--sf-navigation-layout")
+        .trim();
+      const alignToTrigger = layout ? layout === "desktop" : desktop.matches;
+      const anchorBounds = alignToTrigger
         ? trigger.getBoundingClientRect()
         : headerBounds;
       const top = Math.max(headerBounds.bottom + 12, viewportTop + gutter);
@@ -162,7 +166,7 @@ const { align = "start" } = Astro.props;
   }
 
   .disclosure-panel {
-    --viewport-gutter: 16px;
+    --viewport-gutter: var(--sf-navigation-gutter, 16px);
 
     box-sizing: border-box;
     inline-size: 22.5rem;
@@ -186,7 +190,7 @@ const { align = "start" } = Astro.props;
 
   @media (min-width: 64rem) {
     .disclosure-panel {
-      --viewport-gutter: 24px;
+      --viewport-gutter: var(--sf-navigation-gutter, 24px);
     }
   }
 </style>

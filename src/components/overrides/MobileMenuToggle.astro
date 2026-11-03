@@ -1,0 +1,78 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+---
+
+<button
+  type="button"
+  popovertarget="starlight__sidebar"
+  class="docs-menu-toggle sf-nav-link"
+>
+  <Icon name="bars" class="open-docs" size="1.25rem" />
+  <Icon name="close" class="close-docs" size="1.25rem" />
+  <span>Documentation</span>
+</button>
+
+<style>
+  .docs-menu-toggle {
+    position: fixed;
+    inset-block-start: calc(
+      var(--sl-nav-height) - var(--sf-docs-control-height, 44px) - 16px
+    );
+    inset-inline-start: max(16px, env(safe-area-inset-left));
+    z-index: var(--sl-z-index-navbar);
+    box-sizing: border-box;
+    max-inline-size: calc(
+      100% - max(16px, env(safe-area-inset-left)) -
+        max(16px, env(safe-area-inset-right))
+    );
+    gap: 8px;
+    padding: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--sf-canvas);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .docs-menu-toggle :global(svg) {
+    flex: none;
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  .docs-menu-toggle:has(~ :popover-open) {
+    background: var(--sf-action);
+    color: var(--sf-on-action);
+  }
+
+  .docs-menu-toggle:has(~ :popover-open) :global(.open-docs),
+  .docs-menu-toggle:not(:has(~ :popover-open)) :global(.close-docs) {
+    display: none;
+  }
+
+  @media (min-width: 50rem), print {
+    .docs-menu-toggle {
+      display: none;
+    }
+  }
+
+  @media (scripting: none) {
+    .docs-menu-toggle {
+      position: static;
+      margin: 8px 16px 16px;
+    }
+  }
+</style>
+
+<style is:global>
+  body:has(#starlight__sidebar:popover-open) {
+    overflow: hidden;
+  }
+
+  @media (min-width: 50rem) {
+    body:has(#starlight__sidebar:popover-open) {
+      overflow: auto;
+    }
+  }
+</style>

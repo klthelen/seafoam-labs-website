@@ -147,9 +147,6 @@
 }
 
 :root {
-  /* Top header */
-  --sl-nav-height: 4.6rem;
-
   /* Content page width */
   --sl-content-width: 55rem;
 
@@ -165,22 +162,6 @@
     /* Main content x-axis padding between left and right sidebars */
     --sl-content-pad-x: 3rem;
   }
-}
-
-.header {
-  .site-title {
-    --sl-nav-gap: 1rem;
-  }
-
-  .title-wrapper + div {
-    @apply justify-end;
-  }
-
-  site-search button {
-    @apply dark:bg-bg-primary/15 h-8 max-w-40;
-  }
-
-  @apply dark:border-b-border;
 }
 
 /* Shared treatments stay opt-in; Starlight's existing actions use the same rules. */

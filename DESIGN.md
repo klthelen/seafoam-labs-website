@@ -139,8 +139,11 @@ activation; do not add redundant roles or `aria-expanded` to the summary.
 Use `align="start"` (the default) for Projects and `align="end"` for Site menu.
 Mark their containing header capsule with `data-navigation-header`. The popup
 starts 12px below that element's measured bottom, including when its controls
-wrap. Desktop placement follows the trigger; below 64rem it follows the capsule
-edge. Placement stays within 24px desktop or 16px compact viewport gutters.
+wrap. Desktop placement follows the trigger; compact placement follows the capsule
+edge. The Header supplies its current arrangement and viewport gutter through
+CSS properties, so popup placement also follows text enlargement. Standalone
+disclosures fall back to a 64rem breakpoint with 24px desktop or 16px compact
+viewport gutters.
 
 The panel uses a 22.5rem width, 1rem padding, 1.5rem corners, and the shared surface
 and boundary roles. Its height follows the content and scrolls within the available
@@ -152,9 +155,9 @@ Opening preserves trigger focus. Escape closes and returns focus to the trigger;
 outside pointer presses and focus departure close without redirecting focus.
 The component emits a bubbling `navigation-disclosure-toggle` event with
 `detail.open`. The owning Header coordinates other disclosures and Search; it
-can close a disclosure by setting its native `open` property to `false`. Before
-hiding a navigation arrangement on resize, that owner must close it and place
-any affected focus on a visible control.
+can close a disclosure by setting its native `open` property to `false`. When a
+navigation arrangement changes on resize, that owner closes hidden menus and
+places any affected focus on a visible control.
 
 ## Projects menu
 
@@ -165,9 +168,9 @@ Pearl, and Pori. The current overview receives `aria-current="page"` and a label
 underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
-The Projects label is 20px with a 24px line height below 64rem and 16px with the
-same line height on desktop. Its decorative chevron is 12px. Rows retain the
-shared 12px spacing so adjacent hover and focus treatments remain separate.
+The Projects label is 20px with a 24px line height in the compact Header and 16px
+with the same line height on desktop. Its decorative chevron is 12px. Rows retain
+the shared 12px spacing so adjacent hover and focus treatments remain separate.
 Panel height follows these rows and their content, with scrolling handled by
 the disclosure. The containing header supplies `data-navigation-header` for
 placement below its full height.
@@ -175,9 +178,11 @@ placement below its full height.
 ## Site menu
 
 [SiteMenu.astro](src/components/navigation/SiteMenu.astro) uses the shared disclosure
-with end alignment. It lists Wiki, Blog, and About, then reads the social links
-from Starlight's `social` configuration. External rows retain the configured
-labels, icons, destinations, normal tab behavior, and `rel="me"`. Only an exact
+with end alignment. It lists Wiki, Blog, and About from
+[navigation.ts](src/data/navigation.ts), shared with the Header's inline links,
+then reads the social links from Starlight's `social` configuration. External rows
+retain the configured labels, icons, destinations, normal tab behavior, and
+`rel="me"`. Only an exact
 internal destination receives `aria-current="page"`, accepting either
 trailing-slash form.
 
@@ -189,9 +194,9 @@ icon and name also change without JavaScript. The shared trigger supplies the
 Rows use the ordinary 52px minimum height with 12px gaps for separate hover and
 focus treatments. One 1px boundary divider, with 12px space above and below,
 separates the internal and social groups. It is omitted when no social links are
-configured. The panel follows its content height. Header integration must control
-compact visibility, close the menu before hiding it, and move any affected focus
-to a visible counterpart when switching to the desktop arrangement.
+configured. The panel follows its content height. The Header controls compact
+visibility, closes the menu when switching to desktop, and moves any affected
+focus to a visible counterpart.
 
 ## Social links
 
@@ -206,8 +211,40 @@ The icons remain decorative alongside visually hidden labels. Header integration
 controls visibility: show this group with the full navigation and the Site menu's
 labeled social rows with the compact arrangement.
 
-The existing Header lets its title column shrink between 50rem and 64rem so the
-full-size icon targets remain inside the header on documentation pages.
+## Header
+
+[Header.astro](src/components/overrides/Header.astro) owns the primary navigation
+capsule and coordinates Projects, Site menu, and the existing Starlight Search
+dialog. Opening one closes the others. Search retains its provider, keyboard
+shortcut, and modal behavior; the planned inline search field is a separate unit.
+
+The compact capsule has a 4rem minimum height, 16px outer gutters, and 8px
+inner padding, increasing to 12px where space permits. Icon targets stay at least
+44px while text can grow. From a container width of 64rem, it shows the inline
+page and social links, uses a 5rem minimum height,
+and centers within a 73.5rem maximum width. The container query follows root text
+size so enlarged text keeps the compact arrangement longer. Controls can wrap
+without changing their reading order. The home mark retains Starlight's site
+title as its accessible name.
+
+The homepage header stays in normal document flow. Other pages retain Starlight's
+fixed frame; a resize observer supplies its measured height to `--sl-nav-height`
+so the content, table of contents, and sidebar remain below it. CSS supplies the
+initial offsets. Without JavaScript, the header stays in normal flow so native
+disclosures can expand without covering page content.
+
+[MobileMenuToggle.astro](src/components/overrides/MobileMenuToggle.astro) preserves
+Starlight's native documentation-sidebar popover control, with a visible
+Documentation label in its own row below the compact capsule. Its measured
+height reserves enough space when the label wraps. The sidebar becomes permanent
+at Starlight's existing 50rem breakpoint; this is independent of the site's
+64rem navigation breakpoint. Opening documentation navigation closes site menus,
+and opening a site menu or Search closes the compact documentation sidebar.
+
+When resizing hides a focused navigation control, the Header moves focus to its
+visible counterpart, the home link, or the relevant menu control. Opening Search
+from inside a menu first establishes its visible trigger as the return target.
+Appearance changes do not reset an open menu.
 
 ## Typography and icons
 

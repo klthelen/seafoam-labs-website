@@ -3,12 +3,8 @@ import config from "virtual:starlight/user-config";
 import { Icon } from "@astrojs/starlight/components";
 import MenuLink from "./MenuLink.astro";
 import NavigationDisclosure from "./NavigationDisclosure.astro";
+import { sitePages } from "../../data/navigation";
 
-const pages = [
-  { label: "Wiki", href: "/welcome/" },
-  { label: "Blog", href: "/blog/" },
-  { label: "About", href: "/about/" },
-];
 const socialLinks = config.social || [];
 const currentPath = Astro.url.pathname.endsWith("/")
   ? Astro.url.pathname
@@ -27,7 +23,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     </span>
   </Fragment>
   <ul class="site-links">
-    {pages.map(({ href, label }) => (
+    {sitePages.map(({ href, label }) => (
       <li>
         <MenuLink {href} {label} current={href === currentPath} />
       </li>

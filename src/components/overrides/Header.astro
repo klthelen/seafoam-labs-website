@@ -1,142 +1,414 @@
 ---
-// See https://github.com/withastro/starlight/blob/main/packages/starlight/components/Header.astro to get latest version
-
 import config from "virtual:starlight/user-config";
 import LanguageSelect from "virtual:starlight/components/LanguageSelect";
 import Search from "virtual:starlight/components/Search";
 import SiteTitle from "virtual:starlight/components/SiteTitle";
 import SocialIcons from "virtual:starlight/components/SocialIcons";
-import ThemeSelect from "virtual:starlight/components/ThemeSelect";
+import ProjectsMenu from "../navigation/ProjectsMenu.astro";
+import SiteMenu from "../navigation/SiteMenu.astro";
+import { sitePages } from "../../data/navigation";
 
-/**
- * Render the `Search` component if Pagefind is enabled or the default search component has been overridden.
- */
 const shouldRenderSearch =
   config.pagefind ||
   config.components.Search !== "@astrojs/starlight/components/Search.astro";
-
-const pages = [
-  {
-    title: "Devario",
-    href: "/devario/overview/",
-  },
-  {
-    title: "Wiki",
-    href: "/welcome/",
-  },
-  {
-    title: "Blog",
-    href: "/blog/",
-  },
-  {
-    title: "About",
-    href: "/about/",
-  },
-];
+const { hasSidebar } = Astro.locals.starlightRoute;
+const isHomepage = Astro.url.pathname === "/";
+const currentPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
 ---
 
-<div class="header">
-  <div class="title-wrapper sl-flex">
+<div class="header-content" data-docs={hasSidebar ? "" : undefined}>
+  <nav
+    class="site-header"
+    data-navigation-header
+    data-homepage={isHomepage ? "" : undefined}
+    aria-label="Primary"
+  >
     <SiteTitle />
-  </div>
-  <div class="sl-flex print:hidden">
-    <div class="flex items-center gap-6 sm:gap-8">
-      <nav class="inline-flex gap-7 max-[28rem]:hidden">
-        {pages.map((page) => (
-          <a
-            class="text-base font-semibold text-(--sl-color-text) no-underline hover:text-(--sl-color-text-accent)"
-            href={page.href}
-          >
-            {page.title}
-          </a>
-        ))}
-      </nav>
-      {shouldRenderSearch && <Search />}
+    <ProjectsMenu />
+    <div class="page-links" data-desktop-navigation>
+      {sitePages.map(({ href, label }) => (
+        <a
+          class="sf-nav-link"
+          {href}
+          aria-current={href === currentPath ? "page" : undefined}
+        >
+          {label}
+        </a>
+      ))}
     </div>
-  </div>
-  <div class="sl-hidden md:sl-flex right-group print:hidden">
-    <div class="sl-flex social-icons">
+    {shouldRenderSearch && (
+      <div class="header-search">
+        <Search />
+      </div>
+    )}
+    <div class="header-socials" data-desktop-navigation>
       <SocialIcons />
     </div>
-    <ThemeSelect />
-    <LanguageSelect />
-  </div>
+    <div class="site-menu">
+      <SiteMenu />
+    </div>
+    {config.isMultilingual && <LanguageSelect />}
+  </nav>
 </div>
 
+<script>
+  for (const header of document.querySelectorAll<HTMLElement>(".site-header")) {
+    const frame = header.closest<HTMLElement>(".page > .header");
+    const siteMenu = header.querySelector<HTMLElement>(".site-menu");
+    const siteDisclosure = siteMenu?.querySelector("details");
+    const siteTrigger = siteDisclosure?.querySelector("summary");
+    const homeLink = header.querySelector<HTMLAnchorElement>(".site-title");
+    if (!frame || !siteMenu || !siteDisclosure || !siteTrigger || !homeLink)
+      continue;
+
+    const disclosures = header.querySelectorAll<HTMLDetailsElement>(
+      ".navigation-disclosure",
+    );
+    const desktopGroups = header.querySelectorAll<HTMLElement>(
+      "[data-desktop-navigation]",
+    );
+    const searchButton = header.querySelector<HTMLButtonElement>(
+      "button[data-open-modal]",
+    );
+    const searchDialog =
+      header.querySelector<HTMLDialogElement>("site-search dialog");
+    const sidebar = document.getElementById("starlight__sidebar");
+    const docsButton =
+      document.querySelector<HTMLButtonElement>(".docs-menu-toggle");
+
+    const closeDisclosures = (except?: HTMLDetailsElement) => {
+      for (const disclosure of disclosures) {
+        if (disclosure !== except) disclosure.open = false;
+      }
+    };
+
+    header.addEventListener("navigation-disclosure-toggle", (event) => {
+      const disclosure = event.target;
+      if (!(disclosure instanceof HTMLDetailsElement) || !disclosure.open)
+        return;
+      closeDisclosures(disclosure);
+      searchDialog?.close();
+      if (sidebar?.matches(":popover-open")) sidebar.hidePopover();
+    });
+
+    searchDialog?.addEventListener("beforetoggle", (event) => {
+      if (event.newState !== "open") return;
+      const focused = document.activeElement;
+      if (
+        [...disclosures].some((disclosure) => disclosure.contains(focused)) ||
+        sidebar?.contains(focused)
+      ) {
+        searchButton?.focus();
+      }
+      closeDisclosures();
+      if (sidebar?.matches(":popover-open")) sidebar.hidePopover();
+    });
+
+    sidebar?.addEventListener("beforetoggle", (event) => {
+      if (event.newState !== "open") return;
+      if (
+        [...disclosures].some((disclosure) =>
+          disclosure.contains(document.activeElement),
+        )
+      )
+        docsButton?.focus();
+      closeDisclosures();
+    });
+
+    const focusDesktopCounterpart = (focused: Element | null) => {
+      const destination = focused?.closest("a")?.href;
+      const counterpart = [
+        ...header.querySelectorAll<HTMLAnchorElement>(
+          "[data-desktop-navigation] a",
+        ),
+      ].find((link) => link.href === destination);
+      (counterpart ?? homeLink).focus();
+    };
+
+    // CSS can hide a focused control before ResizeObserver runs.
+    document.addEventListener("focusout", (event) => {
+      const focused = event.target;
+      if (!(focused instanceof HTMLElement) || focused.checkVisibility())
+        return;
+
+      if (siteMenu.contains(focused) && !siteMenu.checkVisibility()) {
+        focusDesktopCounterpart(focused);
+      } else if ([...desktopGroups].some((group) => group.contains(focused))) {
+        siteTrigger.focus();
+      } else if (focused === docsButton) {
+        const sidebarLink =
+          sidebar?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ??
+          sidebar?.querySelector("a");
+        sidebarLink?.focus();
+      } else if (sidebar?.contains(focused) && !sidebar.checkVisibility()) {
+        docsButton?.focus();
+      }
+    });
+
+    let desktop =
+      getComputedStyle(header)
+        .getPropertyValue("--sf-navigation-layout")
+        .trim() === "desktop";
+    const updateHeader = () => {
+      const nextDesktop =
+        getComputedStyle(header)
+          .getPropertyValue("--sf-navigation-layout")
+          .trim() === "desktop";
+      if (desktop !== nextDesktop) {
+        const focused = document.activeElement;
+        if (nextDesktop) {
+          const moveFocus = siteMenu.contains(focused);
+          siteDisclosure.open = false;
+          if (moveFocus) focusDesktopCounterpart(focused);
+        } else if (
+          [...desktopGroups].some((group) => group.contains(focused))
+        ) {
+          siteTrigger.focus();
+        }
+        desktop = nextDesktop;
+      }
+      if (!header.hasAttribute("data-homepage")) {
+        if (docsButton?.checkVisibility()) {
+          document.documentElement.style.setProperty(
+            "--sf-docs-control-height",
+            docsButton.getBoundingClientRect().height + "px",
+          );
+        }
+        document.documentElement.style.setProperty(
+          "--sl-nav-height",
+          frame.getBoundingClientRect().height + "px",
+        );
+      }
+    };
+
+    // Apply measured spacing after resize delivery; it can change the frame's size.
+    const headerResize = new ResizeObserver(() => {
+      requestAnimationFrame(updateHeader);
+    });
+    headerResize.observe(frame, { box: "border-box" });
+    if (docsButton) headerResize.observe(docsButton, { box: "border-box" });
+    updateHeader();
+  }
+</script>
+
 <style>
-  @layer starlight.core {
-    .header {
-      display: flex;
-      gap: var(--sl-nav-gap);
-      justify-content: space-between;
-      align-items: center;
-      height: 100%;
+  .header-content {
+    padding: calc(16px + env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right)) 16px
+      max(16px, env(safe-area-inset-left));
+  }
+
+  .site-header {
+    --sf-navigation-layout: compact;
+    --sf-navigation-gutter: 16px;
+    --sf-projects-label-size: 1.25rem;
+
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-inline-size: 73.5rem;
+    min-block-size: 4rem;
+    margin-inline: auto;
+    padding: 8px;
+    border-radius: 999px;
+    background: var(--sf-surface);
+    color: var(--sf-text);
+  }
+
+  .site-header :global(.site-title) {
+    box-sizing: border-box;
+    flex: none;
+    justify-content: center;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: 4px;
+    border-radius: 999px;
+  }
+
+  .site-header :global(.site-title img) {
+    inline-size: 32px;
+    block-size: 32px;
+  }
+
+  .site-header :global(.site-title:focus-visible) {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+  }
+
+  .site-header :global(.disclosure-trigger) {
+    gap: 8px;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: 8px;
+  }
+
+  .site-header :global(.disclosure-trigger > svg) {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+
+  .page-links,
+  .header-socials {
+    display: none;
+    align-items: center;
+  }
+
+  .page-links {
+    gap: 1.5rem;
+  }
+
+  .page-links a {
+    padding-inline: 0;
+    font-weight: 600;
+  }
+
+  .header-search {
+    margin-inline-start: auto;
+  }
+
+  .header-search :global(button[data-open-modal]) {
+    box-sizing: border-box;
+    justify-content: center;
+    inline-size: 44px;
+    min-block-size: 44px;
+    block-size: auto;
+    padding: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sf-text);
+  }
+
+  .header-search :global(button[data-open-modal] > :is(span, kbd)) {
+    display: none;
+  }
+
+  .header-search :global(button[data-open-modal] > svg) {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  .header-search :global(button[data-open-modal]:hover) {
+    color: var(--sf-link);
+  }
+
+  .header-search :global(button[data-open-modal]:focus-visible) {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+  }
+
+  .header-socials {
+    gap: 1rem;
+  }
+
+  .header-socials::before {
+    content: "";
+    inline-size: 1px;
+    block-size: 1.5rem;
+    background: var(--sf-boundary);
+  }
+
+  .site-menu {
+    min-inline-size: 0;
+  }
+
+  .site-menu :global(svg) {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  @media (width < 50rem) {
+    .header-content[data-docs] {
+      padding-block-end: calc(var(--sf-docs-control-height, 44px) + 24px);
+    }
+  }
+
+  @container site-navigation (min-width: 24rem) {
+    .site-header {
+      padding-inline: 12px;
+    }
+  }
+
+  @container site-navigation (min-width: 64rem) {
+    .header-content {
+      padding: calc(24px + env(safe-area-inset-top))
+        max(24px, env(safe-area-inset-right)) 24px
+        max(24px, env(safe-area-inset-left));
     }
 
-    .title-wrapper {
-      /* Prevent long titles overflowing and covering the search and menu buttons on narrow viewports. */
-      overflow: clip;
-      /* Avoid clipping focus ring around link inside title wrapper. */
-      padding: 0.25rem;
-      margin: -0.25rem;
-      min-width: 0;
-    }
+    .site-header {
+      --sf-navigation-layout: desktop;
+      --sf-navigation-gutter: 24px;
+      --sf-projects-label-size: 1rem;
 
-    .right-group,
-    .social-icons {
       gap: 1rem;
-      align-items: center;
-    }
-    .social-icons::after {
-      content: "";
-      height: 2rem;
-      border-inline-end: 1px solid var(--sl-color-gray-5);
+      min-block-size: 5rem;
+      padding-inline: 1.5rem;
     }
 
-    @media (min-width: 50rem) {
-      :global(:root[data-has-sidebar]) {
-        --__sidebar-pad: calc(2 * var(--sl-nav-pad-x));
-      }
-      :global(:root:not([data-has-toc])) {
-        --__toc-width: 0rem;
-      }
-      .header {
-        --__sidebar-width: max(
-          0rem,
-          var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x)
-        );
-        --__main-column-fr: calc(
-          (
-              100% + var(--__sidebar-pad, 0rem) -
-                var(--__toc-width, var(--sl-sidebar-width)) -
-                (2 * var(--__toc-width, var(--sl-nav-pad-x))) -
-                var(--sl-content-inline-start, 0rem) - var(--sl-content-width)
-            ) /
-            2
-        );
-        display: grid;
-        grid-template-columns:
-          minmax(
-            /* 1 (site title): runs up until the main content column’s left edge or the width of the title, whichever is the largest  */
-              calc(
-                var(--__sidebar-width) +
-                  max(0rem, var(--__main-column-fr) - var(--sl-nav-gap))
-              ),
-            auto
-          )
-          /* 2 (search box): all free space that is available. */
-          1fr
-          /* 3 (right items): use the space that these need. */
-          auto;
-        align-content: center;
-      }
+    .site-header :global(.site-title img) {
+      inline-size: 36px;
+      block-size: 36px;
     }
 
-    @media (50rem <= width < 64rem) {
-      .header {
-        /* Leave room for the full-size controls before the title can align with the sidebar. */
-        grid-template-columns: minmax(0, 1fr) auto auto;
-      }
+    .page-links,
+    .header-socials {
+      display: flex;
+    }
+
+    .site-menu {
+      display: none;
+    }
+  }
+
+  :global(:root) {
+    --sl-nav-height: calc(6rem + env(safe-area-inset-top));
+  }
+
+  :global(.page > .header) {
+    container: site-navigation / inline-size;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: var(--sf-canvas);
+  }
+
+  :global(.page > .header:has(.site-header[data-homepage])) {
+    position: static;
+    background: transparent;
+  }
+
+  :global(.page:has(.site-header[data-homepage]) > .main-frame) {
+    padding-top: 0;
+  }
+
+  @media (width < 50rem) {
+    :global(:root[data-has-sidebar]) {
+      --sl-nav-height: calc(9.25rem + env(safe-area-inset-top));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    :global(:root) {
+      --sl-nav-height: calc(8rem + env(safe-area-inset-top));
+    }
+  }
+
+  @media (scripting: none) {
+    :global(.page > .header) {
+      position: static;
+    }
+
+    :global(.main-frame) {
+      padding-top: var(--sl-mobile-toc-height);
+    }
+
+    .header-content[data-docs] {
+      padding-block-end: 0;
     }
   }
 </style>
