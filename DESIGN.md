@@ -156,6 +156,22 @@ can close a disclosure by setting its native `open` property to `false`. Before
 hiding a navigation arrangement on resize, that owner must close it and place
 any affected focus on a visible control.
 
+## Projects menu
+
+[ProjectsMenu.astro](src/components/navigation/ProjectsMenu.astro) combines the
+shared disclosure and menu links. It owns the six project labels, descriptions,
+and overview destinations in this order: Devario, Shelly ALPM, Starfish, Aqueous,
+Pearl, and Pori. The current overview receives `aria-current="page"` and a label
+underline. Matching accepts either trailing-slash form; other pages, including
+documentation within a project, do not mark an overview as the current page.
+
+The Projects label is 20px with a 24px line height below 64rem and 16px with the
+same line height on desktop. Its decorative chevron is 12px. Rows retain the
+shared 12px spacing so adjacent hover and focus treatments remain separate.
+Panel height follows these rows and their content, with scrolling handled by
+the disclosure. The containing header supplies `data-navigation-header` for
+placement below its full height.
+
 ## Typography and icons
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.

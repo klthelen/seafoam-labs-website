@@ -1,0 +1,77 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+import MenuLink from "./MenuLink.astro";
+import NavigationDisclosure from "./NavigationDisclosure.astro";
+
+const projects = [
+  {
+    label: "Devario",
+    description: "Linux desktop",
+    href: "/devario/overview/",
+  },
+  {
+    label: "Shelly ALPM",
+    description: "Visual package manager",
+    href: "/shelly-alpm/overview/",
+  },
+  {
+    label: "Starfish",
+    description: "Package dependency viewer",
+    href: "/starfish/overview/",
+  },
+  {
+    label: "Aqueous",
+    description: "Wayland compositor",
+    href: "/aqueous/overview/",
+  },
+  {
+    label: "Pearl",
+    description: "Desktop shell for Aqueous",
+    href: "/pearl/overview/",
+  },
+  {
+    label: "Pori",
+    description: "Persistent Linux mounts",
+    href: "/pori/overview/",
+  },
+];
+
+const currentPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+---
+
+<NavigationDisclosure>
+  <Fragment slot="trigger">
+    <span class="projects-label">Projects</span>
+    <Icon name="down-caret" size="0.75rem" />
+  </Fragment>
+  <ul class="projects-list">
+    {projects.map(({ href, label, description }) => (
+      <li>
+        <MenuLink {href} {label} {description} current={href === currentPath} />
+      </li>
+    ))}
+  </ul>
+</NavigationDisclosure>
+
+<style>
+  .projects-label {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+  }
+
+  .projects-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 64rem) {
+    .projects-label {
+      font-size: 1rem;
+    }
+  }
+</style>
