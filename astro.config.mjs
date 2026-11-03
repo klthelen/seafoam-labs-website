@@ -205,6 +205,7 @@ export default defineConfig({
         ThemeProvider: "./src/components/overrides/ThemeProvider.astro",
         ThemeSelect: "./src/components/overrides/ThemeSelect.astro",
         Header: "./src/components/overrides/Header.astro",
+        Search: "./src/components/overrides/Search.astro",
         MobileMenuToggle: "./src/components/overrides/MobileMenuToggle.astro",
         Sidebar: "./src/components/overrides/Sidebar.astro",
         PageTitle: "./src/components/overrides/PageTitle.astro",

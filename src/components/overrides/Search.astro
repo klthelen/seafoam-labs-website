@@ -1,0 +1,431 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+import config from "virtual:starlight/user-config";
+import project from "virtual:starlight/project-context";
+
+const label = Astro.locals.t("search.label");
+const placeholder = Astro.locals.starlightRoute.lang.startsWith("en")
+  ? "Search the site"
+  : label;
+const translations = {
+  ...Object.fromEntries(
+    Object.entries(Astro.locals.t.all())
+      .filter(([key]) => key.startsWith("pagefind."))
+      .map(([key, value]) => [key.replace("pagefind.", ""), value]),
+  ),
+  placeholder,
+};
+const bundlePath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/pagefind/`;
+const pagefindConfig =
+  typeof config.pagefind === "object" ? config.pagefind : {};
+---
+
+{import.meta.env.PROD && (
+  <link rel="stylesheet" href={`${bundlePath}pagefind-ui.css`} />
+)}
+<site-search
+  data-bundle-path={bundlePath}
+  data-translations={JSON.stringify(translations)}
+  data-config={JSON.stringify(pagefindConfig)}
+  data-strip-trailing-slash={project.trailingSlash === "never" ? "" : undefined}
+>
+  <button
+    class="sf-icon-control"
+    data-search-open
+    aria-label={label}
+    aria-expanded="false"
+    aria-controls="site-search-interface"
+    aria-keyshortcuts="Control+K Meta+K"
+    hidden
+  >
+    <Icon name="magnifier" />
+  </button>
+  <div class="search-interface" id="site-search-interface" hidden>
+    <label for="site-search-input" class="sr-only">
+      {label}
+    </label>
+    <div id="starlight__search">
+      {import.meta.env.DEV && (
+        <input id="site-search-input" {placeholder} readonly />
+      )}
+    </div>
+    <button
+      class="sf-icon-control"
+      data-search-close
+      aria-label={Astro.locals.t("search.cancelLabel")}
+    >
+      <Icon name="close" />
+    </button>
+    <p class="search-feedback" hidden>
+      {import.meta.env.DEV && Astro.locals.t("search.devWarning")}
+    </p>
+  </div>
+  <p class="sr-only" role="status" aria-atomic="true"></p>
+</site-search>
+
+<script>
+  declare global {
+    interface Window {
+      PagefindUI: new (options: Record<string, unknown>) => unknown;
+    }
+  }
+
+  class SiteSearch extends HTMLElement {
+    connectedCallback() {
+      const openButton =
+        this.querySelector<HTMLButtonElement>("[data-search-open]");
+      const closeButton = this.querySelector<HTMLButtonElement>(
+        "[data-search-close]",
+      );
+      const searchInterface =
+        this.querySelector<HTMLElement>(".search-interface");
+      const container = this.querySelector<HTMLElement>("#starlight__search");
+      const feedback = this.querySelector<HTMLElement>(".search-feedback");
+      const status = this.querySelector<HTMLElement>("[role='status']");
+      if (
+        !openButton ||
+        !closeButton ||
+        !searchInterface ||
+        !container ||
+        !feedback ||
+        !status
+      )
+        return;
+
+      let ready = import.meta.env.DEV;
+      let loading = false;
+      let drawer: HTMLElement | null = null;
+      const positionResults = () => {
+        if (!this.hasAttribute("data-open")) return;
+        const viewport = window.visualViewport;
+        const viewportTop = viewport?.offsetTop ?? 0;
+        const viewportLeft = viewport?.offsetLeft ?? 0;
+        const width = viewport?.width ?? innerWidth;
+        const height = viewport?.height ?? innerHeight;
+        const bounds = searchInterface.getBoundingClientRect();
+        const top = Math.max(bounds.bottom + 8, viewportTop + 8);
+        const panelWidth = Math.min(640, width - 32);
+        const left = Math.max(
+          viewportLeft + 16,
+          Math.min(bounds.left, viewportLeft + width - panelWidth - 16),
+        );
+        this.style.setProperty("--search-top", `${top}px`);
+        this.style.setProperty("--search-left", `${left}px`);
+        this.style.setProperty("--search-width", `${panelWidth}px`);
+        this.style.setProperty(
+          "--search-height",
+          `${Math.max(0, viewportTop + height - top - 8)}px`,
+        );
+      };
+
+      const close = (restoreFocus = false) => {
+        if (!this.hasAttribute("data-open")) return;
+        this.removeAttribute("data-open");
+        searchInterface.hidden = true;
+        openButton.hidden = false;
+        openButton.setAttribute("aria-expanded", "false");
+        drawer?.hidePopover();
+        this.dispatchEvent(new Event("site-search-close", { bubbles: true }));
+        if (restoreFocus) openButton.focus();
+      };
+
+      const updateResults = () => {
+        if (!drawer) return;
+        if (
+          this.hasAttribute("data-open") &&
+          !drawer.classList.contains("pagefind-ui__hidden")
+        ) {
+          drawer.showPopover();
+          positionResults();
+        } else {
+          drawer.hidePopover();
+        }
+        const message =
+          drawer.querySelector(".pagefind-ui__message")?.textContent ?? "";
+        if (status.textContent !== message) status.textContent = message;
+      };
+
+      const initialize = async () => {
+        if (ready || loading) return;
+        loading = true;
+        feedback.hidden = false;
+        feedback.textContent = "Loading search…";
+        status.textContent = feedback.textContent;
+        try {
+          // Starlight writes these assets with the index. Reuse its installed Pagefind version.
+          const bundlePath = this.dataset.bundlePath;
+          const pagefind: { init: () => Promise<void> } = await import(
+            /* @vite-ignore */ `${bundlePath}pagefind.js`
+          );
+          await pagefind.init();
+          await import(/* @vite-ignore */ `${bundlePath}pagefind-ui.js`);
+          const stripTrailingSlash = this.hasAttribute(
+            "data-strip-trailing-slash",
+          );
+          new window.PagefindUI({
+            ...JSON.parse(this.dataset.config ?? "{}"),
+            element: container,
+            baseUrl: import.meta.env.BASE_URL,
+            bundlePath,
+            showImages: false,
+            showSubResults: true,
+            translations: JSON.parse(this.dataset.translations ?? "{}"),
+            processResult: (result: {
+              url: string;
+              sub_results: { url: string }[];
+            }) => {
+              if (stripTrailingSlash) {
+                result.url = result.url.replace(/(.)\/(#.*)?$/, "$1$2");
+                for (const subResult of result.sub_results) {
+                  subResult.url = subResult.url.replace(/(.)\/(#.*)?$/, "$1$2");
+                }
+              }
+            },
+          });
+          const input = container.querySelector("input");
+          if (input) input.id = "site-search-input";
+          drawer = container.querySelector<HTMLElement>(".pagefind-ui__drawer");
+          if (drawer) {
+            drawer.popover = "manual";
+            new MutationObserver(updateResults).observe(drawer, {
+              attributes: true,
+              attributeFilter: ["class"],
+              childList: true,
+              subtree: true,
+              characterData: true,
+            });
+          }
+          ready = true;
+          feedback.hidden = true;
+          status.textContent = "";
+          if (
+            this.hasAttribute("data-open") &&
+            document.activeElement === closeButton
+          )
+            input?.focus();
+        } catch (error) {
+          feedback.textContent =
+            "Search could not load. Close and reopen Search to try again.";
+          status.textContent = feedback.textContent;
+          console.error("Unable to initialize site search.", error);
+        } finally {
+          loading = false;
+        }
+      };
+
+      const open = () => {
+        this.setAttribute("data-open", "");
+        openButton.hidden = true;
+        openButton.setAttribute("aria-expanded", "true");
+        searchInterface.hidden = false;
+        this.dispatchEvent(new Event("site-search-open", { bubbles: true }));
+        searchInterface.scrollIntoView({ block: "nearest" });
+        positionResults();
+        (container.querySelector("input") ?? closeButton).focus();
+        if (import.meta.env.DEV) feedback.hidden = false;
+        updateResults();
+        void initialize();
+      };
+
+      openButton.addEventListener("click", open);
+      closeButton.addEventListener("click", () => close(true));
+      this.addEventListener("site-search-dismiss", () => close());
+      this.addEventListener(
+        "keydown",
+        (event) => {
+          if (event.key !== "Escape" || !this.hasAttribute("data-open")) return;
+          event.preventDefault();
+          event.stopPropagation();
+          close(true);
+        },
+        true,
+      );
+      document.addEventListener("keydown", (event) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === "k"
+        ) {
+          event.preventDefault();
+          if (this.hasAttribute("data-open")) close(true);
+          else open();
+        }
+      });
+      document.addEventListener("pointerdown", (event) => {
+        if (event.target instanceof Node && !this.contains(event.target))
+          close();
+      });
+      this.addEventListener("focusout", (event) => {
+        if (
+          event.relatedTarget instanceof Node &&
+          !this.contains(event.relatedTarget)
+        )
+          close();
+      });
+      this.addEventListener("click", (event) => {
+        if (
+          event.target instanceof Element &&
+          event.target.closest(".pagefind-ui__search-clear")
+        )
+          container.querySelector("input")?.focus();
+      });
+      window.addEventListener("resize", positionResults);
+      window.addEventListener("scroll", positionResults, { passive: true });
+      window.visualViewport?.addEventListener("resize", positionResults);
+      window.visualViewport?.addEventListener("scroll", positionResults);
+      new ResizeObserver(positionResults).observe(searchInterface);
+      openButton.hidden = false;
+    }
+  }
+
+  customElements.define("site-search", SiteSearch);
+</script>
+
+<style>
+  site-search {
+    display: block;
+    min-width: 0;
+  }
+  [hidden] {
+    display: none;
+  }
+  .search-interface:not([hidden]) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  #starlight__search {
+    flex: 1;
+    min-width: 0;
+  }
+  .search-interface > button {
+    flex: none;
+  }
+  .search-feedback {
+    position: fixed;
+    inset: var(--search-top) auto auto var(--search-left);
+    width: var(--search-width);
+    max-height: var(--search-height);
+    margin: 0;
+    padding: 16px;
+    overflow: auto;
+    border: 1.5px solid var(--sf-boundary);
+    border-radius: 24px;
+    background: var(--sf-surface);
+    color: var(--sf-text);
+    white-space: pre-line;
+  }
+</style>
+
+<style is:global>
+  #starlight__search {
+    --pagefind-ui-scale: 1;
+    --pagefind-ui-text: var(--sf-text);
+    --pagefind-ui-primary: var(--sf-link);
+    --pagefind-ui-background: var(--sf-canvas);
+    --pagefind-ui-border: var(--sf-boundary);
+    --pagefind-ui-font: var(--sl-font);
+  }
+  #starlight__search input {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 1.5px solid var(--sf-boundary);
+    border-radius: 999px;
+    background: var(--sf-canvas);
+    color: var(--sf-text);
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  #starlight__search input:focus {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: -2px;
+  }
+  #starlight__search input::placeholder {
+    color: var(--sf-text-muted);
+    opacity: 1;
+  }
+  #starlight__search .pagefind-ui__form::before {
+    display: none;
+  }
+  #starlight__search .pagefind-ui__search-clear {
+    top: 2px;
+    right: 4px;
+    height: calc(100% - 4px);
+    min-width: 44px;
+    max-width: 50%;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.875rem;
+  }
+  #starlight__search .pagefind-ui__search-clear.pagefind-ui__suppressed {
+    visibility: hidden;
+  }
+  #starlight__search .pagefind-ui__drawer {
+    position: fixed;
+    inset: var(--search-top) auto auto var(--search-left);
+    box-sizing: border-box;
+    width: var(--search-width);
+    max-width: none;
+    max-height: var(--search-height);
+    margin: 0;
+    padding: 16px;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scroll-padding: 8px;
+    border: 1.5px solid var(--sf-boundary);
+    border-radius: 24px;
+    background: var(--sf-surface);
+    color: var(--sf-text);
+  }
+  #starlight__search .pagefind-ui__drawer:not(:popover-open) {
+    display: none;
+  }
+  #starlight__search .pagefind-ui__results-area {
+    min-width: 0;
+    margin-top: 0;
+  }
+  #starlight__search .pagefind-ui__message {
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  #starlight__search .pagefind-ui__result {
+    padding: 16px 0;
+    border: 0;
+  }
+  #starlight__search .pagefind-ui__result-inner {
+    min-width: 0;
+    margin-top: 0;
+  }
+  #starlight__search .pagefind-ui__result-nested {
+    padding-left: 16px;
+  }
+  #starlight__search .pagefind-ui__result-nested::before {
+    display: none;
+  }
+  #starlight__search .pagefind-ui__result-link {
+    display: inline-block;
+    color: var(--sf-link);
+    font-size: 1rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  #starlight__search .pagefind-ui__result-excerpt {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  #starlight__search .pagefind-ui__button {
+    min-height: 44px;
+    border-radius: 999px;
+  }
+  #starlight__search :is(a, button):focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 2px;
+  }
+</style>
