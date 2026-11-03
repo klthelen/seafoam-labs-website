@@ -131,5 +131,12 @@ const pages = [
         align-content: center;
       }
     }
+
+    @media (50rem <= width < 64rem) {
+      .header {
+        /* Leave room for the full-size controls before the title can align with the sidebar. */
+        grid-template-columns: minmax(0, 1fr) auto auto;
+      }
+    }
   }
 </style>

@@ -193,6 +193,22 @@ configured. The panel follows its content height. Header integration must contro
 compact visibility, close the menu before hiding it, and move any affected focus
 to a visible counterpart when switching to the desktop arrangement.
 
+## Social links
+
+[SocialIcons.astro](src/components/overrides/SocialIcons.astro) renders the
+configured social links as 20px icons in targets of at least 44px, with 4px gaps.
+Each link retains its configured accessible name, destination, and `rel="me"`,
+using normal browser navigation. The group can wrap when space is limited.
+
+The links reuse `sf-nav-link` for their neutral text color and shared focus
+outline. Hover and press use the link color without adding a filled background.
+The icons remain decorative alongside visually hidden labels. Header integration
+controls visibility: show this group with the full navigation and the Site menu's
+labeled social rows with the compact arrangement.
+
+The existing Header lets its title column shrink between 50rem and 64rem so the
+full-size icon targets remain inside the header on documentation pages.
+
 ## Typography and icons
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.

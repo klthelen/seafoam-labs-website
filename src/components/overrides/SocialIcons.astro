@@ -6,25 +6,34 @@ const links = config.social || [];
 ---
 
 {links.length > 0 && (
-  <>
+  <div class="social-links">
     {links.map(({ label, href, icon }) => (
-      <a {href} rel="me" class="sl-flex">
+      <a {href} rel="me" class="social-link sf-nav-link">
         <span class="sr-only">{label}</span>
-        <Icon class="size-5" name={icon} />
+        <Icon name={icon} size="1.25rem" />
       </a>
     ))}
-  </>
+  </div>
 )}
 
 <style>
-  @layer starlight.core {
-    a {
-      color: var(--sl-color-text-accent);
-      padding: 0.5em;
-      margin: -0.5em;
-    }
-    a:hover {
-      color: var(--sl-color-white);
-    }
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .social-link {
+    box-sizing: border-box;
+    justify-content: center;
+    min-inline-size: 2.75rem;
+    padding: 0.5rem;
+    border-radius: 999px;
+  }
+
+  .social-link:hover,
+  .social-link:active {
+    color: var(--sf-link);
+    text-decoration: none;
   }
 </style>
