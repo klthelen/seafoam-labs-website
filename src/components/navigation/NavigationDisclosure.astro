@@ -48,10 +48,15 @@ const { align = "start" } = Astro.props;
       const anchorBounds = alignToTrigger
         ? trigger.getBoundingClientRect()
         : headerBounds;
-      const top = Math.max(headerBounds.bottom + 12, viewportTop + gutter);
+      let top = Math.max(headerBounds.bottom + 12, viewportTop + gutter);
+      // A short viewport needs room for readable rows, even when the capsule wraps.
+      const useViewport = viewportTop + viewportHeight - top - gutter < 240;
+      const verticalGutter = useViewport ? 8 : gutter;
+      if (useViewport) top = viewportTop + verticalGutter;
+      panel.toggleAttribute("data-viewport-panel", useViewport);
 
       panel.style.maxWidth = `${viewportWidth - gutter * 2}px`;
-      panel.style.maxHeight = `${Math.max(0, viewportTop + viewportHeight - top - gutter)}px`;
+      panel.style.maxHeight = `${Math.max(0, viewportTop + viewportHeight - top - verticalGutter)}px`;
       const panelWidth = panel.getBoundingClientRect().width;
       let left = anchorBounds.left;
       if (disclosure.dataset.align === "end") {
@@ -62,6 +67,9 @@ const { align = "start" } = Astro.props;
         Math.min(left, viewportLeft + viewportWidth - panelWidth - gutter),
       )}px`;
       panel.style.top = `${top}px`;
+      if (top < headerBounds.bottom && document.activeElement === trigger) {
+        panel.querySelector("a")?.focus();
+      }
     };
 
     const updateDisclosure = () => {
@@ -186,6 +194,12 @@ const { align = "start" } = Astro.props;
     overflow-y: auto;
     overscroll-behavior: contain;
     scroll-padding-block: 1rem;
+  }
+
+  .disclosure-panel[data-viewport-panel] {
+    padding: 8px;
+    border-radius: 24px;
+    scroll-padding-block: 8px;
   }
 
   @media (min-width: 64rem) {

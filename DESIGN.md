@@ -151,6 +151,11 @@ visible space. With JavaScript, a manual popover places it above surrounding
 content without a backdrop or layout shift. Without the enhancement, the same
 links expand in normal document flow through native `details`.
 
+When fewer than 240px remain below the capsule, the popup uses the viewport's
+height with 8px vertical gutters and inner padding. Text and link targets retain
+their size. If this covers the focused trigger, focus moves to the first link;
+Escape still closes the popup and returns focus to its trigger.
+
 Opening preserves trigger focus. Escape closes and returns focus to the trigger;
 outside pointer presses and focus departure close without redirecting focus.
 The component emits a bubbling `navigation-disclosure-toggle` event with
@@ -245,6 +250,14 @@ When resizing hides a focused navigation control, the Header moves focus to its
 visible counterpart, the home link, or the relevant menu control. Opening Search
 from inside a menu first establishes its visible trigger as the return target.
 Appearance changes do not reset an open menu.
+
+At viewport heights of 32rem or less, the header and mobile table of contents
+scroll with the article. Skip links use a small reading offset instead of the
+fixed-header offset. The permanent documentation sidebar occupies its own grid
+column and scrolls within the viewport. Compact documentation navigation fills
+the viewport, with a native Close documentation button supplied by
+[Sidebar.astro](src/components/overrides/Sidebar.astro). That override retains
+Starlight's sidebar content, state persistence, and navigation behavior.
 
 ## Typography and icons
 

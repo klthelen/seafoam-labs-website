@@ -63,6 +63,12 @@ import { Icon } from "@astrojs/starlight/components";
       margin: 8px 16px 16px;
     }
   }
+
+  @media (max-height: 32rem) and (scripting: enabled) {
+    .docs-menu-toggle {
+      position: absolute;
+    }
+  }
 </style>
 
 <style is:global>

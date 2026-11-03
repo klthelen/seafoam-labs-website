@@ -75,6 +75,8 @@ const currentPath = Astro.url.pathname.endsWith("/")
     const searchDialog =
       header.querySelector<HTMLDialogElement>("site-search dialog");
     const sidebar = document.getElementById("starlight__sidebar");
+    const sidebarClose =
+      sidebar?.querySelector<HTMLButtonElement>(".sidebar-close");
     const docsButton =
       document.querySelector<HTMLButtonElement>(".docs-menu-toggle");
 
@@ -137,7 +139,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
         focusDesktopCounterpart(focused);
       } else if ([...desktopGroups].some((group) => group.contains(focused))) {
         siteTrigger.focus();
-      } else if (focused === docsButton) {
+      } else if (focused === docsButton || focused === sidebarClose) {
         const sidebarLink =
           sidebar?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ??
           sidebar?.querySelector("a");
@@ -409,6 +411,72 @@ const currentPath = Astro.url.pathname.endsWith("/")
 
     .header-content[data-docs] {
       padding-block-end: 0;
+    }
+  }
+
+  @media (max-height: 32rem) {
+    :global(.page > .header) {
+      position: static;
+    }
+
+    :global(.page > .main-frame) {
+      padding-top: 0;
+    }
+
+    :global(:root[data-has-sidebar]) {
+      scroll-padding-top: 1.5rem;
+    }
+
+    :global(mobile-starlight-toc nav) {
+      position: static;
+    }
+
+    :global(mobile-starlight-toc .dropdown) {
+      max-height: none;
+    }
+
+    :global(.page > .sidebar .sidebar-pane) {
+      inset-block: 0;
+      scroll-padding-block: 50px 8px;
+    }
+
+    :global(.right-sidebar) {
+      position: sticky;
+      top: 0;
+      height: auto;
+      max-height: 100svh;
+      padding-top: 0;
+    }
+
+    @media (min-width: 50rem) {
+      :global(.page:has(.header-content[data-docs])) {
+        display: grid;
+        grid-template-columns: var(--sl-sidebar-width) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+      }
+
+      :global(.page > .header) {
+        grid-column: 1 / -1;
+      }
+
+      :global(.page > .sidebar) {
+        grid-column: 1;
+        grid-row: 2;
+        min-width: 0;
+      }
+
+      :global(.page > .sidebar .sidebar-pane) {
+        position: sticky;
+        top: 0;
+        max-height: 100svh;
+        width: 100%;
+      }
+
+      :global(.page:has(.header-content[data-docs]) > .main-frame) {
+        grid-column: 2;
+        grid-row: 2;
+        padding-inline-start: 0;
+      }
     }
   }
 </style>

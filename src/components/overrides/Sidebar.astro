@@ -1,0 +1,43 @@
+---
+import DefaultSidebar from "@astrojs/starlight/components/Sidebar.astro";
+import { Icon } from "@astrojs/starlight/components";
+---
+
+<button
+  class="sidebar-close sf-nav-link"
+  type="button"
+  popovertarget="starlight__sidebar"
+  popovertargetaction="hide"
+  aria-label="Close documentation"
+  autofocus
+>
+  <Icon name="close" size="20px" />
+</button>
+<DefaultSidebar />
+
+<style>
+  .sidebar-close {
+    display: none;
+  }
+
+  @media (max-height: 32rem) and (width < 50rem) {
+    .sidebar-close {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: inline-flex;
+      align-self: flex-end;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      min-height: 44px;
+      padding: 8px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--sf-canvas);
+      color: var(--sf-text);
+      cursor: pointer;
+    }
+  }
+</style>
