@@ -22,9 +22,8 @@ import jetbrains from "../assets/icons/jetbrains.svg";
       "Open-source tools for Arch Linux and beyond - built with care by Seafoam Labs",
     template: "splash",
     hero: {
-      title: "Seafoam Labs",
-      tagline:
-        "Open-source tools for Arch Linux and beyond - designed with you in mind.",
+      title: 'Seafoam <span class="hero-labs">Labs</span>',
+      tagline: "Open-source tools for Arch Linux and beyond.",
       image: {
         alt: "Cartoon character with teal twin pigtails, large expressive eyes, a white lab coat and pink heart shirt, smiling and waving with one hand while the other arm is outstretched to the left.",
         file: chel,
@@ -32,13 +31,8 @@ import jetbrains from "../assets/icons/jetbrains.svg";
       actions: [
         {
           text: "Learn more",
-          link: "/welcome",
+          link: "/welcome/",
           variant: "primary",
-        },
-        {
-          text: "Blog",
-          link: "/blog",
-          variant: "minimal",
         },
       ],
     },
@@ -140,3 +134,92 @@ import jetbrains from "../assets/icons/jetbrains.svg";
     </a>
   </div>
 </StarlightPage>
+
+<style is:global>
+  :root:has(.site-header[data-homepage]) {
+    --sl-content-width: 77.5rem;
+    --sl-content-pad-x: 16px;
+    --sl-main-pad: 0;
+
+    .content-panel {
+      padding-block: 0;
+    }
+    .sl-container {
+      margin-inline: auto;
+    }
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+      padding-block: 2rem 2.5rem;
+    }
+    .hero > img {
+      order: 2;
+      width: min(100%, 13.75rem);
+      height: auto;
+    }
+    .hero .stack,
+    .hero .copy {
+      min-width: 0;
+      gap: 1.5rem;
+      text-align: center;
+      align-items: center;
+    }
+    .hero h1 {
+      font-size: 2.625rem;
+      line-height: 1.143;
+      color: var(--sf-hero-seafoam);
+      overflow-wrap: anywhere;
+    }
+    .hero-labs {
+      color: var(--sf-hero-labs);
+    }
+    .hero .tagline {
+      max-width: 34ch;
+      font-size: 1.125rem;
+      line-height: 1.556;
+      color: var(--sf-text-muted);
+    }
+    .hero .actions {
+      justify-content: center;
+    }
+    .hero + .sl-markdown-content {
+      margin-top: 0;
+    }
+
+    @media (min-width: 48rem) {
+      --sl-content-pad-x: 24px;
+      .hero h1 {
+        font-size: 3.5rem;
+        line-height: 1.143;
+      }
+    }
+    @media (min-width: 64rem) {
+      --sl-content-pad-x: 32px;
+      .hero {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 22.5rem);
+        gap: 3rem;
+        padding-block: 4rem;
+      }
+      .hero > img {
+        width: 100%;
+        max-width: 22.5rem;
+      }
+      .hero .stack,
+      .hero .copy {
+        text-align: start;
+        align-items: flex-start;
+      }
+      .hero h1 {
+        font-size: 4.5rem;
+        line-height: 1.111;
+      }
+      .hero .tagline {
+        font-size: 1.5rem;
+        line-height: 1.417;
+      }
+      .hero .actions {
+        justify-content: flex-start;
+      }
+    }
+  }
+</style>

@@ -271,6 +271,12 @@ Starlight's sidebar content, state persistence, and navigation behavior.
 
 ## Typography and icons
 
+The homepage retains Starlight's configured hero and original Chel image. Its
+scoped layout places the introduction before the mascot on compact screens and
+beside it on desktop. The title uses solid palette colors, followed by the
+approved tagline and one Learn more link to the Wiki. Product-page heroes keep
+their existing presentation.
+
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with
 each family's SIL Open Font License retained alongside the fonts.

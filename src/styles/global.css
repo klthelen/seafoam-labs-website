@@ -372,8 +372,8 @@
   display: none;
 }
 
-/* Hero page gradient */
-[data-has-hero] {
+/* Retain the existing product-page presentation outside the homepage. */
+[data-has-hero]:not(:has(.site-header[data-homepage])) {
   .page {
     background:
       radial-gradient(
