@@ -183,20 +183,180 @@
   @apply dark:border-b-border;
 }
 
+/* Shared treatments stay opt-in; Starlight's existing actions use the same rules. */
+.sf-action,
+.sf-icon-control,
 .sl-link-button {
-  @apply rounded-lg px-4.5 py-2.5 font-semibold shadow-xs transition duration-75 dark:shadow-none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 3rem;
+  padding: 0.625rem 1.5rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sf-link);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
 
-  &.primary {
-    @apply hover:bg-(--sl-color-accent-high) dark:hover:bg-(--sl-color-accent);
-  }
+.sf-action--compact {
+  min-block-size: 2.75rem;
+  padding: 0.5rem 1.25rem;
+}
 
-  &.secondary {
-    @apply border-(--sl-color-accent) hover:bg-(--sl-color-accent-high) hover:text-(--sl-color-black) dark:border-(--sl-color-accent) dark:hover:bg-(--sl-color-accent);
-  }
+.sf-icon-control {
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  padding: 0.5rem;
+  color: var(--sf-text);
+}
 
-  &.minimal {
-    @apply px-0 shadow-none hover:text-(--sl-color-accent) dark:hover:text-(--sl-color-accent-high);
-  }
+:is(.sf-action, .sf-icon-control, .sl-link-button) svg {
+  flex: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+
+.sf-action--primary,
+.sl-link-button.primary {
+  background: var(--sf-action);
+  color: var(--sf-on-action);
+}
+
+.sf-action--primary:hover:not(:disabled),
+.sl-link-button.primary:hover {
+  background: var(--sf-action-hover);
+  color: var(--sf-on-action);
+}
+
+.sf-action--secondary,
+.sl-link-button.secondary {
+  border-color: var(--sf-link);
+  color: var(--sf-link);
+}
+
+.sf-action--secondary:hover:not(:disabled),
+.sf-icon-control:hover:not(:disabled),
+.sl-link-button.secondary:hover {
+  border-color: transparent;
+  background: var(--sf-action);
+  color: var(--sf-on-action);
+}
+
+.sf-action:active:not(:disabled),
+.sf-icon-control:active:not(:disabled),
+.sl-link-button:is(.primary, .secondary):active {
+  border-color: transparent;
+  background: var(--sf-action-pressed);
+  color: var(--sf-on-action);
+}
+
+.sf-action--card {
+  border-color: var(--sf-card-ink);
+  color: var(--sf-card-ink);
+}
+
+.sf-action--card:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--sf-card-action-hover);
+  color: var(--sf-on-card-action);
+}
+
+.sf-action--card:active:not(:disabled) {
+  border-color: transparent;
+  background: var(--sf-card-action-pressed);
+  color: var(--sf-on-card-action);
+}
+
+.sf-action:disabled {
+  background: var(--sf-surface);
+  color: var(--sf-text-muted);
+  cursor: default;
+}
+
+.sf-action--secondary:disabled {
+  border-color: var(--sf-boundary);
+  background: transparent;
+}
+
+.sf-icon-control:disabled {
+  color: var(--sf-text-muted);
+  cursor: default;
+}
+
+.sf-link,
+.sl-link-button.minimal {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  color: var(--sf-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.sl-link-button.minimal {
+  padding-inline: 0;
+}
+
+.sf-link:hover,
+.sl-link-button.minimal:hover {
+  color: var(--sf-link-hover);
+  text-decoration-thickness: 2px;
+}
+
+.sf-link--card,
+.sf-link--card:hover {
+  color: var(--sf-card-link);
+}
+
+.sf-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-inline: 0.75rem;
+  color: var(--sf-text);
+  text-decoration: none;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.sf-nav-link:hover,
+.sf-nav-link[aria-current="page"] {
+  text-decoration: underline;
+}
+
+:is(
+  .sf-action,
+  .sf-icon-control,
+  .sf-link,
+  .sf-nav-link,
+  .sl-link-button
+):focus-visible {
+  outline: 2px solid var(--sf-focus);
+  outline-offset: 3px;
+}
+
+:is(.sf-action--card, .sf-link--card):focus-visible {
+  outline-color: var(--sf-card-ink);
+}
+
+:is(.sf-action, .sf-icon-control, .sf-nav-link, .sl-link-button)[hidden] {
+  display: none;
 }
 
 /* Hero page gradient */

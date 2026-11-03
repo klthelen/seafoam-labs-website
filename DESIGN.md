@@ -45,7 +45,7 @@ maps shared color roles to Starlight's properties.
 | `--sf-canvas`, `--sf-surface`                                                                                     | Page background and shared panels                             |
 | `--sf-text`, `--sf-text-muted`                                                                                    | Primary and supporting text                                   |
 | `--sf-action`, `--sf-on-action`, `--sf-action-hover`, `--sf-action-pressed`                                       | Action fill, foreground, and interaction states               |
-| `--sf-link`, `--sf-focus`, `--sf-boundary`                                                                        | Links, focus indicators, and control boundaries               |
+| `--sf-link`, `--sf-link-hover`, `--sf-focus`, `--sf-boundary`                                                     | Links, focus indicators, and control boundaries               |
 | `--sf-shelly-surface`, `--sf-starfish-surface`, `--sf-aqueous-surface`, `--sf-pearl-surface`, `--sf-pori-surface` | Project-card backgrounds, named independently of their colors |
 | `--sf-card-ink`, `--sf-card-border`, `--sf-card-link`                                                             | Project-card text, borders, and links                         |
 | `--sf-card-action-hover`, `--sf-card-action-pressed`, `--sf-on-card-action`                                       | Project-card action states                                    |
@@ -69,6 +69,41 @@ Create a file under `src/styles/themes/` defining the same roles within
 value and label to `paletteOptions` in `appearance.ts`. The provider and
 controls then accept it without separate value lists. Check text, action, focus,
 and boundary contrast in both appearances, including hover and pressed states.
+
+## Actions and links
+
+Shared treatments in `global.css` apply to native elements. Use an anchor with
+`href` for navigation and a button for an action; set `type="button"` unless it
+submits a form. The existing Starlight `LinkButton` variants use these same
+treatments, including hero actions on documentation and product pages.
+
+| Classes                          | Treatment                                                           |
+| -------------------------------- | ------------------------------------------------------------------- |
+| `sf-action sf-action--primary`   | Filled primary action                                               |
+| `sf-action sf-action--secondary` | Outlined action on a neutral surface                                |
+| `sf-action sf-action--card`      | Outlined action using the project-card color roles                  |
+| `sf-icon-control`                | Icon-only link or button with an accessible name                    |
+| `sf-link`                        | Underlined contextual link                                          |
+| `sf-link sf-link--card`          | Contextual link on a project card                                   |
+| `sf-nav-link`                    | Navigation link, underlined on hover and when `aria-current="page"` |
+
+Normal actions have a minimum height of 3rem and 1.5rem horizontal padding.
+Add `sf-action--compact` for a minimum height of 2.75rem and 1.25rem horizontal
+padding where the component guide calls for a compact control. Icon controls
+have a minimum 2.75rem square target; glyphs are 1.25rem with a 0.5rem gap to
+labels. Keep at least 0.75rem between adjacent controls in the owning layout.
+Labels wrap and controls grow with their content.
+
+Focus adds a separate 2px outline with a 3px offset, preserving the current fill
+and space around the control. Card actions and links use the card ink for focus.
+Keep that outline clear of clipping containers. Contextual links retain their
+color after a visit; hover thickens the underline. Shared actions have immediate
+feedback without movement or animation.
+
+Use native `disabled` only for an unavailable button, with a visible explanation
+at the call site. Disabled buttons do not receive hover or pressed treatments.
+Navigation links remain usable; do not simulate a disabled link with these styles.
+Unclassed links and buttons keep their existing component or framework styling.
 
 ## Typography and icons
 

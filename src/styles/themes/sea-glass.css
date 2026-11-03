@@ -9,6 +9,7 @@
   --sf-action-hover: light-dark(#35414b, #f3f1ec);
   --sf-action-pressed: light-dark(#18232b, #dfd3ba);
   --sf-link: light-dark(#252d35, #f0e4cb);
+  --sf-link-hover: light-dark(#35414b, #f3f1ec);
   --sf-focus: light-dark(#252d35, #f0e4cb);
   --sf-boundary: light-dark(#64717b, #89959c);
 
