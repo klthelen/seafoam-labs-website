@@ -127,6 +127,35 @@ focus uses the shared 2px outline and 3px offset, independently of the fill.
 The containing menu must leave room around rows for that outline. Popup
 containers own placement, dismissal, and scrolling.
 
+## Navigation disclosures
+
+[NavigationDisclosure.astro](src/components/navigation/NavigationDisclosure.astro)
+provides a native `details` / `summary` control. Supply non-interactive trigger
+content in the `trigger` slot and the navigation list in the default slot. The
+trigger content must include its visible label or an accessible text alternative
+for an icon. The browser owns expanded/collapsed semantics and Enter/Space
+activation; do not add redundant roles or `aria-expanded` to the summary.
+
+Use `align="start"` (the default) for Projects and `align="end"` for Site menu.
+Mark their containing header capsule with `data-navigation-header`. The popup
+starts 12px below that element's measured bottom, including when its controls
+wrap. Desktop placement follows the trigger; below 64rem it follows the capsule
+edge. Placement stays within 24px desktop or 16px compact viewport gutters.
+
+The panel uses a 22.5rem width, 1rem padding, 1.5rem corners, and the shared surface
+and boundary roles. Its height follows the content and scrolls within the available
+visible space. With JavaScript, a manual popover places it above surrounding
+content without a backdrop or layout shift. Without the enhancement, the same
+links expand in normal document flow through native `details`.
+
+Opening preserves trigger focus. Escape closes and returns focus to the trigger;
+outside pointer presses and focus departure close without redirecting focus.
+The component emits a bubbling `navigation-disclosure-toggle` event with
+`detail.open`. The owning Header coordinates other disclosures and Search; it
+can close a disclosure by setting its native `open` property to `false`. Before
+hiding a navigation arrangement on resize, that owner must close it and place
+any affected focus on a visible control.
+
 ## Typography and icons
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
