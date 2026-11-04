@@ -340,6 +340,19 @@ const links = [
       gap: 1rem 2.5rem;
     }
   }
+  @media (min-width: 2172px) {
+    .shoreline {
+      /* Grow the fade with the side gutters beyond the artwork's native width. */
+      --shoreline-edge-fade: min(12rem, calc((100vw - 2172px) / 2));
+      mask-image: linear-gradient(
+        to right,
+        transparent,
+        black var(--shoreline-edge-fade),
+        black calc(100% - var(--shoreline-edge-fade)),
+        transparent
+      );
+    }
+  }
   @media print {
     .shoreline,
     .footer-preferences {

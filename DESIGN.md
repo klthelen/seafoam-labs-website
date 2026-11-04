@@ -324,11 +324,13 @@ the brand. Other routes retain the compact footer and Starlight's footer content
 
 Below 48rem, the artwork uses the dedicated square mobile composition. Wider
 screens use the complete panoramic composition, capped at its native 2172px
-width. Both preserve their aspect ratio without cropping. Responsive WebP
-exports live in `public/images/shoreline/`. Negative top margins compensate for
-the images' transparent upper area, leaving approximately 1rem between the
-functional content and the visible artwork. The illustration does not intercept
-pointer input and is omitted from print.
+width. Beyond that width, a CSS transparency mask softens both outer edges into
+the active page background. The fade grows with the side gutters up to 12rem;
+the central artwork is unchanged. Both compositions preserve their aspect ratio
+without cropping. Responsive WebP exports live in `public/images/shoreline/`.
+Negative top margins compensate for the images' transparent upper area, leaving
+approximately 1rem between the functional content and the visible artwork. The
+illustration does not intercept pointer input and is omitted from print.
 
 The homepage frame lets the illustration span the viewport while its hero,
 project content, and footer links share a 77.5rem maximum width. The former
