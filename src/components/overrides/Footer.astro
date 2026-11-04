@@ -3,8 +3,12 @@ import Default from "@astrojs/starlight/components/Footer.astro";
 import { Image } from "astro:assets";
 import shellyChelAvif from "../../assets/images/shelly-chel.avif";
 import SitePreferences from "../SitePreferences.astro";
+import shellheart from "../../assets/images/shellheart-small.webp";
+import jetbrains from "../../assets/icons/jetbrains.svg";
+import jetbrainsWhite from "../../assets/icons/jetbrains-white.svg";
 
 const { siteTitle } = Astro.locals.starlightRoute;
+const isHomepage = Astro.url.pathname === "/";
 
 const links = [
   {
@@ -26,39 +30,320 @@ const links = [
   <slot />
 </Default>
 
-<div class="mt-12 flex flex-col items-center justify-between border-t border-(--sl-color-gray-6) pt-8 text-(length:--sl-text-sm) text-(--sl-color-gray-3) sm:mt-16 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:pt-12">
-  <span class="mt-6 mb-2 sm:mt-auto sm:mb-auto">
-    © {new Date().getFullYear()} {siteTitle}
-  </span>
-  <a
-    class="order-last text-center text-(--sl-color-gray-5) select-none sm:order-0 sm:mx-6"
-    href={shellyChelAvif.src}
-  >
-    <Image
-      class="inline-block rounded-full text-transparent"
-      src={shellyChelAvif}
-      alt="Shelly Chel"
-      height={48}
-      width={48}
-      layout="fixed"
-    />
-  </a>
-  <nav class="order-first flex flex-wrap gap-x-2 sm:order-0">
-    {links.map((link, index) => (
-      <>
-        {index === 0 ? (
-          ""
-        ) : (
-          <span class="text-(--sl-color-gray-5) select-none">·</span>
-        )}
-        <a
-          class="text-(--sl-color-accent) no-underline hover:underline"
-          href={link.href}
-        >
-          {link.title}
+{isHomepage ? (
+  <footer class="homepage-footer not-content" aria-label="Seafoam Labs">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <a href="/" class="footer-wordmark">
+          <Image src={shellheart} alt="" width={64} height={64} />
+          <span>Seafoam Labs</span>
         </a>
-      </>
-    ))}
-  </nav>
-  <SitePreferences />
-</div>
+        <p>Open-source tools for Arch Linux and beyond.</p>
+      </div>
+      <nav class="footer-projects" aria-labelledby="footer-projects-title">
+        <h2 id="footer-projects-title">Projects</h2>
+        <ul>
+          <li>
+            <a href="/devario/overview/">Devario</a>
+          </li>
+          <li>
+            <a href="/shelly-alpm/overview/">Shelly ALPM</a>
+          </li>
+          <li>
+            <a href="/starfish/overview/">Starfish</a>
+          </li>
+          <li>
+            <a href="/aqueous/overview/">Aqueous</a>
+          </li>
+          <li>
+            <a href="/pearl/overview/">Pearl</a>
+          </li>
+          <li>
+            <a href="/pori/overview/">Pori</a>
+          </li>
+        </ul>
+      </nav>
+      <nav class="footer-explore" aria-labelledby="footer-explore-title">
+        <h2 id="footer-explore-title">Explore</h2>
+        <ul>
+          <li>
+            <a href="/welcome/">Wiki</a>
+          </li>
+          <li>
+            <a href="/blog/">Blog</a>
+          </li>
+          <li>
+            <a href="/about/">About</a>
+          </li>
+        </ul>
+      </nav>
+      <nav class="footer-community" aria-labelledby="footer-community-title">
+        <h2 id="footer-community-title">Community</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/Seafoam-Labs">GitHub</a>
+          </li>
+          <li>
+            <a href="https://fluxer.gg/vOjrMXcE">Fluxer</a>
+          </li>
+          <li>
+            <a href="https://www.patreon.com/cw/SeafoamLabs">Patreon</a>
+          </li>
+        </ul>
+      </nav>
+      <p class="footer-copyright">© {new Date().getFullYear()} Seafoam Labs</p>
+      <div class="footer-preferences">
+        <SitePreferences />
+      </div>
+      <a class="footer-credit sf-link" href="https://jb.gg/OpenSource">
+        <span>Powered by</span>
+        <Image
+          src={jetbrains}
+          alt="JetBrains"
+          width={149}
+          height={32}
+          class="dark:hidden"
+        />
+        <Image
+          src={jetbrainsWhite}
+          alt="JetBrains"
+          width={149}
+          height={32}
+          class="hidden dark:block"
+        />
+      </a>
+    </div>
+    <div class="shoreline" aria-hidden="true">
+      <picture class="dark:hidden">
+        <source
+          media="(width < 48rem)"
+          srcset="/images/shoreline/shoreline-mobile-light-v2-480.webp 480w, /images/shoreline/shoreline-mobile-light-v2-800.webp 800w, /images/shoreline/shoreline-mobile-light-v2-1254.webp 1254w"
+          sizes="100vw"
+          width="1254"
+          height="1254"
+        />
+        <img
+          src="/images/shoreline/shoreline-wide-light-v2-1280.webp"
+          srcset="/images/shoreline/shoreline-wide-light-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-light-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-light-v2-2172.webp 2172w"
+          sizes="(min-width: 2172px) 2172px, 100vw"
+          width="2172"
+          height="724"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
+      <picture class="hidden dark:block">
+        <source
+          media="(width < 48rem)"
+          srcset="/images/shoreline/shoreline-mobile-dark-v2-480.webp 480w, /images/shoreline/shoreline-mobile-dark-v2-800.webp 800w, /images/shoreline/shoreline-mobile-dark-v2-1254.webp 1254w"
+          sizes="100vw"
+          width="1254"
+          height="1254"
+        />
+        <img
+          src="/images/shoreline/shoreline-wide-dark-v2-1280.webp"
+          srcset="/images/shoreline/shoreline-wide-dark-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-dark-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-dark-v2-2172.webp 2172w"
+          sizes="(min-width: 2172px) 2172px, 100vw"
+          width="2172"
+          height="724"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </footer>
+) : (
+  <div class="mt-12 flex flex-col items-center justify-between border-t border-(--sl-color-gray-6) pt-8 text-(length:--sl-text-sm) text-(--sl-color-gray-3) sm:mt-16 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:pt-12">
+    <span class="mt-6 mb-2 sm:mt-auto sm:mb-auto">
+      © {new Date().getFullYear()} {siteTitle}
+    </span>
+    <a
+      class="order-last text-center text-(--sl-color-gray-5) select-none sm:order-0 sm:mx-6"
+      href={shellyChelAvif.src}
+    >
+      <Image
+        class="inline-block rounded-full text-transparent"
+        src={shellyChelAvif}
+        alt="Shelly Chel"
+        height={48}
+        width={48}
+        layout="fixed"
+      />
+    </a>
+    <nav class="order-first flex flex-wrap gap-x-2 sm:order-0">
+      {links.map((link, index) => (
+        <>
+          {index === 0 ? (
+            ""
+          ) : (
+            <span class="text-(--sl-color-gray-5) select-none">·</span>
+          )}
+          <a
+            class="text-(--sl-color-accent) no-underline hover:underline"
+            href={link.href}
+          >
+            {link.title}
+          </a>
+        </>
+      ))}
+    </nav>
+    <SitePreferences />
+  </div>
+)}
+
+<style>
+  .homepage-footer {
+    margin-top: 3rem;
+    color: var(--sf-text);
+  }
+  .footer-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "brand brand" "projects explore" "projects community" "copyright copyright" "preferences preferences" "credits credits";
+    gap: 1.5rem 1rem;
+    width: calc(100% - 2 * var(--sl-content-pad-x));
+    max-width: 77.5rem;
+    margin-inline: auto;
+    overflow-wrap: anywhere;
+  }
+  .footer-content > * {
+    min-width: 0;
+  }
+  .footer-brand {
+    grid-area: brand;
+  }
+  .footer-wordmark {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    width: fit-content;
+    max-width: 100%;
+    color: inherit;
+    text-decoration: none;
+    font-family: var(--sf-font-heading);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .footer-wordmark img {
+    width: 4rem;
+    height: auto;
+  }
+  .footer-brand p {
+    max-width: 30ch;
+    margin: 1rem 0 0;
+    font-size: 1.125rem;
+    line-height: 1.556;
+    color: var(--sf-text-muted);
+  }
+  .footer-projects {
+    grid-area: projects;
+  }
+  .footer-explore {
+    grid-area: explore;
+  }
+  .footer-community {
+    grid-area: community;
+  }
+  h2 {
+    margin: 0 0 0.5rem;
+    color: inherit;
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 2.75rem;
+    padding-block: 0.5rem;
+    color: var(--sf-link);
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  nav a:hover {
+    color: var(--sf-link-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .footer-wordmark:focus-visible,
+  nav a:focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .footer-copyright {
+    grid-area: copyright;
+    margin: 0;
+    align-self: end;
+    color: var(--sf-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .footer-preferences {
+    grid-area: preferences;
+  }
+  .footer-preferences :global(site-preferences:not([hidden])) {
+    align-items: flex-start;
+    margin: 0;
+  }
+  .footer-credit {
+    grid-area: credits;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-self: start;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    max-width: 100%;
+    font-size: 0.875rem;
+  }
+  .footer-credit img {
+    max-width: 100%;
+    height: auto;
+  }
+  .shoreline {
+    max-width: 2172px;
+    margin-inline: auto;
+    /* Overlap only the artwork's transparent upper area; retain its full canvas. */
+    margin-top: calc(1rem - min(28vw, 351.12px));
+    pointer-events: none;
+  }
+  .shoreline img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  @media (min-width: 48rem) {
+    .shoreline {
+      margin-top: calc(1rem - min(6vw, 130.32px));
+    }
+  }
+  @media (min-width: 64rem) {
+    .homepage-footer {
+      margin-top: 5rem;
+    }
+    .footer-content {
+      grid-template-columns: minmax(0, 1.8fr) repeat(3, minmax(0, 1fr));
+      grid-template-areas: "brand projects explore community" "copyright projects preferences preferences" "credits credits credits credits";
+      gap: 1rem 2.5rem;
+    }
+  }
+  @media print {
+    .shoreline,
+    .footer-preferences {
+      display: none;
+    }
+  }
+</style>

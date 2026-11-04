@@ -2,11 +2,8 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import DevarioShowcase from "../components/DevarioShowcase.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
-import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
-import { Image } from "astro:assets";
+import ProjectCard from "../components/ProjectCard.astro";
 import chel from "../assets/images/chel.png";
-import jetbrainsWhite from "../assets/icons/jetbrains-white.svg";
-import jetbrains from "../assets/icons/jetbrains.svg";
 ---
 
 <StarlightPage
@@ -22,9 +19,8 @@ import jetbrains from "../assets/icons/jetbrains.svg";
       "Open-source tools for Arch Linux and beyond - built with care by Seafoam Labs",
     template: "splash",
     hero: {
-      title: "Seafoam Labs",
-      tagline:
-        "Open-source tools for Arch Linux and beyond - designed with you in mind.",
+      title: 'Seafoam <span class="hero-labs">Labs</span>',
+      tagline: "Open-source tools for Arch Linux and beyond.",
       image: {
         alt: "Cartoon character with teal twin pigtails, large expressive eyes, a white lab coat and pink heart shirt, smiling and waving with one hand while the other arm is outstretched to the left.",
         file: chel,
@@ -32,13 +28,8 @@ import jetbrains from "../assets/icons/jetbrains.svg";
       actions: [
         {
           text: "Learn more",
-          link: "/welcome",
+          link: "/welcome/",
           variant: "primary",
-        },
-        {
-          text: "Blog",
-          link: "/blog",
-          variant: "minimal",
         },
       ],
     },
@@ -47,96 +38,181 @@ import jetbrains from "../assets/icons/jetbrains.svg";
 >
   <DevarioShowcase />
 
-  <AnchorHeading level="2" id="projects">
-    Projects
-  </AnchorHeading>
+  <section class="homepage-projects" aria-labelledby="projects">
+    <AnchorHeading level="2" id="projects">
+      Projects
+    </AnchorHeading>
+    <div class="project-grid">
+      <ProjectCard title="Shelly ALPM" project="shelly" href="/shelly-alpm/">
+        A modern, visual package manager for Arch Linux - a Pacman alternative
+        designed with you in mind. Built in Zig with GTK4, Shelly ALPM brings a
+        polished UI to Arch package management with support for CachyOS, Garuda
+        Linux, and more.
+      </ProjectCard>
 
-  <CardGrid>
-    <Card title="Shelly ALPM" icon="linux">
-      A modern, visual package manager for Arch Linux - a Pacman alternative
-      designed with you in mind. Built in Zig with GTK4, Shelly ALPM brings a
-      polished UI to Arch package management with support for CachyOS, Garuda
-      Linux, and more.
-      <p class="mt-3">
-        <a href="/shelly-alpm">Explore Shelly ALPM →</a>
-      </p>
-    </Card>
+      <ProjectCard
+        title="Starfish"
+        project="starfish"
+        href="/starfish/overview/"
+      >
+        A dependency viewer for Arch packages. Visualise and explore the
+        dependency graph of any package installed on your system with clarity
+        and ease.
+      </ProjectCard>
 
-    <Card title="Starfish" icon="star">
-      A dependency viewer for Arch packages. Visualise and explore the
-      dependency graph of any package installed on your system with clarity and
-      ease.
-      <p class="mt-3">
-        <a href="/starfish/overview">Explore Starfish →</a>
-      </p>
-    </Card>
+      <ProjectCard title="Aqueous" project="aqueous" href="/aqueous/overview/">
+        A Wayland compositor built in Zig with ten native layouts, Vulkan blur,
+        HDR, screen mirroring, and Pearl settings integration.
+      </ProjectCard>
 
-    <Card title="Aqueous" icon="seti:elixir">
-      A Wayland compositor built in Zig with ten native layouts, Vulkan blur,
-      HDR, screen mirroring, and Pearl settings integration.
-      <p class="mt-3">
-        <a href="/aqueous/overview">Explore Aqueous →</a>
-      </p>
-    </Card>
+      <ProjectCard title="Pearl" project="pearl" href="/pearl/overview/">
+        A desktop shell for Aqueous built in Zig with GTK4 and a Material Design
+        look. Bar, dock, launcher, control center, settings and session tools in
+        one native shell.
+      </ProjectCard>
 
-    <Card title="Pearl" icon="desktop">
-      A desktop shell for Aqueous built in Zig with GTK4 and a Material Design
-      look. Bar, dock, launcher, control center, settings and session tools in
-      one native shell.
-      <p class="mt-3">
-        <a href="/pearl/overview">Explore Pearl →</a>
-      </p>
-    </Card>
-
-    <Card title="Pori" icon="database">
-      A desktop tool for creating reliable, persistent Linux mounts using native
-      systemd <code>.mount</code> units. Configure local disk mounts without
-      manually editing <code>/etc/fstab</code>.
-      <p class="mt-3">
-        <a href="/pori/overview">Explore Pori →</a>
-      </p>
-    </Card>
-  </CardGrid>
-
-  <AnchorHeading level="2" id="about-seafoam-labs">
-    About Seafoam Labs
-  </AnchorHeading>
-
-  <LinkCard
-    title="GitHub Organisation"
-    description="Browse all Seafoam Labs repositories on GitHub."
-    href="https://github.com/Seafoam-Labs"
-  />
-
-  <LinkCard
-    title="Seafoam Labs Package Repository"
-    description="Browse Seafoam Labs packages and setup instructions for adding the repository to your Arch Linux system."
-    href="https://repo.seafoam-labs.org/"
-  />
-
-  <AnchorHeading level="3" id="powered-by">
-    Powered by
-  </AnchorHeading>
-
-  <div class="my-4">
-    <a
-      href="https://jb.gg/OpenSource"
-      class="inline-block rounded-md p-3 hover:bg-(--sl-color-gray-6) dark:hover:bg-(--sl-color-gray-6)"
-    >
-      <Image
-        src={jetbrainsWhite}
-        class="hidden dark:block"
-        alt="JetBrains logo."
-        width={298}
-        height={64}
-      />
-      <Image
-        src={jetbrains}
-        class="mt-0 block dark:hidden"
-        alt="JetBrains logo."
-        width={298}
-        height={64}
-      />
-    </a>
-  </div>
+      <ProjectCard title="Pori" project="pori" href="/pori/overview/">
+        A desktop tool for creating reliable, persistent Linux mounts using
+        native systemd <code>.mount</code> units. Configure local disk mounts
+        without manually editing <code>/etc/fstab</code>.
+      </ProjectCard>
+    </div>
+  </section>
 </StarlightPage>
+
+<style is:global>
+  :root:has(.site-header[data-homepage]) {
+    --sl-content-width: 77.5rem;
+    --sl-content-pad-x: 16px;
+    --sl-main-pad: 0;
+
+    .content-panel {
+      padding: 0;
+    }
+    .sl-container {
+      max-width: none;
+    }
+    .hero,
+    .sl-markdown-content {
+      width: calc(100% - 2 * var(--sl-content-pad-x));
+      max-width: 77.5rem;
+      margin-inline: auto;
+    }
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+      padding-block: 2rem 2.5rem;
+    }
+    .hero > img {
+      order: 2;
+      width: min(100%, 13.75rem);
+      height: auto;
+    }
+    .hero .stack,
+    .hero .copy {
+      min-width: 0;
+      gap: 1.5rem;
+      text-align: center;
+      align-items: center;
+    }
+    .hero h1 {
+      font-size: 2.625rem;
+      line-height: 1.143;
+      color: var(--sf-hero-seafoam);
+      overflow-wrap: anywhere;
+    }
+    .hero-labs {
+      color: var(--sf-hero-labs);
+    }
+    .hero .tagline {
+      max-width: 34ch;
+      font-size: 1.125rem;
+      line-height: 1.556;
+      color: var(--sf-text-muted);
+    }
+    .hero .actions {
+      justify-content: center;
+    }
+    .hero + .sl-markdown-content {
+      margin-top: 0;
+    }
+
+    .homepage-projects {
+      margin-block-start: 3rem;
+    }
+    .sl-heading-wrapper {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+    .sl-heading-wrapper :is(h2, h3) {
+      flex: 1;
+      display: block;
+      min-width: 0;
+      margin: 0;
+      padding-inline-end: 0;
+      overflow-wrap: anywhere;
+    }
+    .sl-anchor-link {
+      flex: none;
+      margin-inline-start: 0;
+    }
+    .project-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 1.5rem;
+    }
+    .project-grid > * {
+      margin: 0;
+    }
+
+    @media (min-width: 48rem) {
+      --sl-content-pad-x: 24px;
+      .project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 32px;
+      }
+      .hero h1 {
+        font-size: 3.5rem;
+        line-height: 1.143;
+      }
+    }
+    @media (min-width: 64rem) {
+      --sl-content-pad-x: 32px;
+      .homepage-projects {
+        margin-block-start: 4rem;
+      }
+      .project-grid {
+        column-gap: 40px;
+      }
+      .hero {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 22.5rem);
+        gap: 3rem;
+        padding-block: 4rem;
+      }
+      .hero > img {
+        width: 100%;
+        max-width: 22.5rem;
+      }
+      .hero .stack,
+      .hero .copy {
+        text-align: start;
+        align-items: flex-start;
+      }
+      .hero h1 {
+        font-size: 4.5rem;
+        line-height: 1.111;
+      }
+      .hero .tagline {
+        font-size: 1.5rem;
+        line-height: 1.417;
+      }
+      .hero .actions {
+        justify-content: flex-start;
+      }
+    }
+  }
+</style>

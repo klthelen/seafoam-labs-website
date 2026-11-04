@@ -1,650 +1,147 @@
 ---
-import { Image } from "astro:assets";
-import { Badge } from "@astrojs/starlight/components";
-import { isoChecksumUrl, isoDownloadUrl } from "../consts";
-import devarioLogo from "../assets/images/devario-logo.png";
+import { Icon } from "@astrojs/starlight/components";
+import CopyChecksum from "./CopyChecksum.astro";
+import { isoChecksumUrl, isoDownloadUrl, isoSha256 } from "../consts";
+import fish from "../assets/images/fish-dithered-stronger-transparent.png";
 ---
 
-<section class="devario-showcase" aria-labelledby="devario-title">
-  <div class="dv-copy">
-    <p class="dv-eyebrow">
-      MEET DEVARIO <span>Free &amp; open source</span>
-    </p>
-    <h2 id="devario-title">
-      A free Linux desktop.
-      <br />
-      <em>See how it fits together.</em>
-    </h2>
-    <p class="dv-intro">
-      Devario Community is an independent Linux distribution built around
-      Aqueous, Pearl, and Shelly. Install it with Calamares, make it your own,
-      and explore the open-source projects behind it.
-    </p>
-    <ul class="dv-features">
-      <li>
-        <span class="dv-check" aria-hidden="true">
-          ✓
-        </span>
-        <div>
-          <strong>
-            <a href="/devario/setup/">Guided setup</a>
-          </strong>
-          <span>Offline installation with Calamares and a local account.</span>
-        </div>
-      </li>
-      <li>
-        <span class="dv-check" aria-hidden="true">
-          ✓
-        </span>
-        <div>
-          <strong>
-            <a href="/shelly-alpm/docs/packages/">Shelly packages</a>
-          </strong>
-          <span>Install and update software with the native RLPM backend.</span>
-        </div>
-      </li>
-      <li>
-        <span class="dv-check" aria-hidden="true">
-          ✓
-        </span>
-        <div>
-          <strong>
-            <a href="/aqueous/layouts/">Aqueous windows</a>
-          </strong>
-          <span>
-            Floating windows by default, with tiling and scrolling layouts.
-          </span>
-        </div>
-      </li>
-      <li>
-        <span class="dv-check" aria-hidden="true">
-          ✓
-        </span>
-        <div>
-          <strong>
-            <a href="/pearl/overview/">Pearl desktop</a>
-          </strong>
-          <span>Your launcher, panels, settings, and login screen.</span>
-        </div>
-      </li>
-      <li class="dv-kernel">
-        <span class="dv-check" aria-hidden="true">
-          ✓
-        </span>
-        <div>
-          <strong>
-            <a href="/devario/platform/#kernel-installation-and-boot">
-              The Devario kernel and boot setup
-            </a>
-          </strong>
-          <span>
-            Seafoam Labs' kernel for x86-64-v3 hardware, with dracut boot images
-            and systemd-boot. See the components and how they connect.
-          </span>
-        </div>
-      </li>
-    </ul>
-    <div class="dv-actions">
-      <a class="dv-primary" href="/devario/overview/">
-        See the overview <span aria-hidden="true">→</span>
-      </a>
-      <a href="https://github.com/Seafoam-Labs/devario-os">
-        Explore the code <span aria-hidden="true">↗</span>
-      </a>
-    </div>
-    <div class="dv-download">
-      <span class="dv-download-intro">Make yourself at home.</span>
-      <a class="dv-iso" href={isoDownloadUrl}>
-        Get the ISO
-        <svg
-          aria-hidden="true"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />
-        </svg>
-      </a>
-      <Badge text="Beta" variant="note" size="small" />
-      <a class="dv-checksum" download href={isoChecksumUrl}>
-        SHA-256
-      </a>
-    </div>
-  </div>
-  <figure
-    class="dv-visual"
-    aria-label="Concept illustration of a Devario desktop"
+<section class="devario-showcase not-content" aria-labelledby="devario-title">
+  <h2 id="devario-title">Devario</h2>
+  <span
+    class="devario-fish"
+    aria-hidden="true"
+    style={{
+      "--fish-artwork": `url(${fish.src})`,
+      aspectRatio: `${fish.width} / ${fish.height}`,
+    }}
+  ></span>
+  <p class="devario-description">
+    Linux desktop built around Aqueous, Pearl, and Shelly. Install with
+    Calamares and make it your own.
+  </p>
+  <a
+    class="sf-action sf-action--primary devario-overview"
+    href="/devario/overview/"
   >
-    <div class="dv-halo" aria-hidden="true"></div>
-    <div class="dv-screen" aria-hidden="true">
-      <div class="dv-toolbar">
-        <span class="dv-brand">
-          <span class="dv-fish">
-            <Image src={devarioLogo} alt="" width={88} />
-          </span>
-          devario
-        </span>
-        <span class="dv-workspaces">
-          <i></i>
-          <i></i>
-          <i></i>
-        </span>
-        <span>09:41</span>
-      </div>
-      <div class="dv-desktop">
-        <div class="dv-wallpaper"></div>
-        <div class="dv-window">
-          <div class="dv-windowbar">
-            <span>Make yourself at home</span>
-            <span class="dv-windowdots">● ● ●</span>
-          </div>
-          <div class="dv-windowbody">
-            <span class="dv-fish dv-app-icon">
-              <Image src={devarioLogo} alt="" width={88} />
-            </span>
-            <strong>
-              Your desktop.
-              <br />
-              Your way.
-            </strong>
-            <span>A little less effort. A lot more flow.</span>
-            <div class="dv-layouts">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        </div>
-        <div class="dv-dock">
-          <span>▦</span>
-          <span>▱</span>
-          <span>◎</span>
-          <span>⚙</span>
-        </div>
-      </div>
-    </div>
-    <div class="dv-stand" aria-hidden="true"></div>
-    <div class="dv-foot" aria-hidden="true"></div>
-    <figcaption>
-      Open software. A desktop that feels like yours.
-      <br />
-      <span>Concept illustration</span>
-    </figcaption>
-  </figure>
+    Overview
+  </a>
+  <div class="devario-downloads">
+    <a class="sf-action sf-action--secondary" href={isoDownloadUrl}>
+      <Icon name="download" />
+      Download ISO
+    </a>
+    <CopyChecksum checksum={isoSha256} href={isoChecksumUrl} />
+  </div>
+  <a
+    class="sf-link devario-github"
+    href="https://github.com/Seafoam-Labs/devario-os"
+  >
+    View on GitHub
+    <Icon name="external" size="1.25rem" />
+  </a>
 </section>
 
 <style>
   .devario-showcase {
-    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
-    gap: 2.5rem;
-    align-items: center;
-    margin: 0 0 4rem;
-    padding: 2.5rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 1.25rem;
-    background:
-      radial-gradient(
-        ellipse at 100% 40%,
-        color-mix(in srgb, var(--color-seafoam) 9%, transparent),
-        transparent 60%
-      ),
-      var(--sl-color-black);
-    color: var(--sl-color-white);
-    isolation: isolate;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    min-width: 0;
+    padding: 24px;
+    border-radius: 24px;
+    background: var(--sf-surface);
+    color: var(--sf-text);
   }
-  .devario-showcase * {
-    box-sizing: border-box;
-  }
-  .devario-showcase .dv-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin: 0 0 1rem;
-    color: var(--sl-color-text-accent);
-    font-size: 0.68rem;
-    font-weight: 750;
-    letter-spacing: 0.14em;
-  }
-  .dv-eyebrow span {
-    padding-left: 0.8rem;
-    border-left: 1px solid var(--sl-color-gray-5);
-    color: var(--sl-color-gray-3);
-    font-weight: 500;
-    letter-spacing: 0;
-    font-size: 0.75rem;
-  }
-  .devario-showcase h2 {
+  h2 {
     margin: 0;
-    font-size: clamp(1.8rem, 3.1vw, 2.7rem);
-    letter-spacing: -0.045em;
-    line-height: 1.12;
-    color: var(--sl-color-white);
+    font-size: 2.125rem;
+    line-height: 1.235;
+    text-align: center;
+    overflow-wrap: anywhere;
   }
-  .dv-copy h2 em {
-    font-style: normal;
-    color: var(--sl-color-text-accent);
-  }
-  .devario-showcase .dv-intro {
-    margin: 1.1rem 0 1.4rem;
-    color: var(--sl-color-gray-2);
-    font-size: 0.94rem;
-    line-height: 1.7;
-  }
-  .devario-showcase .dv-features {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem 0.9rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .devario-showcase .dv-features li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-  }
-  .dv-check {
-    display: grid;
-    place-content: center;
-    width: 1.1rem;
-    height: 1.1rem;
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-    border-radius: 50%;
-    background: color-mix(
-      in srgb,
-      var(--sl-color-text-accent) 13%,
-      transparent
-    );
-    color: var(--sl-color-text-accent);
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
-  .dv-features strong {
+  .devario-fish {
     display: block;
-    font-size: 0.81rem;
-    line-height: 1.4;
-    color: var(--sl-color-white);
+    justify-self: center;
+    width: min(100%, 9.0625rem);
+    background-color: currentColor;
+    mask: var(--fish-artwork) center / contain no-repeat;
+    mask-mode: alpha;
   }
-  .dv-features strong a {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-color: var(--sl-color-gray-4);
-    text-underline-offset: 0.2em;
-  }
-  .dv-features strong a:hover {
-    color: var(--sl-color-text-accent);
-  }
-  .dv-features div > span {
-    display: block;
-    margin-top: 0.2rem;
-    color: var(--sl-color-gray-3);
-    font-size: 0.73rem;
-    line-height: 1.5;
-  }
-  .devario-showcase .dv-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    margin-top: 1.6rem;
-  }
-  .dv-actions a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--sl-color-text-accent);
-    text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 650;
-  }
-  .dv-actions a.dv-primary {
-    padding: 0.7rem 1rem;
-    background: var(--sl-color-text-accent);
-    color: var(--sl-color-black);
-    border-radius: 0.5rem;
-  }
-  .devario-showcase .dv-download {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.2rem;
-  }
-  .dv-download-intro {
-    color: var(--sl-color-gray-2);
-    font-size: 0.8rem;
-  }
-  .dv-iso {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    padding: 0.65rem 1rem;
-    border-radius: 0.5rem;
-    background: var(--color-purple-light);
-    color: var(--color-bg-primary);
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-decoration: none;
-  }
-  .dv-iso:hover {
-    filter: brightness(1.08);
-  }
-  .dv-checksum {
-    color: var(--sl-color-gray-3);
-    font-size: 0.73rem;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-  .dv-checksum:hover {
-    color: var(--sl-color-text-accent);
-  }
-  .devario-showcase .dv-visual {
-    position: relative;
+  .devario-description {
     min-width: 0;
     margin: 0;
-    padding: 1rem 0 0;
-    text-align: center;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--sf-text-muted);
+    overflow-wrap: anywhere;
   }
-  .dv-halo {
-    position: absolute;
-    inset: 0 -1rem 2rem;
-    border: 1px solid
-      color-mix(in srgb, var(--sl-color-text-accent) 10%, transparent);
-    border-radius: 50%;
-    transform: scaleY(0.85);
-    z-index: -1;
-  }
-  .dv-screen {
-    position: relative;
-    margin: 1.3rem 0 0;
-    padding: 6px;
-    border: 1px solid #52647c;
-    border-radius: 12px;
-    background: #172237;
-    box-shadow: 0 18px 44px #0003;
-    transform: rotate(-3deg);
-  }
-  .dv-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 7px 8px;
-    color: #cbd5e1;
-    font-size: 7px;
-    line-height: 1.3;
-  }
-  .dv-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 700;
-    color: #5eead4;
-    font-size: 9px;
-  }
-  .dv-fish {
-    /* Display the fish above the wordmark in the original Fastfetch asset. */
-    position: relative;
-    display: block;
-    width: 20px;
-    height: 10px;
-    overflow: hidden;
-  }
-  .dv-fish img {
-    position: absolute;
-    top: -10%;
-    left: -5%;
-    width: 110%;
-    max-width: none;
-    height: auto;
-  }
-  .dv-workspaces {
-    display: flex;
-    gap: 4px;
-  }
-  .dv-workspaces i {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: #52647c;
-  }
-  .dv-workspaces i:first-child {
-    width: 12px;
-    background: #5eead4;
-  }
-  .dv-desktop {
-    position: relative;
-    aspect-ratio: 1.48;
-    overflow: hidden;
-    border-radius: 6px;
-    background: #0d2937;
-  }
-  .dv-wallpaper {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 0% 100%, #9251b7 0%, transparent 65%),
-      radial-gradient(ellipse at 100% 20%, #29b49c 0%, transparent 70%), #153844;
-  }
-  .dv-wallpaper:after {
-    position: absolute;
-    width: 110%;
-    height: 90%;
-    left: -35%;
-    bottom: -60%;
-    border-radius: 50%;
-    border: 24px solid #65dec02b;
-    box-shadow: 0 0 0 25px #65dec010;
-    content: "";
-    transform: rotate(-30deg);
-  }
-  .dv-window {
-    position: absolute;
-    inset: 14% 12% 18%;
-    overflow: hidden;
-    border: 1px solid #ffffff22;
-    border-radius: 7px;
-    background: #182536ec;
-    box-shadow: 0 12px 20px #07182766;
-  }
-  .dv-windowbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 8px;
-    border-bottom: 1px solid #ffffff10;
-    color: #cbd5e1;
-    font-size: 6px;
-    line-height: 1.2;
-  }
-  .dv-windowdots {
-    font-size: 5px;
-    letter-spacing: 2px;
-    color: #7e8d9b;
-  }
-  .dv-windowbody {
+  .devario-downloads {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    gap: 0.75rem;
+    margin-top: -0.75rem;
+  }
+  .devario-github {
+    display: inline-flex;
+    justify-self: center;
     align-items: center;
-    padding: 10px 5px;
-    gap: 6px;
-    color: #a6b6c6;
-    font-size: 6px;
-    line-height: 1.3;
-  }
-  .dv-app-icon {
-    width: 40px;
-    height: 20px;
-  }
-  .dv-windowbody strong {
-    color: #eef9fa;
-    font-size: 16px;
-    line-height: 1.1;
-    letter-spacing: -0.035em;
-  }
-  .dv-layouts {
-    display: flex;
-    gap: 4px;
-    margin-top: 2px;
-  }
-  .dv-layouts span {
-    width: 13px;
-    height: 9px;
-    border: 1px solid #7e99a9;
-    border-radius: 2px;
-    background: linear-gradient(
-      to right,
-      transparent 45%,
-      #7e99a9 45%,
-      #7e99a9 55%,
-      transparent 55%
-    );
-  }
-  .dv-layouts span:first-child {
-    border-color: #5eead4;
-    background: linear-gradient(
-      to right,
-      transparent 60%,
-      #5eead4 60%,
-      #5eead4 70%,
-      transparent 70%
-    );
-  }
-  .dv-dock {
-    position: absolute;
-    bottom: 4%;
-    left: 50%;
-    display: flex;
-    gap: 5px;
-    transform: translateX(-50%);
-    padding: 4px 6px;
-    border: 1px solid #ffffff22;
-    border-radius: 7px;
-    background: #19233f99;
-    line-height: 1;
-  }
-  .dv-dock span {
-    display: grid;
-    place-content: center;
-    width: 17px;
-    height: 17px;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #d5f9f3;
-    background: #67bbae33;
-  }
-  .dv-dock span:nth-child(2) {
-    color: #fde09b;
-    background: #e1b34c33;
-  }
-  .dv-dock span:nth-child(3) {
-    color: #cbb8fd;
-    background: #8b5cf633;
-  }
-  .dv-stand {
-    width: 39px;
-    height: 28px;
-    margin: 0 auto;
-    background: linear-gradient(90deg, #334155, #64748b, #334155);
-    clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
-  }
-  .dv-foot {
-    width: 100px;
-    height: 5px;
-    margin: 0 auto;
-    border-radius: 50% 50% 2px 2px;
-    background: #64748b;
-  }
-  .dv-visual figcaption {
-    margin-top: 1.3rem;
-    color: var(--sl-color-gray-2);
-    font-size: 0.76rem;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    max-width: 100%;
+    font-size: 1rem;
     line-height: 1.5;
   }
-  .dv-visual figcaption span {
-    font-size: 0.62rem;
-    color: var(--sl-color-gray-3);
+  .devario-github :global(svg) {
+    flex: none;
   }
-  @media (max-width: 55rem) {
+
+  @media (width < 24rem) {
     .devario-showcase {
-      padding: 2rem;
+      padding: 20px;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .devario-showcase {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+      column-gap: 3rem;
+      padding: 40px;
+    }
+    h2 {
+      grid-column: 1;
+      text-align: start;
+      font-size: 3rem;
+      line-height: 1.167;
+    }
+    .devario-fish {
+      grid-column: 2;
+      grid-row: 1 / 4;
+      align-self: center;
+      width: 100%;
+    }
+    .devario-description {
+      grid-column: 1;
+      max-width: 45ch;
+      font-size: 1.125rem;
+      line-height: 1.556;
+    }
+    .devario-overview {
+      grid-column: 1;
+      justify-self: start;
+    }
+    .devario-downloads {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
       gap: 1.5rem;
-      grid-template-columns: 1fr;
-    }
-    .devario-showcase .dv-visual {
-      width: min(100%, 22rem);
-      margin: 0 auto;
-    }
-    .devario-showcase h2 {
-      font-size: 2.1rem;
-    }
-  }
-  @media (max-width: 30rem) {
-    .devario-showcase {
-      padding: 1.5rem;
-      gap: 1.2rem;
-      border-radius: 1rem;
-    }
-    .devario-showcase h2 {
-      font-size: 1.85rem;
-    }
-    .devario-showcase .dv-intro {
-      font-size: 0.9rem;
-    }
-    .devario-showcase .dv-features {
-      grid-template-columns: 1fr;
-      gap: 0.8rem;
-    }
-    .dv-features strong {
-      font-size: 0.85rem;
-    }
-    .dv-features div > span {
-      font-size: 0.78rem;
-    }
-    .dv-eyebrow span {
-      font-size: 0.65rem;
-    }
-    .devario-showcase .dv-visual {
       margin-top: 0.5rem;
     }
-  }
-  .devario-showcase .dv-features li > div,
-  .devario-showcase .dv-features li + li,
-  .devario-showcase .dv-features .dv-check {
-    margin-top: 0;
-  }
-  .devario-showcase .dv-visual * {
-    margin-block: 0;
-  }
-  .devario-showcase .dv-visual figcaption {
-    margin-top: 1.3rem;
-  }
-  .devario-showcase .dv-visual {
-    font-family: system-ui, sans-serif;
-  }
-
-  .devario-showcase .dv-features .dv-kernel {
-    grid-column: 1 / -1;
-  }
-
-  .dv-actions a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-  .dv-features a:focus-visible,
-  .dv-actions a:focus-visible,
-  .dv-checksum:focus-visible,
-  .dv-iso:focus-visible {
-    outline: 2px solid var(--sl-color-text-accent);
-    outline-offset: 4px;
+    .devario-github {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
   }
 </style>

@@ -1,12 +1,32 @@
 ---
+import { getImage } from "astro:assets";
 import { appearanceOptions, paletteOptions } from "../data/appearance";
+
+const [themeIcon, paletteIcon] = await Promise.all([
+  getImage({
+    src: "https://cdn-icons-png.flaticon.com/512/16769/16769239.png",
+    width: 96,
+    height: 96,
+    format: "png",
+  }),
+  getImage({
+    src: "https://cdn-icons-png.flaticon.com/512/3917/3917392.png",
+    width: 96,
+    height: 96,
+    format: "png",
+  }),
+]);
 ---
 
 <site-preferences hidden>
   <div class="preference-controls">
     <details name="site-preferences">
       <summary aria-label="Choose theme" title="Theme">
-        <span class="preference-icon theme-icon" aria-hidden="true"></span>
+        <span
+          class="preference-icon"
+          style={{ "--preference-icon": `url("${themeIcon.src}")` }}
+          aria-hidden="true"
+        ></span>
       </summary>
       <div class="preference-panel" popover="manual">
         <fieldset>
@@ -27,7 +47,11 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
     </details>
     <details name="site-preferences">
       <summary aria-label="Choose color palette" title="Color palette">
-        <span class="preference-icon palette-icon" aria-hidden="true"></span>
+        <span
+          class="preference-icon"
+          style={{ "--preference-icon": `url("${paletteIcon.src}")` }}
+          aria-hidden="true"
+        ></span>
       </summary>
       <div class="preference-panel" popover="manual">
         <fieldset>
@@ -238,14 +262,6 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
     background-color: currentColor;
     mask: var(--preference-icon) center / contain no-repeat;
     mask-mode: alpha;
-  }
-
-  .theme-icon {
-    --preference-icon: url("https://cdn-icons-png.flaticon.com/512/16769/16769239.png");
-  }
-
-  .palette-icon {
-    --preference-icon: url("https://cdn-icons-png.flaticon.com/512/3917/3917392.png");
   }
 
   .preference-panel {

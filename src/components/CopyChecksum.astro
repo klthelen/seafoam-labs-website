@@ -1,0 +1,106 @@
+---
+interface Props {
+  checksum: string;
+  href: string;
+}
+
+const { checksum, href } = Astro.props;
+---
+
+<div class="copy-checksum" data-checksum={checksum}>
+  <div class="checksum-actions">
+    <button class="sf-link" type="button" hidden>
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      >
+        <rect x="8" y="8" width="12" height="13" rx="2" />
+        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+      </svg>
+      Copy checksum
+    </button>
+    <a class="sf-link" {href}>
+      Checksum file
+    </a>
+  </div>
+  <p class="checksum-status" role="status" aria-atomic="true"></p>
+</div>
+
+<script>
+  for (const control of document.querySelectorAll<HTMLElement>(
+    ".copy-checksum",
+  )) {
+    const button = control.querySelector("button");
+    const status = control.querySelector<HTMLElement>("[role='status']");
+    const checksum = control.dataset.checksum;
+    if (!button || !status || !checksum || !navigator.clipboard?.writeText)
+      continue;
+
+    button.addEventListener("click", async () => {
+      status.textContent = "";
+      try {
+        await navigator.clipboard.writeText(checksum);
+        status.textContent = "Checksum copied";
+      } catch {
+        status.textContent =
+          "Could not copy the checksum. Open the checksum file to copy it manually.";
+      }
+    });
+    button.hidden = false;
+  }
+</script>
+
+<style>
+  .copy-checksum {
+    min-width: 0;
+  }
+  .checksum-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0 1rem;
+  }
+  button,
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    max-width: 100%;
+    padding: 0.5rem 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    cursor: pointer;
+  }
+  button[hidden] {
+    display: none;
+  }
+  svg {
+    flex: none;
+  }
+  .checksum-status {
+    margin: 0;
+    max-width: 42ch;
+    color: var(--sf-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  @media (min-width: 64rem) {
+    .checksum-actions {
+      justify-content: flex-start;
+    }
+  }
+</style>
