@@ -269,7 +269,13 @@ the viewport, with a native Close documentation button supplied by
 [Sidebar.astro](src/components/overrides/Sidebar.astro). That override retains
 Starlight's sidebar content, state persistence, and navigation behavior.
 
-## Release checksum
+## Homepage components
+
+The homepage retains Starlight's configured hero and original Chel image. Its
+scoped layout places the introduction before the mascot on compact screens and
+beside it on desktop. The title uses solid palette colors, followed by the
+approved tagline and one Learn more link to the Wiki. Product-page heroes keep
+their existing presentation.
 
 The homepage uses one [ProjectCard.astro](src/components/ProjectCard.astro) for
 the five explicit project descriptions. Palette roles select each surface;
@@ -288,6 +294,28 @@ text color. The transparent derivative preserves all 4569 × 2533 source pixels:
 only the original blue background pixels become transparent; the shape and
 dithering are unchanged. No palette-specific image copies are needed.
 
+The homepage footer uses the approved Seafoam Shore v2 artwork: daylight in
+light mode and twilight in dark mode, for both Classic and Sea Glass. Links,
+appearance controls, copyright, Flaticon attribution, and the JetBrains credit
+are real content above the illustration. The original shellheart identifies
+the brand. Other routes retain the compact footer and Starlight's footer content.
+
+Below 48rem, the artwork uses the dedicated square mobile composition. Wider
+screens use the complete panoramic composition, capped at its native 2172px
+width. Both preserve their aspect ratio without cropping. Responsive WebP
+exports live in `public/images/shoreline/`. Negative top margins compensate for
+the images' transparent upper area, leaving approximately 1rem between the
+functional content and the visible artwork. The illustration does not intercept
+pointer input and is omitted from print.
+
+The homepage frame lets the illustration span the viewport while its hero,
+project content, and footer links share a 77.5rem maximum width. The former
+resource cards and standalone Powered by block are removed. Their useful
+destinations and credit remain in the footer or Wiki; the package repository
+is still linked from the Wiki introduction.
+
+## Release checksum
+
 [consts.ts](src/consts.ts) keeps the ISO URL, checksum-file URL, and published
 SHA-256 together while preserving the existing documentation imports. The
 digest for `devario-2026.10.28-x86_64.iso` was verified against its mirror file
@@ -301,12 +329,6 @@ Checksum file link remains available when copying fails, the API is unavailable,
 or JavaScript is disabled.
 
 ## Typography and icons
-
-The homepage retains Starlight's configured hero and original Chel image. Its
-scoped layout places the introduction before the mascot on compact screens and
-beside it on desktop. The title uses solid palette colors, followed by the
-approved tagline and one Learn more link to the Wiki. Product-page heroes keep
-their existing presentation.
 
 Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with

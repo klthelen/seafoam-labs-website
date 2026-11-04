@@ -2,12 +2,8 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import DevarioShowcase from "../components/DevarioShowcase.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
-import { LinkCard } from "@astrojs/starlight/components";
 import ProjectCard from "../components/ProjectCard.astro";
-import { Image } from "astro:assets";
 import chel from "../assets/images/chel.png";
-import jetbrainsWhite from "../assets/icons/jetbrains-white.svg";
-import jetbrains from "../assets/icons/jetbrains.svg";
 ---
 
 <StarlightPage
@@ -82,48 +78,6 @@ import jetbrains from "../assets/icons/jetbrains.svg";
       </ProjectCard>
     </div>
   </section>
-
-  <AnchorHeading level="2" id="about-seafoam-labs">
-    About Seafoam Labs
-  </AnchorHeading>
-
-  <LinkCard
-    title="GitHub Organisation"
-    description="Browse all Seafoam Labs repositories on GitHub."
-    href="https://github.com/Seafoam-Labs"
-  />
-
-  <LinkCard
-    title="Seafoam Labs Package Repository"
-    description="Browse Seafoam Labs packages and setup instructions for adding the repository to your Arch Linux system."
-    href="https://repo.seafoam-labs.org/"
-  />
-
-  <AnchorHeading level="3" id="powered-by">
-    Powered by
-  </AnchorHeading>
-
-  <div class="my-4">
-    <a
-      href="https://jb.gg/OpenSource"
-      class="inline-block rounded-md p-3 hover:bg-(--sl-color-gray-6) dark:hover:bg-(--sl-color-gray-6)"
-    >
-      <Image
-        src={jetbrainsWhite}
-        class="hidden dark:block"
-        alt="JetBrains logo."
-        width={298}
-        height={64}
-      />
-      <Image
-        src={jetbrains}
-        class="mt-0 block dark:hidden"
-        alt="JetBrains logo."
-        width={298}
-        height={64}
-      />
-    </a>
-  </div>
 </StarlightPage>
 
 <style is:global>
@@ -133,9 +87,15 @@ import jetbrains from "../assets/icons/jetbrains.svg";
     --sl-main-pad: 0;
 
     .content-panel {
-      padding-block: 0;
+      padding: 0;
     }
     .sl-container {
+      max-width: none;
+    }
+    .hero,
+    .sl-markdown-content {
+      width: calc(100% - 2 * var(--sl-content-pad-x));
+      max-width: 77.5rem;
       margin-inline: auto;
     }
     .hero {

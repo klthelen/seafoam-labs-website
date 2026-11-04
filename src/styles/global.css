@@ -400,7 +400,7 @@
 }
 
 .sl-container {
-  footer {
+  footer:not(.homepage-footer) {
     /* Hide meta and pagination if they have no content */
     .meta:not(:has(*)),
     .pagination-links:not(:has(*)) {
