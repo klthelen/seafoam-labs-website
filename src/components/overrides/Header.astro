@@ -208,14 +208,13 @@ const currentPath = Astro.url.pathname.endsWith("/")
   .site-header {
     --sf-navigation-layout: compact;
     --sf-navigation-gutter: 16px;
-    --sf-projects-label-size: 1.25rem;
 
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    max-inline-size: 73.5rem;
+    max-inline-size: 77.5rem;
     min-block-size: 4rem;
     margin-inline: auto;
     padding: 8px;
@@ -269,13 +268,9 @@ const currentPath = Astro.url.pathname.endsWith("/")
   }
 
   .home-link:hover,
-  .page-links a:hover {
-    text-decoration: none;
-  }
-
+  .page-links a:hover,
   .home-link[aria-current="page"],
   .page-links a[aria-current="page"] {
-    font-weight: 700;
     text-decoration: none;
   }
 
@@ -337,22 +332,43 @@ const currentPath = Astro.url.pathname.endsWith("/")
     .site-header {
       --sf-navigation-layout: desktop;
       --sf-navigation-gutter: 24px;
-      --sf-projects-label-size: 1rem;
 
       gap: 1rem;
-      min-block-size: 5rem;
-      padding-inline: 1.5rem;
+      min-block-size: 6rem;
+      padding-inline: 2rem;
     }
 
     .site-header :global(.site-title img) {
-      inline-size: 36px;
-      block-size: 36px;
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
     }
 
     .home-link,
     .page-links,
     .header-socials {
       display: flex;
+    }
+
+    .home-link,
+    .page-links a {
+      min-block-size: 3rem;
+      font-size: 1.25rem;
+    }
+
+    .header-search :global(.sf-icon-control),
+    .header-socials :global(.social-link) {
+      min-inline-size: 3rem;
+      min-block-size: 3rem;
+    }
+
+    .header-search :global(.sf-icon-control svg),
+    .header-socials :global(svg) {
+      inline-size: 1.5rem;
+      block-size: 1.5rem;
+    }
+
+    .header-search :global(#starlight__search input) {
+      font-size: 1.25rem;
     }
 
     .site-menu {
@@ -396,7 +412,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
 
   @media (min-width: 64rem) {
     :global(:root) {
-      --sl-nav-height: calc(8rem + env(safe-area-inset-top));
+      --sl-nav-height: calc(9rem + env(safe-area-inset-top));
     }
   }
 

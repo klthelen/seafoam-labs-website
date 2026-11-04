@@ -189,9 +189,9 @@ Pearl, and Pori. The current overview receives `aria-current="page"` and a label
 underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
-The Projects label uses DM Sans 700, at 20px with a 24px line height in the compact
-Header and 16px with the same line height on desktop. Its content adds 0.25rem
-vertical and 0.5rem horizontal padding to the shared trigger, giving 12px vertical
+The Projects label uses DM Sans 700, at 1.25rem with a 1.5rem line height in both
+compact and desktop headers. Its content adds 0.25rem vertical and 0.5rem
+horizontal padding to the shared trigger, giving 12px vertical
 and 16px horizontal padding at the default text size. The label and 32px
 chevron form a centered group with a 0.5rem gap. The chevron points down when
 closed and up when open, following the native disclosure state. Rows retain the
@@ -242,13 +242,14 @@ labeled social rows with the compact arrangement.
 [Header.astro](src/components/overrides/Header.astro) owns the primary navigation
 capsule and coordinates Projects, Site menu, and inline Search. Opening one
 closes the others. Search replaces the middle navigation with its input and
-close control, retaining Home and the desktop social group. Escape and the
+close control, retaining the logo and the desktop social group. Escape and the
 close control restore Search focus; outside dismissal respects the clicked
 target.
 
 The Home, Wiki, Blog, and About links use `--sf-nav-link-hover` for hover
-feedback instead of an underline. The current page uses DM Sans 700 instead of
-600, with no underline at rest or on hover. Keyboard focus keeps the shared outline.
+feedback instead of an underline. All four links use DM Sans 600, with no
+underline at rest or on hover. The current page retains `aria-current="page"`,
+and keyboard focus keeps the shared outline.
 The navigation hover role is separate because Sea Glass's ordinary link hover
 color matches the header's resting text in dark mode. Contextual links within
 page content retain their underlines.
@@ -274,17 +275,21 @@ successful network request in failure tests.
 The compact capsule has a 4rem minimum height, 16px outer gutters, and 8px
 inner padding, increasing to 12px where space permits. Icon targets stay at least
 44px while text can grow. From a container width of 64rem, it shows the inline
-page and social links, uses a 5rem minimum height,
-and centers within a 73.5rem maximum width. The container query follows root text
-size so enlarged text keeps the compact arrangement longer. Controls can wrap
-without changing their reading order.
+page and social links, uses a 6rem minimum height and 2rem horizontal padding,
+and centers within a 77.5rem maximum width to match the homepage content. Desktop
+text links and the search input use 1.25rem text. The logo grows to 2.5rem, and
+search and social icons use 1.5rem glyphs in targets of at least 3rem.
+These rem dimensions follow the root text size. The container query follows
+root text size so enlarged text keeps the compact arrangement longer. Controls
+can wrap without changing their reading order.
 
 The desktop header places a separate Home text link between the logo and
 Projects, using the capsule's ordinary spacing. The logo and text are independent
 links and keyboard stops, both using Starlight's `siteTitleHref`. The logo retains
 Starlight's SiteTitle component and accessible site name. Compact layouts keep
 the logo in the header and provide Home as the first site-menu entry. The desktop
-Home link uses the shared focus outline and bold current-page treatment.
+Home link uses the shared focus outline and the same weight as the other text
+links.
 Opening Search hides the desktop Home text link with the other navigation links,
 retaining the logo. When resizing hides the desktop Home link, focus moves to the
 site-menu trigger. When the compact menu disappears, its focused Home entry
