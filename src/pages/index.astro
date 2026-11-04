@@ -112,8 +112,8 @@ import chel from "../assets/images/chel.png";
     .hero .copy {
       min-width: 0;
       gap: 1.5rem;
-      text-align: center;
-      align-items: center;
+      text-align: start;
+      align-items: flex-start;
     }
     .hero h1 {
       font-size: 2.625rem;
@@ -131,7 +131,7 @@ import chel from "../assets/images/chel.png";
       color: var(--sf-text-muted);
     }
     .hero .actions {
-      justify-content: center;
+      justify-content: flex-start;
     }
     .hero + .sl-markdown-content {
       margin-top: 0;
@@ -197,11 +197,6 @@ import chel from "../assets/images/chel.png";
         width: 100%;
         max-width: 22.5rem;
       }
-      .hero .stack,
-      .hero .copy {
-        text-align: start;
-        align-items: flex-start;
-      }
       .hero h1 {
         font-size: 4.5rem;
         line-height: 1.111;
@@ -209,9 +204,6 @@ import chel from "../assets/images/chel.png";
       .hero .tagline {
         font-size: 1.5rem;
         line-height: 1.417;
-      }
-      .hero .actions {
-        justify-content: flex-start;
       }
     }
   }

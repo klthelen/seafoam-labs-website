@@ -293,7 +293,8 @@ Starlight's sidebar content, state persistence, and navigation behavior.
 
 The homepage retains Starlight's configured hero and original Chel image. Its
 scoped layout places the introduction before the mascot on compact screens and
-beside it on desktop. The title uses solid palette colors, followed by the
+beside it on desktop. Copy and actions stay left aligned; the compact mascot
+is centered below them. The title uses solid palette colors, followed by the
 approved tagline and one Learn more link to the Wiki. Product-page heroes keep
 their existing presentation.
 
@@ -306,7 +307,8 @@ enlarged text instead of widening the page.
 
 The homepage Devario feature replaces the previous desktop illustration and
 feature list. Its compact sequence is title, fish, description, Overview,
-Download ISO, checksum controls, then GitHub. Desktop places the fish alongside
+Download ISO, checksum controls, then GitHub. Its description remains left
+aligned beneath the centered compact title and fish. Desktop places the fish alongside
 the introduction and keeps download utilities below it.
 
 The approved stronger dithered fish is used as an alpha mask in the current
