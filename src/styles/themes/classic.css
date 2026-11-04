@@ -11,6 +11,7 @@
   --sf-action-pressed: light-dark(#134e4a, #14b8a6);
   --sf-link: light-dark(#0f766e, #5eead4);
   --sf-link-hover: light-dark(#115e59, #2dd4a8);
+  --sf-nav-link-hover: var(--sf-link-hover);
   --sf-focus: var(--sf-link);
   --sf-boundary: #64748b;
 

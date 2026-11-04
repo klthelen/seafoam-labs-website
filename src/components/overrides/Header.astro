@@ -258,6 +258,16 @@ const currentPath = Astro.url.pathname.endsWith("/")
     font-weight: 600;
   }
 
+  .page-links a:hover:not([aria-current="page"]) {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .page-links a:hover {
+      color: var(--sf-nav-link-hover);
+    }
+  }
+
   .header-search {
     margin-inline-start: auto;
   }
