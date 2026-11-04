@@ -271,6 +271,16 @@ Starlight's sidebar content, state persistence, and navigation behavior.
 
 ## Release checksum
 
+The homepage Devario feature replaces the previous desktop illustration and
+feature list. Its compact sequence is title, fish, description, Overview,
+Download ISO, checksum controls, then GitHub. Desktop places the fish alongside
+the introduction and keeps download utilities below it.
+
+The approved stronger dithered fish is used as an alpha mask in the current
+text color. The transparent derivative preserves all 4569 × 2533 source pixels:
+only the original blue background pixels become transparent; the shape and
+dithering are unchanged. No palette-specific image copies are needed.
+
 [consts.ts](src/consts.ts) keeps the ISO URL, checksum-file URL, and published
 SHA-256 together while preserving the existing documentation imports. The
 digest for `devario-2026.10.28-x86_64.iso` was verified against its mirror file
