@@ -247,7 +247,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     gap: 8px;
     min-inline-size: 44px;
     min-block-size: 44px;
-    padding: 8px;
+    padding: 0.5rem;
   }
 
   .home-link,
@@ -258,12 +258,12 @@ const currentPath = Astro.url.pathname.endsWith("/")
   }
 
   .page-links {
-    gap: 1.5rem;
+    gap: inherit;
   }
 
   .home-link,
   .page-links a {
-    padding-inline: 0;
+    padding-inline: 1rem;
     font-weight: 600;
   }
 

@@ -280,6 +280,11 @@ page and social links, uses a 6rem minimum height and 2rem horizontal padding,
 and centers within a 77.5rem maximum width to match the homepage content. Desktop
 text links and the search input use 1.25rem text. The logo grows to 2.5rem, and
 search and social icons use 1.5rem glyphs in targets of at least 3rem.
+Home, Projects, Wiki, Blog, and About each have 1rem horizontal padding and
+a 1rem gap between controls. The page-links group inherits the capsule's gap
+so it keeps the same spacing as Home and Projects. Projects includes its label
+and chevron within that padding. Disclosure padding also uses rem so these
+insets stay equal when the root text size changes.
 These rem dimensions follow the root text size. The container query follows
 root text size so enlarged text keeps the compact arrangement longer. Controls
 can wrap without changing their reading order.
