@@ -185,11 +185,13 @@ Pearl, and Pori. The current overview receives `aria-current="page"` and a label
 underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
-The Projects label is 20px with a 24px line height in the compact Header and 16px
-with the same line height on desktop. A three-column grid balances its decorative
-chevron with an equal empty track on the left, centering the label itself in the
-trigger. The chevron is 0.75rem with a 0.5rem text gap. Rows retain
-the shared 12px spacing so adjacent hover and focus treatments remain separate.
+The Projects label uses DM Sans 700, at 20px with a 24px line height in the compact
+Header and 16px with the same line height on desktop. Its content adds 0.25rem
+vertical and 0.5rem horizontal padding to the shared trigger, giving 12px vertical
+and 16px horizontal padding at the default text size. The label and 32px
+chevron form a centered group with a 0.5rem gap. The chevron points down when
+closed and up when open, following the native disclosure state. Rows retain the
+shared 12px spacing so adjacent hover and focus treatments remain separate.
 Panel height follows these rows and their content, with scrolling handled by
 the disclosure. The containing header supplies `data-navigation-header` for
 placement below its full height.
@@ -362,7 +364,7 @@ or JavaScript is disabled.
 
 ## Typography and icons
 
-Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600.
+Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600/700.
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with
 each family's SIL Open Font License retained alongside the fonts.
 
