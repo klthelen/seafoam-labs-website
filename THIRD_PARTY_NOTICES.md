@@ -5,7 +5,9 @@
 The footer's theme and palette controls use UIcons by Flaticon, published by
 Freepik Company. These icons are governed by the **Flaticon License**, not MIT or
 the repository's GNU GPL license. Their source files are not vendored in this
-repository; the controls reference Flaticon's hosted PNGs as CSS alpha masks.
+repository. Astro fetches the two hosted PNGs during the build and generates
+small local images for use as CSS alpha masks in the rendered website. Visitors
+load these images from the website, without a separate Flaticon CDN request.
 
 | Control       | Icon and source page                                                                       | Hosted image                                                              |
 | ------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
@@ -22,13 +24,13 @@ Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Keep that credit visible and its link accessible. A repository notice does not
 replace the attribution in the rendered website.
 
-Flaticon's UIcons guide documents website integration through its CDN and allows
-footer attribution. Using these individual hosted images as masks follows that
-integration approach; the guide's examples use its CSS and icon-font delivery.
-The icon pages identify these resources as free for personal and commercial use
-with attribution. The license restricts redistribution and sublicensing of the
-assets, so do not copy them into the repository or offer them for download without
-separate permission. Refer to the current official terms for permitted uses.
+Flaticon's UIcons guide documents downloaded assets and CDN integration for
+websites, and allows footer attribution. The icon pages identify these resources
+as free for personal and commercial use with attribution. Generated images are
+incorporated into this website under that license; they are not relicensed under
+the repository's GNU GPL license. Do not offer them as standalone downloads or
+include them in an icon collection. Refer to the current official terms for
+permitted uses.
 
 Official sources:
 

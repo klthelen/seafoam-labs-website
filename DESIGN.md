@@ -334,8 +334,10 @@ Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/6
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with
 each family's SIL Open Font License retained alongside the fonts.
 
-The footer icons load from Flaticon's CDN and retain a visible attribution link.
-Their sources and separate license are recorded in
+Astro generates the two footer icons from their Flaticon sources at build time,
+so the published website serves them locally. Only those two remote image paths
+are authorized in the image configuration. The icons retain their visible
+attribution link; their sources and separate license are recorded in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Verification
