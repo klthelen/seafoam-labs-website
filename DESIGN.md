@@ -156,8 +156,10 @@ disclosures fall back to a 64rem breakpoint with 24px desktop or 16px compact
 viewport gutters.
 
 The panel uses a 22.5rem width, 1rem padding, 1.5rem corners, and the shared surface
-and boundary roles. Its height follows the content and scrolls within the available
-visible space. With JavaScript, a manual popover places it above surrounding
+and boundary roles. Its height follows the content. When the full list fits in
+the visible viewport, the panel can use the bottom clearance to avoid an
+unnecessary scrollbar. Taller lists scroll within the available space.
+With JavaScript, a manual popover places it above surrounding
 content without a backdrop or layout shift. Without the enhancement, the same
 links expand in normal document flow through native `details`.
 

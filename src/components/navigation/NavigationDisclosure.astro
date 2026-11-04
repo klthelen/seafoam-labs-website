@@ -56,7 +56,17 @@ const { align = "start" } = Astro.props;
       panel.toggleAttribute("data-viewport-panel", useViewport);
 
       panel.style.maxWidth = `${viewportWidth - gutter * 2}px`;
-      panel.style.maxHeight = `${Math.max(0, viewportTop + viewportHeight - top - verticalGutter)}px`;
+      const availableHeight = viewportTop + viewportHeight - top;
+      let maxHeight = Math.max(0, availableHeight - verticalGutter);
+      if (!useViewport) {
+        const contentHeight =
+          panel.scrollHeight + panel.offsetHeight - panel.clientHeight;
+        // Use spare bottom clearance when the full list fits without scrolling.
+        if (contentHeight <= availableHeight) {
+          maxHeight = Math.max(maxHeight, contentHeight);
+        }
+      }
+      panel.style.maxHeight = `${maxHeight}px`;
       const panelWidth = panel.getBoundingClientRect().width;
       let left = anchorBounds.left;
       if (disclosure.dataset.align === "end") {
