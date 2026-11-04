@@ -189,7 +189,8 @@ Pearl, and Pori. The current overview receives `aria-current="page"` and a label
 underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
-The Projects label uses DM Sans 700, at 1.25rem with a 1.5rem line height in both
+The Projects label inherits DM Sans 600 from the shared disclosure trigger,
+matching the header's text links, at 1.25rem with a 1.5rem line height in both
 compact and desktop headers. Its content adds 0.25rem vertical and 0.5rem
 horizontal padding to the shared trigger, giving 12px vertical
 and 16px horizontal padding at the default text size. The label and 32px
