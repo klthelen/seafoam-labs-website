@@ -322,15 +322,19 @@ appearance controls, copyright, Flaticon attribution, and the JetBrains credit
 are real content above the illustration. The original shellheart identifies
 the brand. Other routes retain the compact footer and Starlight's footer content.
 
-Below 48rem, the artwork uses the dedicated square mobile composition. Wider
-screens use the complete panoramic composition, capped at its native 2172px
-width. Beyond that width, a CSS transparency mask softens both outer edges into
-the active page background. The fade grows with the side gutters up to 12rem;
-the central artwork is unchanged. Both compositions preserve their aspect ratio
-without cropping. Responsive WebP exports live in `public/images/shoreline/`.
-Negative top margins compensate for the images' transparent upper area, leaving
-approximately 1rem between the functional content and the visible artwork. The
-illustration does not intercept pointer input and is omitted from print.
+The panoramic artwork is used at every viewport width. It scales from 1080px to
+its native 2172px width, preserving its aspect ratio. Narrower screens clip the
+sides around the shell, starfish, and pearl cluster, whose center is 75% across
+the image. The horizontal offset is clamped to the image edges so wider screens
+reveal more of the scene without introducing blank space. Clipping is confined
+to the decorative artwork; footer links and controls remain outside it.
+
+Beyond 2172px, a CSS transparency mask softens both outer edges into the active
+page background. The fade grows with the side gutters up to 12rem. Responsive
+WebP exports live in `public/images/shoreline/`; their `sizes` hints describe the
+full rendered image width, including the cropped portion. Negative top margins
+compensate for the image's transparent upper area. The illustration does not
+intercept pointer input and is omitted from print.
 
 The homepage frame lets the illustration span the viewport while its hero,
 project content, and footer links share a 77.5rem maximum width. The former

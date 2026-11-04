@@ -114,44 +114,28 @@ const links = [
       </a>
     </div>
     <div class="shoreline" aria-hidden="true">
-      <picture class="dark:hidden">
-        <source
-          media="(width < 48rem)"
-          srcset="/images/shoreline/shoreline-mobile-light-v2-480.webp 480w, /images/shoreline/shoreline-mobile-light-v2-800.webp 800w, /images/shoreline/shoreline-mobile-light-v2-1254.webp 1254w"
-          sizes="100vw"
-          width="1254"
-          height="1254"
-        />
-        <img
-          src="/images/shoreline/shoreline-wide-light-v2-1280.webp"
-          srcset="/images/shoreline/shoreline-wide-light-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-light-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-light-v2-2172.webp 2172w"
-          sizes="(min-width: 2172px) 2172px, 100vw"
-          width="2172"
-          height="724"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-      </picture>
-      <picture class="hidden dark:block">
-        <source
-          media="(width < 48rem)"
-          srcset="/images/shoreline/shoreline-mobile-dark-v2-480.webp 480w, /images/shoreline/shoreline-mobile-dark-v2-800.webp 800w, /images/shoreline/shoreline-mobile-dark-v2-1254.webp 1254w"
-          sizes="100vw"
-          width="1254"
-          height="1254"
-        />
-        <img
-          src="/images/shoreline/shoreline-wide-dark-v2-1280.webp"
-          srcset="/images/shoreline/shoreline-wide-dark-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-dark-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-dark-v2-2172.webp 2172w"
-          sizes="(min-width: 2172px) 2172px, 100vw"
-          width="2172"
-          height="724"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-      </picture>
+      <img
+        class="block dark:hidden"
+        src="/images/shoreline/shoreline-wide-light-v2-1280.webp"
+        srcset="/images/shoreline/shoreline-wide-light-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-light-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-light-v2-2172.webp 2172w"
+        sizes="(min-width: 2172px) 2172px, (min-width: 1080px) 100vw, 1080px"
+        width="2172"
+        height="724"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        class="hidden dark:block"
+        src="/images/shoreline/shoreline-wide-dark-v2-1280.webp"
+        srcset="/images/shoreline/shoreline-wide-dark-v2-1280.webp 1280w, /images/shoreline/shoreline-wide-dark-v2-1920.webp 1920w, /images/shoreline/shoreline-wide-dark-v2-2172.webp 2172w"
+        sizes="(min-width: 2172px) 2172px, (min-width: 1080px) 100vw, 1080px"
+        width="2172"
+        height="724"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   </footer>
 ) : (
@@ -314,21 +298,24 @@ const links = [
     height: auto;
   }
   .shoreline {
+    --shoreline-image-width: clamp(1080px, 100vw, 2172px);
     max-width: 2172px;
     margin-inline: auto;
-    /* Overlap only the artwork's transparent upper area; retain its full canvas. */
-    margin-top: calc(1rem - min(28vw, 351.12px));
+    /* Overlap only the artwork's transparent upper area. */
+    margin-top: calc(1rem - var(--shoreline-image-width) * 0.06);
+    overflow: clip;
     pointer-events: none;
   }
   .shoreline img {
-    display: block;
-    width: 100%;
+    width: var(--shoreline-image-width);
+    max-width: none;
     height: auto;
-  }
-  @media (min-width: 48rem) {
-    .shoreline {
-      margin-top: calc(1rem - min(6vw, 130.32px));
-    }
+    /* Center the shell/starfish/pearl cluster at 75%, without exposing an edge. */
+    margin-left: clamp(
+      calc(100% - var(--shoreline-image-width)),
+      calc(50% - var(--shoreline-image-width) * 0.75),
+      0px
+    );
   }
   @media (min-width: 64rem) {
     .homepage-footer {
