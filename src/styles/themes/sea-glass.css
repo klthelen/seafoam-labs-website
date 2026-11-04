@@ -6,8 +6,8 @@
   --sf-text-muted: light-dark(#4c5a64, #c6cdd1);
   --sf-action: light-dark(#252d35, #f0e4cb);
   --sf-on-action: light-dark(#f3f1ec, #263039);
-  --sf-action-hover: light-dark(#35414b, #f3f1ec);
-  --sf-action-pressed: light-dark(#18232b, #dfd3ba);
+  --sf-action-hover: color-mix(in srgb, var(--sf-action) 90%, black);
+  --sf-action-pressed: color-mix(in srgb, var(--sf-action) 80%, black);
   --sf-link: light-dark(#252d35, #f0e4cb);
   --sf-link-hover: light-dark(#35414b, #f3f1ec);
   --sf-nav-link-hover: light-dark(#35414b, #f0e4cb);

@@ -66,8 +66,11 @@ New components consume these roles rather than hard-coded theme colors. Keep
 link and focus roles distinct even when their values match. Sea Glass assigns
 amethyst to Shelly and Pearl, honey to Starfish and Pori, and rose to Aqueous;
 Classic uses the canvas with a card border. These choices belong to the palette.
-Classic's hover and pressed shades extend the original palette to keep action
-labels legible. The palette files hold the exact values.
+Filled action states derive from each palette's normal fill: hover mixes 90%
+of `--sf-action` with 10% black, and press mixes 80% with 20% black, in sRGB.
+This darkens the fill while preserving its hue and follows future palette
+changes automatically. The label keeps `--sf-on-action` at full opacity;
+check its contrast in every state when changing a palette's base colors.
 
 The older product-page gradients and Devario showcase still use the legacy
 Tailwind colors in `global.css`, so changing the palette does not yet recolor

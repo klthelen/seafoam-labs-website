@@ -6,9 +6,9 @@
   --sf-text-muted: light-dark(#334155, #cbd5e1);
   --sf-action: light-dark(#0f766e, #5eead4);
   --sf-on-action: light-dark(#ffffff, #0f172a);
-  /* Functional shades supplement the PDF's resting colors with legible interaction states. */
-  --sf-action-hover: light-dark(#115e59, #2dd4a8);
-  --sf-action-pressed: light-dark(#134e4a, #14b8a6);
+  /* Derive interaction shades from the fill so palette changes retain its hue. */
+  --sf-action-hover: color-mix(in srgb, var(--sf-action) 90%, black);
+  --sf-action-pressed: color-mix(in srgb, var(--sf-action) 80%, black);
   --sf-link: light-dark(#0f766e, #5eead4);
   --sf-link-hover: light-dark(#115e59, #2dd4a8);
   --sf-nav-link-hover: var(--sf-link-hover);
