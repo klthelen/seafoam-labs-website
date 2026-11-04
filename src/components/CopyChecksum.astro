@@ -1,35 +1,32 @@
 ---
 interface Props {
   checksum: string;
-  href: string;
 }
 
-const { checksum, href } = Astro.props;
+const { checksum } = Astro.props;
 ---
 
 <div class="copy-checksum" data-checksum={checksum}>
-  <div class="checksum-actions">
-    <button class="sf-link" type="button" hidden>
-      <svg
-        aria-hidden="true"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linejoin="round"
-      >
-        <rect x="8" y="8" width="12" height="13" rx="2" />
-        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
-      </svg>
-      Copy checksum
-    </button>
-    <a class="sf-link" {href}>
-      Checksum file
-    </a>
-  </div>
+  <button class="sf-link" type="button" hidden>
+    <svg
+      aria-hidden="true"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linejoin="round"
+    >
+      <rect x="8" y="8" width="12" height="13" rx="2" />
+      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+    </svg>
+    Copy checksum
+  </button>
   <p class="checksum-status" role="status" aria-atomic="true"></p>
+  <p class="checksum-value">
+    SHA-256: <code>{checksum}</code>
+  </p>
 </div>
 
 <script>
@@ -38,37 +35,40 @@ const { checksum, href } = Astro.props;
   )) {
     const button = control.querySelector("button");
     const status = control.querySelector<HTMLElement>("[role='status']");
+    const fallback = control.querySelector<HTMLElement>(".checksum-value");
     const checksum = control.dataset.checksum;
-    if (!button || !status || !checksum || !navigator.clipboard?.writeText)
+    if (
+      !button ||
+      !status ||
+      !fallback ||
+      !checksum ||
+      !navigator.clipboard?.writeText
+    )
       continue;
 
     button.addEventListener("click", async () => {
       status.textContent = "";
       try {
         await navigator.clipboard.writeText(checksum);
+        fallback.hidden = true;
         status.textContent = "Checksum copied";
       } catch {
         status.textContent =
-          "Could not copy the checksum. Open the checksum file to copy it manually.";
+          "Could not copy the checksum. Select and copy it below.";
+        fallback.hidden = false;
       }
     });
     button.hidden = false;
+    fallback.hidden = true;
   }
 </script>
 
 <style>
   .copy-checksum {
     min-width: 0;
+    max-width: 100%;
   }
-  .checksum-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0 1rem;
-  }
-  button,
-  a {
+  button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -90,7 +90,8 @@ const { checksum, href } = Astro.props;
   svg {
     flex: none;
   }
-  .checksum-status {
+  .checksum-status,
+  .checksum-value {
     margin: 0;
     max-width: 42ch;
     color: var(--sf-text-muted);
@@ -98,9 +99,7 @@ const { checksum, href } = Astro.props;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
-  @media (min-width: 64rem) {
-    .checksum-actions {
-      justify-content: flex-start;
-    }
+  .checksum-value code {
+    font-size: inherit;
   }
 </style>

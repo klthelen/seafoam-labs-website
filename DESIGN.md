@@ -348,10 +348,11 @@ destinations, as confirmed during the handoff. Heading permalinks can wrap with
 enlarged text instead of widening the page.
 
 The homepage Devario feature replaces the previous desktop illustration and
-feature list. Its compact sequence is title, fish, description, Overview,
-Download ISO, checksum controls, then GitHub. Its description remains left
-aligned beneath the centered compact title and fish. Desktop places the fish alongside
-the introduction and keeps download utilities below it.
+feature list. Overview is a text link beside the heading, followed by the
+description and the Download ISO and Copy checksum controls. Desktop places
+the enlarged fish alongside this content, with View on GitHub in the upper
+right. Compact layouts wrap the heading and controls as needed, then place
+the fish and GitHub link below the introduction.
 
 The approved stronger dithered fish is used as an alpha mask in the current
 text color. The transparent derivative preserves all 4569 × 2533 source pixels:
@@ -394,9 +395,10 @@ No download size is displayed without verified metadata.
 
 [CopyChecksum.astro](src/components/CopyChecksum.astro) copies the digest through
 the browser clipboard API and reports success only after the write succeeds.
-Its status region exists before the action and does not take focus. A normal
-Checksum file link remains available when copying fails, the API is unavailable,
-or JavaScript is disabled.
+Its status region exists before the action and does not take focus. There is
+no separate checksum-file link in the homepage card. The digest itself becomes
+available for manual selection when copying fails, the API is unavailable,
+or JavaScript is disabled. The setup documentation retains its checksum-file link.
 
 ## Typography and icons
 
