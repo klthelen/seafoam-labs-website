@@ -269,6 +269,20 @@ the viewport, with a native Close documentation button supplied by
 [Sidebar.astro](src/components/overrides/Sidebar.astro). That override retains
 Starlight's sidebar content, state persistence, and navigation behavior.
 
+## Release checksum
+
+[consts.ts](src/consts.ts) keeps the ISO URL, checksum-file URL, and published
+SHA-256 together while preserving the existing documentation imports. The
+digest for `devario-2026.10.28-x86_64.iso` was verified against its mirror file
+on 3 November 2026. Update these values together when changing the release.
+No download size is displayed without verified metadata.
+
+[CopyChecksum.astro](src/components/CopyChecksum.astro) copies the digest through
+the browser clipboard API and reports success only after the write succeeds.
+Its status region exists before the action and does not take focus. A normal
+Checksum file link remains available when copying fails, the API is unavailable,
+or JavaScript is disabled.
+
 ## Typography and icons
 
 The homepage retains Starlight's configured hero and original Chel image. Its

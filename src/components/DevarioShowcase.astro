@@ -1,7 +1,8 @@
 ---
 import { Image } from "astro:assets";
 import { Badge } from "@astrojs/starlight/components";
-import { isoChecksumUrl, isoDownloadUrl } from "../consts";
+import { isoChecksumUrl, isoDownloadUrl, isoSha256 } from "../consts";
+import CopyChecksum from "./CopyChecksum.astro";
 import devarioLogo from "../assets/images/devario-logo.png";
 ---
 
@@ -111,9 +112,7 @@ import devarioLogo from "../assets/images/devario-logo.png";
         </svg>
       </a>
       <Badge text="Beta" variant="note" size="small" />
-      <a class="dv-checksum" download href={isoChecksumUrl}>
-        SHA-256
-      </a>
+      <CopyChecksum checksum={isoSha256} href={isoChecksumUrl} />
     </div>
   </div>
   <figure
@@ -338,15 +337,6 @@ import devarioLogo from "../assets/images/devario-logo.png";
   }
   .dv-iso:hover {
     filter: brightness(1.08);
-  }
-  .dv-checksum {
-    color: var(--sl-color-gray-3);
-    font-size: 0.73rem;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-  .dv-checksum:hover {
-    color: var(--sl-color-text-accent);
   }
   .devario-showcase .dv-visual {
     position: relative;
@@ -642,7 +632,6 @@ import devarioLogo from "../assets/images/devario-logo.png";
   }
   .dv-features a:focus-visible,
   .dv-actions a:focus-visible,
-  .dv-checksum:focus-visible,
   .dv-iso:focus-visible {
     outline: 2px solid var(--sl-color-text-accent);
     outline-offset: 4px;
