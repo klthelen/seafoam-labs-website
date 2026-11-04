@@ -247,8 +247,8 @@ close control restore Search focus; outside dismissal respects the clicked
 target.
 
 The Home, Wiki, Blog, and About links use `--sf-nav-link-hover` for hover
-feedback instead of an underline. The current page keeps its persistent
-underline, including on hover, and keyboard focus keeps the shared outline.
+feedback instead of an underline. The current page uses DM Sans 700 instead of
+600, with no underline at rest or on hover. Keyboard focus keeps the shared outline.
 The navigation hover role is separate because Sea Glass's ordinary link hover
 color matches the header's resting text in dark mode. Contextual links within
 page content retain their underlines.
@@ -283,8 +283,8 @@ The desktop header places a separate Home text link between the logo and
 Projects, using the capsule's ordinary spacing. The logo and text are independent
 links and keyboard stops, both using Starlight's `siteTitleHref`. The logo retains
 Starlight's SiteTitle component and accessible site name. Compact layouts keep
-the logo in the header and provide Home as the first site-menu entry. Home uses
-the shared navigation-link focus outline and a persistent current-page underline.
+the logo in the header and provide Home as the first site-menu entry. The desktop
+Home link uses the shared focus outline and bold current-page treatment.
 Opening Search hides the desktop Home text link with the other navigation links,
 retaining the logo. When resizing hides the desktop Home link, focus moves to the
 site-menu trigger. When the compact menu disappears, its focused Home entry
