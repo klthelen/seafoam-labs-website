@@ -1,0 +1,77 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  project: "shelly" | "starfish" | "aqueous" | "pearl" | "pori";
+}
+
+const { title, href, project } = Astro.props;
+---
+
+<article
+  class="project-card not-content"
+  style={{ "--project-surface": `var(--sf-${project}-surface)` }}
+>
+  <h3>{title}</h3>
+  <p>
+    <slot />
+  </p>
+  <a
+    class="sf-action sf-action--card"
+    {href}
+    aria-label={`Learn more about ${title}`}
+  >
+    Learn more
+  </a>
+</article>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--sf-card-border);
+    border-radius: 20px;
+    background: var(--project-surface);
+    color: var(--sf-card-ink);
+    overflow-wrap: anywhere;
+  }
+  h3 {
+    margin: 0 0 1rem;
+    color: inherit;
+    font-size: 1.625rem;
+    line-height: 1.231;
+  }
+  p {
+    flex: 1;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  a {
+    margin-top: 1.5rem;
+  }
+  p :global(code) {
+    font-size: 0.9375em;
+  }
+  @media (width < 24rem) {
+    .project-card {
+      padding: 20px;
+    }
+  }
+  @media (min-width: 64rem) {
+    .project-card {
+      padding: 32px;
+    }
+    h3 {
+      font-size: 1.5rem;
+      line-height: 1.333;
+    }
+    p {
+      font-size: 1.125rem;
+      line-height: 1.556;
+    }
+  }
+</style>

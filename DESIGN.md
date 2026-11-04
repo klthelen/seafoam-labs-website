@@ -271,6 +271,13 @@ Starlight's sidebar content, state persistence, and navigation behavior.
 
 ## Release checksum
 
+The homepage uses one [ProjectCard.astro](src/components/ProjectCard.astro) for
+the five explicit project descriptions. Palette roles select each surface;
+the collection owns its responsive columns. Cards have natural content height
+and align actions within desktop rows. Aqueous and Pearl retain their overview
+destinations, as confirmed during the handoff. Heading permalinks can wrap with
+enlarged text instead of widening the page.
+
 The homepage Devario feature replaces the previous desktop illustration and
 feature list. Its compact sequence is title, fish, description, Overview,
 Download ISO, checksum controls, then GitHub. Desktop places the fish alongside
