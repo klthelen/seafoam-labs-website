@@ -154,10 +154,13 @@ const pagefindConfig =
         try {
           // Starlight writes these assets with the index. Reuse its installed Pagefind version.
           const bundlePath = this.dataset.bundlePath;
-          const pagefind: { init: () => Promise<void> } = await import(
-            /* @vite-ignore */ `${bundlePath}pagefind.js`
-          );
+          const pagefind: {
+            init: () => Promise<void>;
+            filters: () => Promise<unknown>;
+          } = await import(/* @vite-ignore */ `${bundlePath}pagefind.js`);
           await pagefind.init();
+          // init starts the worker; filters waits for its metadata and WASM to be ready.
+          await pagefind.filters();
           await import(/* @vite-ignore */ `${bundlePath}pagefind-ui.js`);
           const stripTrailingSlash = this.hasAttribute(
             "data-strip-trailing-slash",
@@ -205,7 +208,7 @@ const pagefindConfig =
             input?.focus();
         } catch (error) {
           feedback.textContent =
-            "Search could not load. Close and reopen Search to try again.";
+            "Search could not load. Reload this page to try again.";
           status.textContent = feedback.textContent;
           console.error("Unable to initialize site search.", error);
         } finally {
