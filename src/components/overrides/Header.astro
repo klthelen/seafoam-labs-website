@@ -11,7 +11,7 @@ import { sitePages } from "../../data/navigation";
 const shouldRenderSearch =
   config.pagefind ||
   config.components.Search !== "@astrojs/starlight/components/Search.astro";
-const { hasSidebar } = Astro.locals.starlightRoute;
+const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
 const isHomepage = Astro.url.pathname === "/";
 const currentPath = Astro.url.pathname.endsWith("/")
   ? Astro.url.pathname
@@ -26,6 +26,14 @@ const currentPath = Astro.url.pathname.endsWith("/")
     aria-label="Primary"
   >
     <SiteTitle />
+    <a
+      class="home-link sf-nav-link"
+      href={siteTitleHref}
+      aria-current={siteTitleHref === currentPath ? "page" : undefined}
+      data-desktop-navigation
+    >
+      Home
+    </a>
     <ProjectsMenu />
     <div class="page-links" data-desktop-navigation>
       {sitePages.map(({ href, label }) => (
@@ -59,8 +67,8 @@ const currentPath = Astro.url.pathname.endsWith("/")
     const siteMenu = header.querySelector<HTMLElement>(".site-menu");
     const siteDisclosure = siteMenu?.querySelector("details");
     const siteTrigger = siteDisclosure?.querySelector("summary");
-    const homeLink = header.querySelector<HTMLAnchorElement>(".site-title");
-    if (!frame || !siteMenu || !siteDisclosure || !siteTrigger || !homeLink)
+    const logoLink = header.querySelector<HTMLAnchorElement>(".site-title");
+    if (!frame || !siteMenu || !siteDisclosure || !siteTrigger || !logoLink)
       continue;
 
     const disclosures = header.querySelectorAll<HTMLDetailsElement>(
@@ -117,10 +125,10 @@ const currentPath = Astro.url.pathname.endsWith("/")
       const destination = focused?.closest("a")?.href;
       const counterpart = [
         ...header.querySelectorAll<HTMLAnchorElement>(
-          "[data-desktop-navigation] a",
+          "a[data-desktop-navigation], [data-desktop-navigation] a",
         ),
       ].find((link) => link.href === destination);
-      (counterpart ?? homeLink).focus();
+      (counterpart ?? logoLink).focus();
     };
 
     // CSS can hide a focused control before ResizeObserver runs.
@@ -243,6 +251,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     padding: 8px;
   }
 
+  .home-link,
   .page-links,
   .header-socials {
     display: none;
@@ -253,16 +262,19 @@ const currentPath = Astro.url.pathname.endsWith("/")
     gap: 1.5rem;
   }
 
+  .home-link,
   .page-links a {
     padding-inline: 0;
     font-weight: 600;
   }
 
+  .home-link:hover:not([aria-current="page"]),
   .page-links a:hover:not([aria-current="page"]) {
     text-decoration: none;
   }
 
   @media (hover: hover) {
+    .home-link:hover,
     .page-links a:hover {
       color: var(--sf-nav-link-hover);
     }
@@ -331,6 +343,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
       block-size: 36px;
     }
 
+    .home-link,
     .page-links,
     .header-socials {
       display: flex;
@@ -342,6 +355,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
   }
 
   .site-header[data-search-open] > :global(.navigation-disclosure),
+  .site-header[data-search-open] .home-link,
   .site-header[data-search-open] .page-links,
   .site-header[data-search-open] .site-menu {
     display: none;

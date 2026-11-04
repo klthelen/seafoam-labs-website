@@ -6,6 +6,7 @@ import NavigationDisclosure from "./NavigationDisclosure.astro";
 import { sitePages } from "../../data/navigation";
 
 const socialLinks = config.social || [];
+const { siteTitleHref } = Astro.locals.starlightRoute;
 const currentPath = Astro.url.pathname.endsWith("/")
   ? Astro.url.pathname
   : `${Astro.url.pathname}/`;
@@ -23,6 +24,13 @@ const currentPath = Astro.url.pathname.endsWith("/")
     </span>
   </Fragment>
   <ul class="site-links">
+    <li>
+      <MenuLink
+        href={siteTitleHref}
+        label="Home"
+        current={siteTitleHref === currentPath}
+      />
+    </li>
     {sitePages.map(({ href, label }) => (
       <li>
         <MenuLink {href} {label} current={href === currentPath} />

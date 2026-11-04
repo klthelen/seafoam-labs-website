@@ -203,7 +203,8 @@ placement below its full height.
 ## Site menu
 
 [SiteMenu.astro](src/components/navigation/SiteMenu.astro) uses the shared disclosure
-with end alignment. It lists Wiki, Blog, and About from
+with end alignment. Home is first and uses Starlight's `siteTitleHref`, matching
+the header's home link. Wiki, Blog, and About follow from
 [navigation.ts](src/data/navigation.ts), shared with the Header's inline links,
 then reads the social links from Starlight's `social` configuration. External rows
 retain the configured labels, icons, destinations, normal tab behavior, and
@@ -245,7 +246,7 @@ close control, retaining Home and the desktop social group. Escape and the
 close control restore Search focus; outside dismissal respects the clicked
 target.
 
-The inline Wiki, Blog, and About links use `--sf-nav-link-hover` for hover
+The Home, Wiki, Blog, and About links use `--sf-nav-link-hover` for hover
 feedback instead of an underline. The current page keeps its persistent
 underline, including on hover, and keyboard focus keeps the shared outline.
 The navigation hover role is separate because Sea Glass's ordinary link hover
@@ -276,8 +277,18 @@ inner padding, increasing to 12px where space permits. Icon targets stay at leas
 page and social links, uses a 5rem minimum height,
 and centers within a 73.5rem maximum width. The container query follows root text
 size so enlarged text keeps the compact arrangement longer. Controls can wrap
-without changing their reading order. The home mark retains Starlight's site
-title as its accessible name.
+without changing their reading order.
+
+The desktop header places a separate Home text link between the logo and
+Projects, using the capsule's ordinary spacing. The logo and text are independent
+links and keyboard stops, both using Starlight's `siteTitleHref`. The logo retains
+Starlight's SiteTitle component and accessible site name. Compact layouts keep
+the logo in the header and provide Home as the first site-menu entry. Home uses
+the shared navigation-link focus outline and a persistent current-page underline.
+Opening Search hides the desktop Home text link with the other navigation links,
+retaining the logo. When resizing hides the desktop Home link, focus moves to the
+site-menu trigger. When the compact menu disappears, its focused Home entry
+transfers focus to the desktop Home link.
 
 The homepage header stays in normal document flow. Other pages retain Starlight's
 fixed frame; a resize observer supplies its measured height to `--sl-nav-height`
