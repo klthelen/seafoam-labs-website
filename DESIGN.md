@@ -186,7 +186,9 @@ underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
 The Projects label is 20px with a 24px line height in the compact Header and 16px
-with the same line height on desktop. Its decorative chevron is 12px. Rows retain
+with the same line height on desktop. A three-column grid balances its decorative
+chevron with an equal empty track on the left, centering the label itself in the
+trigger. The chevron is 0.75rem with a 0.5rem text gap. Rows retain
 the shared 12px spacing so adjacent hover and focus treatments remain separate.
 Panel height follows these rows and their content, with scrolling handled by
 the disclosure. The containing header supplies `data-navigation-header` for

@@ -42,10 +42,10 @@ const currentPath = Astro.url.pathname.endsWith("/")
 ---
 
 <NavigationDisclosure>
-  <Fragment slot="trigger">
+  <span class="projects-trigger" slot="trigger">
     <span class="projects-label">Projects</span>
     <Icon name="down-caret" size="0.75rem" />
-  </Fragment>
+  </span>
   <ul class="projects-list">
     {projects.map(({ href, label, description }) => (
       <li>
@@ -56,7 +56,16 @@ const currentPath = Astro.url.pathname.endsWith("/")
 </NavigationDisclosure>
 
 <style>
+  .projects-trigger {
+    display: inline-grid;
+    /* Balance the chevron with an empty track so the label stays centered. */
+    grid-template-columns: 0.75rem auto 0.75rem;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .projects-label {
+    grid-column: 2;
     font-size: var(--sf-projects-label-size, 1.25rem);
     line-height: 1.5rem;
   }
