@@ -145,6 +145,9 @@ content in the `trigger` slot and the navigation list in the default slot. The
 trigger content must include its visible label or an accessible text alternative
 for an icon. The browser owns expanded/collapsed semantics and Enter/Space
 activation; do not add redundant roles or `aria-expanded` to the summary.
+Disclosure triggers use the palette's action fill and contrasting text on hover,
+matching the header's icon controls, with no underline. The same fill marks the
+open state, and the shared keyboard focus outline remains visible.
 
 Use `align="start"` (the default) for Projects and `align="end"` for Site menu.
 Mark their containing header capsule with `data-navigation-header`. The popup
