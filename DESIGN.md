@@ -294,6 +294,10 @@ Returning to the top brings the backdrop back behind the pill. The reserved
 height stays at 6rem so the page does not jump. Only the shadow fades, over 200ms;
 reduced motion disables that transition.
 
+Wiki and documentation pages keep the full-width backdrop fixed at the top
+while scrolling. Their header does not detach or gain the floating-pill shadow,
+so it remains visually connected to the documentation navigation.
+
 Below that width, the header retains its pill shape and outer spacing, including
 in narrow or split-screen desktop windows.
 

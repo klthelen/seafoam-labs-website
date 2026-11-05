@@ -213,6 +213,10 @@ const currentPath = Astro.url.pathname.endsWith("/")
       max(16px, env(safe-area-inset-left));
   }
 
+  .header-content[data-docs] {
+    pointer-events: auto;
+  }
+
   .site-header {
     --sf-navigation-layout: compact;
     --sf-navigation-gutter: 16px;
@@ -388,7 +392,6 @@ const currentPath = Astro.url.pathname.endsWith("/")
   @container site-navigation (width < 80rem) {
     .header-content[data-docs] {
       background: var(--sf-canvas);
-      pointer-events: auto;
     }
   }
 
@@ -414,7 +417,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     }
 
     @media (height > 32rem) {
-      .header-content::before {
+      .header-content:not([data-docs])::before {
         /* The backdrop scrolls away while the pill stays in place. */
         transform: translateY(calc(-1 * var(--sf-header-scroll, 0px)));
       }
@@ -422,7 +425,9 @@ const currentPath = Astro.url.pathname.endsWith("/")
   }
 
   @media (height > 32rem) {
-    :global(.header[data-scrolled]) .site-header {
+    :global(.header[data-scrolled])
+      .header-content:not([data-docs])
+      .site-header {
       box-shadow: var(--sl-shadow-sm);
     }
 
