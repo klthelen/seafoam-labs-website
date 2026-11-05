@@ -232,6 +232,21 @@
   cursor: pointer;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .sf-action:not(:disabled),
+  .sf-icon-control:not(:disabled),
+  .sl-link-button {
+    transition:
+      background-color 140ms ease-out,
+      color 140ms ease-out,
+      border-color 140ms ease-out;
+  }
+
+  :is(.sf-action, .sf-icon-control, .sl-link-button):active:not(:disabled) {
+    transition-duration: 75ms;
+  }
+}
+
 .sf-action--compact {
   min-block-size: 2.75rem;
   padding: 0.5rem 1.25rem;

@@ -239,6 +239,18 @@ const [themeIcon, paletteIcon] = await Promise.all([
     color: var(--sf-on-action);
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    summary {
+      transition:
+        background-color 140ms ease-out,
+        color 140ms ease-out;
+    }
+
+    summary:active {
+      transition-duration: 75ms;
+    }
+  }
+
   summary:focus-visible,
   label:has(input:focus-visible),
   a:focus-visible {

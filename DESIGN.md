@@ -111,8 +111,11 @@ Labels wrap and controls grow with their content.
 Focus adds a separate 2px outline with a 3px offset, preserving the current fill
 and space around the control. Card actions and links use the card ink for focus.
 Keep that outline clear of clipping containers. Contextual links retain their
-color after a visit; hover thickens the underline. Shared actions have immediate
-feedback without movement or animation.
+color after a visit; hover thickens the underline. Shared action and icon buttons
+transition their background, text, and border colors over 140ms with `ease-out`
+when entering and leaving hover. Press feedback uses 75ms. Navigation disclosure
+and footer appearance triggers use the same color timing. Focus outlines remain
+immediate, and reduced-motion preferences disable these transitions.
 
 Use native `disabled` only for an unavailable button, with a visible explanation
 at the call site. Disabled buttons do not receive hover or pressed treatments.

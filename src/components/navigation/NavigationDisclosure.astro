@@ -184,6 +184,18 @@ const { align = "start" } = Astro.props;
     color: var(--sf-on-action);
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    .disclosure-trigger {
+      transition:
+        background-color 140ms ease-out,
+        color 140ms ease-out;
+    }
+
+    .disclosure-trigger:active {
+      transition-duration: 75ms;
+    }
+  }
+
   .disclosure-panel {
     --viewport-gutter: var(--sf-navigation-gutter, 16px);
 
