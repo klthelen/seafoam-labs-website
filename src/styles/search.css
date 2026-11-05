@@ -1,0 +1,113 @@
+:is(#starlight__search, #page-search) {
+  --pagefind-ui-scale: 1;
+  --pagefind-ui-text: var(--sf-text);
+  --pagefind-ui-primary: var(--sf-link);
+  --pagefind-ui-background: var(--sf-canvas);
+  --pagefind-ui-border: var(--sf-boundary);
+  --pagefind-ui-font: var(--sl-font);
+  min-inline-size: 0;
+  white-space: normal;
+}
+
+:is(#starlight__search, #page-search) input {
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--sf-boundary);
+  border-radius: 999px;
+  background: var(--sf-canvas);
+  color: var(--sf-text);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+:is(#starlight__search, #page-search) input:focus {
+  outline: 2px solid var(--sf-focus);
+  outline-offset: -2px;
+}
+
+:is(#starlight__search, #page-search) input::placeholder {
+  color: var(--sf-text-muted);
+  opacity: 1;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__form::before {
+  display: none;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__search-clear {
+  top: 2px;
+  right: 4px;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  max-width: 50%;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+:is(#starlight__search, #page-search)
+  .pagefind-ui__search-clear.pagefind-ui__suppressed {
+  visibility: hidden;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__results-area {
+  min-width: 0;
+  margin-top: 0;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__message {
+  height: auto;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result {
+  padding: 1rem 0;
+  border: 0;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result-inner {
+  min-width: 0;
+  margin-top: 0;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result-nested {
+  padding-left: 1rem;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result-nested::before {
+  display: none;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result-link {
+  display: inline-block;
+  color: var(--sf-link);
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__result-excerpt {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+:is(#starlight__search, #page-search) .pagefind-ui__button {
+  height: auto;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  white-space: normal;
+}
+
+:is(#starlight__search, #page-search) :is(a, button):focus-visible {
+  outline: 2px solid var(--sf-focus);
+  outline-offset: 2px;
+}

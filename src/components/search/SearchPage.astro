@@ -1,0 +1,166 @@
+---
+import config from "virtual:starlight/user-config";
+import project from "virtual:starlight/project-context";
+import "../../styles/search.css";
+
+const label = Astro.locals.t("search.label");
+const placeholder = Astro.locals.starlightRoute.lang.startsWith("en")
+  ? "Search the site"
+  : label;
+const translations = {
+  ...Object.fromEntries(
+    Object.entries(Astro.locals.t.all())
+      .filter(([key]) => key.startsWith("pagefind."))
+      .map(([key, value]) => [key.replace("pagefind.", ""), value]),
+  ),
+  placeholder,
+};
+const bundlePath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/pagefind/`;
+const pagefindConfig =
+  typeof config.pagefind === "object" ? config.pagefind : {};
+---
+
+{import.meta.env.PROD && (
+  <link rel="stylesheet" href={`${bundlePath}pagefind-ui.css`} />
+)}
+<section class="search-page not-content" data-pagefind-ignore>
+  <label for="page-search-input">{placeholder}</label>
+  <div
+    id="page-search"
+    class="site-search-provider"
+    data-bundle-path={bundlePath}
+    data-translations={JSON.stringify(translations)}
+    data-config={JSON.stringify(pagefindConfig)}
+    data-strip-trailing-slash={
+      project.trailingSlash === "never" ? "" : undefined
+    }
+  >
+    {import.meta.env.DEV && (
+      <input id="page-search-input" {placeholder} readonly />
+    )}
+  </div>
+  <p data-search-feedback>
+    {import.meta.env.DEV
+      ? Astro.locals.t("search.devWarning")
+      : "Loading search…"}
+  </p>
+  <p class="sr-only" role="status" aria-atomic="true"></p>
+  <noscript>
+    <p>Enable JavaScript to search the site.</p>
+  </noscript>
+</section>
+
+<script>
+  import { createPagefindSearch } from "../../utils/pagefind";
+
+  const page = document.querySelector<HTMLElement>(".search-page");
+  const container = page?.querySelector<HTMLElement>("#page-search");
+  const feedback = page?.querySelector<HTMLElement>("[data-search-feedback]");
+  const status = page?.querySelector<HTMLElement>("[role='status']");
+
+  if (page && container && feedback && status) {
+    const initialQuery =
+      new URL(location.href).searchParams.get("q")?.trim() ?? "";
+    const updateQueryString = (query: string) => {
+      const url = new URL(location.href);
+      if (query.trim()) url.searchParams.set("q", query.trim());
+      else url.searchParams.delete("q");
+      history.replaceState(null, "", url);
+    };
+
+    if (import.meta.env.PROD) {
+      const initialize = async () => {
+        status.textContent = feedback.textContent;
+        try {
+          const search = await createPagefindSearch(container, {
+            pageSize: 10,
+            showSubResults: true,
+            excerptLength: 20,
+          });
+          const input = container.querySelector("input");
+          if (input) {
+            input.id = "page-search-input";
+            input.addEventListener("input", () =>
+              updateQueryString(input.value),
+            );
+            input.addEventListener("keydown", (event) => {
+              if (event.key === "Escape") updateQueryString("");
+            });
+          }
+
+          const drawer = container.querySelector<HTMLElement>(
+            ".pagefind-ui__drawer",
+          );
+          if (drawer) {
+            new MutationObserver(() => {
+              const message = drawer.classList.contains("pagefind-ui__hidden")
+                ? ""
+                : (drawer.querySelector(".pagefind-ui__message")?.textContent ??
+                  "");
+              if (status.textContent !== message) status.textContent = message;
+            }).observe(drawer, {
+              attributes: true,
+              attributeFilter: ["class"],
+              childList: true,
+              subtree: true,
+              characterData: true,
+            });
+          }
+          feedback.hidden = true;
+          status.textContent = "";
+          if (initialQuery) search.triggerSearch(initialQuery);
+        } catch (error) {
+          feedback.textContent =
+            "Search could not load. Reload this page to try again.";
+          status.textContent = feedback.textContent;
+          console.error("Unable to initialize site search.", error);
+        }
+      };
+      void initialize();
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        container.querySelector("input")?.focus();
+      }
+    });
+    container.addEventListener("click", (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest(".pagefind-ui__search-clear")
+      ) {
+        updateQueryString("");
+        container.querySelector("input")?.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .search-page {
+    max-inline-size: 52rem;
+  }
+  label {
+    display: block;
+    margin-block-end: 0.5rem;
+    font-weight: 600;
+  }
+  [data-search-feedback] {
+    white-space: pre-line;
+  }
+  @media (scripting: none) {
+    [data-search-feedback] {
+      display: none;
+    }
+  }
+  #page-search :global(.pagefind-ui__drawer) {
+    margin-block-start: 1.5rem;
+  }
+  #page-search :global(.pagefind-ui__result) {
+    padding-block: 1.25rem;
+  }
+  #page-search :global(.pagefind-ui__result-link) {
+    font-size: 1.125rem;
+  }
+</style>

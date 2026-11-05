@@ -2,6 +2,7 @@
 import { Icon } from "@astrojs/starlight/components";
 import config from "virtual:starlight/user-config";
 import project from "virtual:starlight/project-context";
+import "../../styles/search.css";
 
 const label = Astro.locals.t("search.label");
 const placeholder = Astro.locals.starlightRoute.lang.startsWith("en")
@@ -18,57 +19,74 @@ const translations = {
 const bundlePath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/pagefind/`;
 const pagefindConfig =
   typeof config.pagefind === "object" ? config.pagefind : {};
+const searchPage = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/search/`;
+const isSearchPage =
+  Astro.url.pathname.replace(/\/$/, "") === searchPage.replace(/\/$/, "");
 ---
 
-{import.meta.env.PROD && (
+{import.meta.env.PROD && !isSearchPage && (
   <link rel="stylesheet" href={`${bundlePath}pagefind-ui.css`} />
 )}
-<site-search
-  data-bundle-path={bundlePath}
-  data-translations={JSON.stringify(translations)}
-  data-config={JSON.stringify(pagefindConfig)}
-  data-strip-trailing-slash={project.trailingSlash === "never" ? "" : undefined}
->
-  <button
+{isSearchPage ? (
+  <a
     class="sf-icon-control"
-    data-search-open
+    href="#page-search-input"
     aria-label={label}
-    aria-expanded="false"
-    aria-controls="site-search-interface"
     aria-keyshortcuts="Control+K Meta+K"
-    hidden
   >
     <Icon name="magnifier" />
-  </button>
-  <div class="search-interface" id="site-search-interface" hidden>
-    <label for="site-search-input" class="sr-only">
-      {label}
-    </label>
-    <div id="starlight__search">
-      {import.meta.env.DEV && (
-        <input id="site-search-input" {placeholder} readonly />
-      )}
-    </div>
+  </a>
+) : (
+  <site-search>
     <button
       class="sf-icon-control"
-      data-search-close
-      aria-label={Astro.locals.t("search.cancelLabel")}
+      data-search-open
+      aria-label={label}
+      aria-expanded="false"
+      aria-controls="site-search-interface"
+      aria-keyshortcuts="Control+K Meta+K"
+      hidden
     >
-      <Icon name="close" />
+      <Icon name="magnifier" />
     </button>
-    <p class="search-feedback" hidden>
-      {import.meta.env.DEV && Astro.locals.t("search.devWarning")}
-    </p>
-  </div>
-  <p class="sr-only" role="status" aria-atomic="true"></p>
-</site-search>
+    <div class="search-interface" id="site-search-interface" hidden>
+      <label for="site-search-input" class="sr-only">
+        {label}
+      </label>
+      <div
+        id="starlight__search"
+        class="site-search-provider"
+        data-bundle-path={bundlePath}
+        data-translations={JSON.stringify(translations)}
+        data-config={JSON.stringify(pagefindConfig)}
+        data-strip-trailing-slash={
+          project.trailingSlash === "never" ? "" : undefined
+        }
+      >
+        {import.meta.env.DEV && (
+          <input id="site-search-input" {placeholder} readonly />
+        )}
+      </div>
+      <button
+        class="sf-icon-control"
+        data-search-close
+        aria-label={Astro.locals.t("search.cancelLabel")}
+      >
+        <Icon name="close" />
+      </button>
+      <p class="search-feedback" hidden>
+        {import.meta.env.DEV && Astro.locals.t("search.devWarning")}
+      </p>
+      <a class="search-all-results" data-search-all href={searchPage} hidden>
+        View all results
+      </a>
+    </div>
+    <p class="sr-only" role="status" aria-atomic="true"></p>
+  </site-search>
+)}
 
 <script>
-  declare global {
-    interface Window {
-      PagefindUI: new (options: Record<string, unknown>) => unknown;
-    }
-  }
+  import { createPagefindSearch } from "../../utils/pagefind";
 
   class SiteSearch extends HTMLElement {
     connectedCallback() {
@@ -82,13 +100,16 @@ const pagefindConfig =
       const container = this.querySelector<HTMLElement>("#starlight__search");
       const feedback = this.querySelector<HTMLElement>(".search-feedback");
       const status = this.querySelector<HTMLElement>("[role='status']");
+      const allResultsLink =
+        this.querySelector<HTMLAnchorElement>("[data-search-all]");
       if (
         !openButton ||
         !closeButton ||
         !searchInterface ||
         !container ||
         !feedback ||
-        !status
+        !status ||
+        !allResultsLink
       )
         return;
 
@@ -99,6 +120,13 @@ const pagefindConfig =
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       );
+
+      const updateAllResultsLink = (query: string) => {
+        const url = new URL(allResultsLink.href);
+        if (query.trim()) url.searchParams.set("q", query.trim());
+        else url.searchParams.delete("q");
+        allResultsLink.href = url.href;
+      };
 
       const animateField = (opening: boolean) => {
         if (fieldAnimation) {
@@ -147,6 +175,21 @@ const pagefindConfig =
           "--search-height",
           `${Math.max(0, viewportTop + height - top - 8)}px`,
         );
+
+        // Keep the full-results link reachable when the viewport or keyboard leaves little room.
+        this.removeAttribute("data-preview-limited");
+        if (
+          drawer?.matches(":popover-open") &&
+          drawer.getBoundingClientRect().height > viewportTop + height - top - 8
+        ) {
+          this.setAttribute("data-preview-limited", "");
+          if (
+            drawer
+              .querySelector(".pagefind-ui__results")
+              ?.contains(document.activeElement)
+          )
+            allResultsLink.focus({ preventScroll: true });
+        }
       };
 
       const close = (restoreFocus = false) => {
@@ -172,6 +215,9 @@ const pagefindConfig =
 
       const updateResults = () => {
         if (!drawer) return;
+        // Pagefind inserts its result area after the first query.
+        if (drawer.lastElementChild !== allResultsLink)
+          drawer.append(allResultsLink);
         if (
           this.hasAttribute("data-open") &&
           !drawer.classList.contains("pagefind-ui__hidden")
@@ -193,44 +239,23 @@ const pagefindConfig =
         feedback.textContent = "Loading search…";
         status.textContent = feedback.textContent;
         try {
-          // Starlight writes these assets with the index. Reuse its installed Pagefind version.
-          const bundlePath = this.dataset.bundlePath;
-          const pagefind: {
-            init: () => Promise<void>;
-            filters: () => Promise<unknown>;
-          } = await import(/* @vite-ignore */ `${bundlePath}pagefind.js`);
-          await pagefind.init();
-          // init starts the worker; filters waits for its metadata and WASM to be ready.
-          await pagefind.filters();
-          await import(/* @vite-ignore */ `${bundlePath}pagefind-ui.js`);
-          const stripTrailingSlash = this.hasAttribute(
-            "data-strip-trailing-slash",
-          );
-          new window.PagefindUI({
-            ...JSON.parse(this.dataset.config ?? "{}"),
-            element: container,
-            baseUrl: import.meta.env.BASE_URL,
-            bundlePath,
-            showImages: false,
-            showSubResults: true,
-            translations: JSON.parse(this.dataset.translations ?? "{}"),
-            processResult: (result: {
-              url: string;
-              sub_results: { url: string }[];
-            }) => {
-              if (stripTrailingSlash) {
-                result.url = result.url.replace(/(.)\/(#.*)?$/, "$1$2");
-                for (const subResult of result.sub_results) {
-                  subResult.url = subResult.url.replace(/(.)\/(#.*)?$/, "$1$2");
-                }
-              }
-            },
+          await createPagefindSearch(container, {
+            pageSize: 3,
+            showSubResults: false,
+            excerptLength: 15,
           });
           const input = container.querySelector("input");
-          if (input) input.id = "site-search-input";
+          if (input) {
+            input.id = "site-search-input";
+            input.addEventListener("input", () =>
+              updateAllResultsLink(input.value),
+            );
+          }
           drawer = container.querySelector<HTMLElement>(".pagefind-ui__drawer");
           if (drawer) {
             drawer.popover = "manual";
+            drawer.append(allResultsLink);
+            allResultsLink.hidden = false;
             new MutationObserver(updateResults).observe(drawer, {
               attributes: true,
               attributeFilter: ["class"],
@@ -279,6 +304,16 @@ const pagefindConfig =
       this.addEventListener(
         "keydown",
         (event) => {
+          if (
+            event.key === "Enter" &&
+            !event.isComposing &&
+            event.target instanceof HTMLInputElement
+          ) {
+            event.preventDefault();
+            updateAllResultsLink(event.target.value);
+            location.assign(allResultsLink.href);
+            return;
+          }
           if (event.key !== "Escape" || !this.hasAttribute("data-open")) return;
           event.preventDefault();
           event.stopPropagation();
@@ -311,8 +346,10 @@ const pagefindConfig =
         if (
           event.target instanceof Element &&
           event.target.closest(".pagefind-ui__search-clear")
-        )
+        ) {
+          updateAllResultsLink("");
           container.querySelector("input")?.focus();
+        }
       });
       window.addEventListener("resize", positionResults);
       window.addEventListener("scroll", positionResults, { passive: true });
@@ -371,68 +408,32 @@ const pagefindConfig =
     color: var(--sf-text);
     white-space: pre-line;
   }
+  #starlight__search .search-all-results {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--sf-link);
+    font-size: 1rem;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  #starlight__search .search-all-results:focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 2px;
+  }
 </style>
 
 <style is:global>
-  #starlight__search {
-    --pagefind-ui-scale: 1;
-    --pagefind-ui-text: var(--sf-text);
-    --pagefind-ui-primary: var(--sf-link);
-    --pagefind-ui-background: var(--sf-canvas);
-    --pagefind-ui-border: var(--sf-boundary);
-    --pagefind-ui-font: var(--sl-font);
-  }
-  #starlight__search input {
-    box-sizing: border-box;
-    width: 100%;
-    height: auto;
-    min-width: 0;
-    min-height: 48px;
-    padding: 8px 16px;
-    border: 1.5px solid var(--sf-boundary);
-    border-radius: 999px;
-    background: var(--sf-canvas);
-    color: var(--sf-text);
-    font: inherit;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  #starlight__search input:focus {
-    outline: 2px solid var(--sf-focus);
-    outline-offset: -2px;
-  }
-  #starlight__search input::placeholder {
-    color: var(--sf-text-muted);
-    opacity: 1;
-  }
-  #starlight__search .pagefind-ui__form::before {
-    display: none;
-  }
-  #starlight__search .pagefind-ui__search-clear {
-    top: 2px;
-    right: 4px;
-    height: calc(100% - 4px);
-    min-width: 44px;
-    max-width: 50%;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 0.875rem;
-  }
-  #starlight__search .pagefind-ui__search-clear.pagefind-ui__suppressed {
-    visibility: hidden;
-  }
   #starlight__search .pagefind-ui__drawer {
+    display: block;
     position: fixed;
     inset: var(--search-top) auto auto var(--search-left);
     box-sizing: border-box;
     width: var(--search-width);
     max-width: none;
-    max-height: var(--search-height);
     margin: 0;
     padding: 16px;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scroll-padding: 8px;
+    overflow: visible;
     border: 1.5px solid var(--sf-boundary);
     border-radius: 24px;
     background: var(--sf-surface);
@@ -441,47 +442,10 @@ const pagefindConfig =
   #starlight__search .pagefind-ui__drawer:not(:popover-open) {
     display: none;
   }
-  #starlight__search .pagefind-ui__results-area {
-    min-width: 0;
-    margin-top: 0;
-  }
-  #starlight__search .pagefind-ui__message {
-    padding: 0;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  #starlight__search .pagefind-ui__result {
-    padding: 16px 0;
-    border: 0;
-  }
-  #starlight__search .pagefind-ui__result-inner {
-    min-width: 0;
-    margin-top: 0;
-  }
-  #starlight__search .pagefind-ui__result-nested {
-    padding-left: 16px;
-  }
-  #starlight__search .pagefind-ui__result-nested::before {
+  #starlight__search .pagefind-ui__button {
     display: none;
   }
-  #starlight__search .pagefind-ui__result-link {
-    display: inline-block;
-    color: var(--sf-link);
-    font-size: 1rem;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-  }
-  #starlight__search .pagefind-ui__result-excerpt {
-    font-size: 0.875rem;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-  }
-  #starlight__search .pagefind-ui__button {
-    min-height: 44px;
-    border-radius: 999px;
-  }
-  #starlight__search :is(a, button):focus-visible {
-    outline: 2px solid var(--sf-focus);
-    outline-offset: 2px;
+  site-search[data-preview-limited] .pagefind-ui__results {
+    display: none;
   }
 </style>

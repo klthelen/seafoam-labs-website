@@ -1,0 +1,16 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import SearchPage from "../../components/search/SearchPage.astro";
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Search",
+    description: "Search Seafoam Labs projects, documentation, and news.",
+    template: "splash",
+    pagefind: false,
+  }}
+  hasSidebar={false}
+>
+  <SearchPage />
+</StarlightPage>
