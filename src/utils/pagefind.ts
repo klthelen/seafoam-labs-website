@@ -17,6 +17,7 @@ declare global {
 export async function createPagefindSearch(
   container: HTMLElement,
   options: SearchOptions,
+  clearIcon: HTMLTemplateElement,
 ) {
   // Starlight writes these assets with the index; reuse its installed provider.
   const bundlePath = container.dataset.bundlePath ?? "/pagefind/";
@@ -73,6 +74,15 @@ export async function createPagefindSearch(
   const clearButton = container.querySelector<HTMLButtonElement>(
     ".pagefind-ui__search-clear",
   );
-  if (clearButton) clearButton.type = "button";
+  if (clearButton) {
+    clearButton.type = "button";
+    const clearLabel = document.createElement("span");
+    clearLabel.id = `${container.id}-clear-label`;
+    clearLabel.hidden = true;
+    clearButton.setAttribute("aria-labelledby", clearLabel.id);
+    // Retain Pagefind's translated text node and its native clear action.
+    clearLabel.append(...clearButton.childNodes);
+    clearButton.append(clearLabel, clearIcon.content.cloneNode(true));
+  }
   return search;
 }

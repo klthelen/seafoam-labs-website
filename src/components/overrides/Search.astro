@@ -5,9 +5,8 @@ import project from "virtual:starlight/project-context";
 import "../../styles/search.css";
 
 const label = Astro.locals.t("search.label");
-const placeholder = Astro.locals.starlightRoute.lang.startsWith("en")
-  ? "Search the site"
-  : label;
+const isEnglish = Astro.locals.starlightRoute.lang.startsWith("en");
+const placeholder = isEnglish ? "Search the site" : label;
 const translations = {
   ...Object.fromEntries(
     Object.entries(Astro.locals.t.all())
@@ -15,6 +14,9 @@ const translations = {
       .map(([key, value]) => [key.replace("pagefind.", ""), value]),
   ),
   placeholder,
+  clear_search: isEnglish
+    ? "Clear search"
+    : Astro.locals.t("pagefind.clear_search"),
 };
 const bundlePath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/pagefind/`;
 const pagefindConfig =
@@ -50,6 +52,9 @@ const isSearchPage =
       <Icon name="magnifier" />
     </button>
     <div class="search-interface" id="site-search-interface" hidden>
+      <template data-search-clear-icon>
+        <Icon name="close" />
+      </template>
       <label for="site-search-input" class="sr-only">
         {label}
       </label>
@@ -69,10 +74,11 @@ const isSearchPage =
       </div>
       <button
         class="sf-icon-control"
-        data-search-close
-        aria-label={Astro.locals.t("search.cancelLabel")}
+        type="button"
+        data-search-submit
+        aria-label={label}
       >
-        <Icon name="close" />
+        <Icon name="magnifier" />
       </button>
       <p class="search-feedback" hidden>
         {import.meta.env.DEV && Astro.locals.t("search.devWarning")}
@@ -92,8 +98,11 @@ const isSearchPage =
     connectedCallback() {
       const openButton =
         this.querySelector<HTMLButtonElement>("[data-search-open]");
-      const closeButton = this.querySelector<HTMLButtonElement>(
-        "[data-search-close]",
+      const submitButton = this.querySelector<HTMLButtonElement>(
+        "[data-search-submit]",
+      );
+      const clearIcon = this.querySelector<HTMLTemplateElement>(
+        "[data-search-clear-icon]",
       );
       const searchInterface =
         this.querySelector<HTMLElement>(".search-interface");
@@ -104,7 +113,8 @@ const isSearchPage =
         this.querySelector<HTMLAnchorElement>("[data-search-all]");
       if (
         !openButton ||
-        !closeButton ||
+        !submitButton ||
+        !clearIcon ||
         !searchInterface ||
         !container ||
         !feedback ||
@@ -126,6 +136,11 @@ const isSearchPage =
         if (query.trim()) url.searchParams.set("q", query.trim());
         else url.searchParams.delete("q");
         allResultsLink.href = url.href;
+      };
+
+      const showAllResults = () => {
+        updateAllResultsLink(container.querySelector("input")?.value ?? "");
+        location.assign(allResultsLink.href);
       };
 
       const animateField = (opening: boolean) => {
@@ -239,11 +254,15 @@ const isSearchPage =
         feedback.textContent = "Loading search…";
         status.textContent = feedback.textContent;
         try {
-          await createPagefindSearch(container, {
-            pageSize: 3,
-            showSubResults: false,
-            excerptLength: 15,
-          });
+          await createPagefindSearch(
+            container,
+            {
+              pageSize: 3,
+              showSubResults: false,
+              excerptLength: 15,
+            },
+            clearIcon,
+          );
           const input = container.querySelector("input");
           if (input) {
             input.id = "site-search-input";
@@ -269,7 +288,7 @@ const isSearchPage =
           status.textContent = "";
           if (this.hasAttribute("data-open")) {
             animateField(true);
-            if (document.activeElement === closeButton) input?.focus();
+            if (document.activeElement === submitButton) input?.focus();
           }
         } catch (error) {
           feedback.textContent =
@@ -291,7 +310,7 @@ const isSearchPage =
         this.dispatchEvent(new Event("site-search-open", { bubbles: true }));
         searchInterface.scrollIntoView({ block: "nearest" });
         positionResults();
-        (container.querySelector("input") ?? closeButton).focus();
+        (container.querySelector("input") ?? submitButton).focus();
         if (import.meta.env.DEV) feedback.hidden = false;
         updateResults();
         animateField(true);
@@ -299,7 +318,7 @@ const isSearchPage =
       };
 
       openButton.addEventListener("click", open);
-      closeButton.addEventListener("click", () => close(true));
+      submitButton.addEventListener("click", showAllResults);
       this.addEventListener("site-search-dismiss", () => close());
       this.addEventListener(
         "keydown",
@@ -310,8 +329,7 @@ const isSearchPage =
             event.target instanceof HTMLInputElement
           ) {
             event.preventDefault();
-            updateAllResultsLink(event.target.value);
-            location.assign(allResultsLink.href);
+            showAllResults();
             return;
           }
           if (event.key !== "Escape" || !this.hasAttribute("data-open")) return;
@@ -391,7 +409,7 @@ const isSearchPage =
     inset-inline-end: 0;
     transform: translateY(-50%);
   }
-  site-search[data-closing] :is([data-search-close], .search-feedback) {
+  site-search[data-closing] :is([data-search-submit], .search-feedback) {
     visibility: hidden;
   }
   .search-feedback {

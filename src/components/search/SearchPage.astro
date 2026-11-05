@@ -61,10 +61,13 @@ const pagefindConfig =
 
   const page = document.querySelector<HTMLElement>(".search-page");
   const container = page?.querySelector<HTMLElement>("#page-search");
+  const clearIcon = page?.querySelector<HTMLTemplateElement>(
+    "[data-search-clear-icon]",
+  );
   const feedback = page?.querySelector<HTMLElement>("[data-search-feedback]");
   const status = page?.querySelector<HTMLElement>("[role='status']");
 
-  if (page && container && feedback && status) {
+  if (page && container && clearIcon && feedback && status) {
     const initialQuery =
       new URL(location.href).searchParams.get("q")?.trim() ?? "";
     const updateQueryString = (query: string) => {
@@ -78,26 +81,15 @@ const pagefindConfig =
       const initialize = async () => {
         status.textContent = feedback.textContent;
         try {
-          const search = await createPagefindSearch(container, {
-            pageSize: 10,
-            showSubResults: true,
-            excerptLength: 20,
-          });
-          const clearButton = container.querySelector<HTMLButtonElement>(
-            ".pagefind-ui__search-clear",
+          const search = await createPagefindSearch(
+            container,
+            {
+              pageSize: 10,
+              showSubResults: true,
+              excerptLength: 20,
+            },
+            clearIcon,
           );
-          const clearIcon = page.querySelector<HTMLTemplateElement>(
-            "[data-search-clear-icon]",
-          );
-          if (clearButton && clearIcon) {
-            const clearLabel = document.createElement("span");
-            clearLabel.id = "page-search-clear-label";
-            clearLabel.hidden = true;
-            clearButton.setAttribute("aria-labelledby", clearLabel.id);
-            // Retain Pagefind's translated text node and its native clear action.
-            clearLabel.append(...clearButton.childNodes);
-            clearButton.append(clearLabel, clearIcon.content.cloneNode(true));
-          }
           const input = container.querySelector("input");
           if (input) {
             input.id = "page-search-input";
@@ -177,16 +169,6 @@ const pagefindConfig =
   }
   #page-search :global(.pagefind-ui__drawer) {
     margin-block-start: 1.5rem;
-  }
-  #page-search :global(.pagefind-ui__search-clear) {
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    padding: 0;
-  }
-  #page-search :global(.pagefind-ui__search-clear svg) {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
   }
   #page-search :global(.pagefind-ui__result) {
     padding-block: 1.25rem;
