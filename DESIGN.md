@@ -246,7 +246,8 @@ labeled social rows with the compact arrangement.
 [Header.astro](src/components/overrides/Header.astro) owns the primary navigation
 capsule and coordinates Projects, Site menu, and inline Search. Opening one
 closes the others. Search replaces the middle navigation with its input and
-search button, retaining the logo and the desktop social group. Escape restores
+search button, retaining the logo or narrow-screen Site menu and the desktop
+social group. Escape restores
 Search focus; outside dismissal respects the clicked target.
 
 The Home, Wiki, Blog, and About links use `--sf-nav-link-hover` for hover
@@ -304,7 +305,17 @@ successful network request in failure tests.
 
 The compact capsule has a 4rem minimum height, 16px outer gutters, and 8px
 inner padding, increasing to 12px where space permits. Icon targets stay at least
-44px while text can grow. From a container width of 64rem, it shows the inline
+44px while text can grow. Below a container width of 22.5rem, the Site menu
+replaces the logo at the start of the row, followed by Projects and Search.
+Home remains the first link in that menu. The leading menu stays available
+while Search is open. Wider compact headers retain the logo and trailing menu.
+The two menu placements reuse the same component; only the appropriate instance
+is displayed or keyboard-accessible, including without JavaScript. Resizing
+closes a hidden menu and transfers affected focus to the visible menu trigger
+or desktop link. The rem breakpoint responds to enlarged text, and controls
+can still wrap when that text needs more space.
+
+From a container width of 64rem, it shows the inline
 page and social links, uses a 6rem minimum height and 2rem horizontal padding,
 and centers within a 77.5rem maximum width to match the homepage content. Desktop
 text links and the search input use 1.25rem text. The logo grows to 2.5rem, and

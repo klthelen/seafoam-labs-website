@@ -25,6 +25,9 @@ const currentPath = Astro.url.pathname.endsWith("/")
     data-homepage={isHomepage ? "" : undefined}
     aria-label="Primary"
   >
+    <div class="site-menu site-menu--leading">
+      <SiteMenu />
+    </div>
     <SiteTitle />
     <a
       class="home-link sf-nav-link"
@@ -54,7 +57,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     <div class="header-socials" data-desktop-navigation>
       <SocialIcons />
     </div>
-    <div class="site-menu">
+    <div class="site-menu site-menu--trailing">
       <SiteMenu />
     </div>
     {config.isMultilingual && <LanguageSelect />}
@@ -64,12 +67,11 @@ const currentPath = Astro.url.pathname.endsWith("/")
 <script>
   for (const header of document.querySelectorAll<HTMLElement>(".site-header")) {
     const frame = header.closest<HTMLElement>(".page > .header");
-    const siteMenu = header.querySelector<HTMLElement>(".site-menu");
-    const siteDisclosure = siteMenu?.querySelector("details");
-    const siteTrigger = siteDisclosure?.querySelector("summary");
+    const siteTriggers = [
+      ...header.querySelectorAll<HTMLElement>(".site-menu summary"),
+    ];
     const logoLink = header.querySelector<HTMLAnchorElement>(".site-title");
-    if (!frame || !siteMenu || !siteDisclosure || !siteTrigger || !logoLink)
-      continue;
+    if (!frame || siteTriggers.length === 0 || !logoLink) continue;
 
     const disclosures = header.querySelectorAll<HTMLDetailsElement>(
       ".navigation-disclosure",
@@ -131,6 +133,10 @@ const currentPath = Astro.url.pathname.endsWith("/")
       (counterpart ?? logoLink).focus();
     };
 
+    const focusSiteMenu = () => {
+      siteTriggers.find((trigger) => trigger.checkVisibility())?.focus();
+    };
+
     // CSS can hide a focused control before ResizeObserver runs.
     document.addEventListener("focusout", (event) => {
       if (header.hasAttribute("data-search-open")) return;
@@ -138,10 +144,14 @@ const currentPath = Astro.url.pathname.endsWith("/")
       if (!(focused instanceof HTMLElement) || focused.checkVisibility())
         return;
 
-      if (siteMenu.contains(focused) && !siteMenu.checkVisibility()) {
-        focusDesktopCounterpart(focused);
+      if (focused.closest(".site-menu") || focused === logoLink) {
+        if (siteTriggers.some((trigger) => trigger.checkVisibility())) {
+          focusSiteMenu();
+        } else {
+          focusDesktopCounterpart(focused);
+        }
       } else if ([...desktopGroups].some((group) => group.contains(focused))) {
-        siteTrigger.focus();
+        focusSiteMenu();
       } else if (focused === docsButton || focused === sidebarClose) {
         const sidebarLink =
           sidebar?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ??
@@ -152,10 +162,9 @@ const currentPath = Astro.url.pathname.endsWith("/")
       }
     });
 
-    let desktop =
-      getComputedStyle(header)
-        .getPropertyValue("--sf-navigation-layout")
-        .trim() === "desktop";
+    let navigationLayout = getComputedStyle(header)
+      .getPropertyValue("--sf-navigation-layout")
+      .trim();
     const updateScrollState = () => {
       const scrollOffset = Math.min(
         Math.max(0, window.scrollY),
@@ -165,22 +174,26 @@ const currentPath = Astro.url.pathname.endsWith("/")
       frame.toggleAttribute("data-scrolled", scrollOffset > 0);
     };
     const updateHeader = () => {
-      const nextDesktop =
-        getComputedStyle(header)
-          .getPropertyValue("--sf-navigation-layout")
-          .trim() === "desktop";
-      if (desktop !== nextDesktop) {
+      const nextLayout = getComputedStyle(header)
+        .getPropertyValue("--sf-navigation-layout")
+        .trim();
+      if (navigationLayout !== nextLayout) {
         const focused = document.activeElement;
-        if (nextDesktop) {
-          const moveFocus = siteMenu.contains(focused);
-          siteDisclosure.open = false;
-          if (moveFocus) focusDesktopCounterpart(focused);
+        const focusedMenu = focused?.closest(".site-menu");
+        for (const disclosure of disclosures) {
+          const menu = disclosure.closest(".site-menu");
+          if (menu && !menu.checkVisibility()) disclosure.open = false;
+        }
+        if (nextLayout === "desktop") {
+          if (focusedMenu) focusDesktopCounterpart(focused);
         } else if (
+          (focusedMenu && !focusedMenu.checkVisibility()) ||
+          (focused === logoLink && !logoLink.checkVisibility()) ||
           [...desktopGroups].some((group) => group.contains(focused))
         ) {
-          siteTrigger.focus();
+          focusSiteMenu();
         }
-        desktop = nextDesktop;
+        navigationLayout = nextLayout;
       }
       if (docsButton?.checkVisibility()) {
         document.documentElement.style.setProperty(
@@ -318,6 +331,10 @@ const currentPath = Astro.url.pathname.endsWith("/")
     min-inline-size: 0;
   }
 
+  .site-menu--leading {
+    display: none;
+  }
+
   .site-menu :global(svg) {
     inline-size: 20px;
     block-size: 20px;
@@ -332,6 +349,21 @@ const currentPath = Astro.url.pathname.endsWith("/")
   @container site-navigation (min-width: 24rem) {
     .site-header {
       padding-inline: 12px;
+    }
+  }
+
+  @container site-navigation (width < 22.5rem) {
+    .site-header {
+      --sf-navigation-layout: narrow;
+    }
+
+    .site-header :global(.site-title),
+    .site-menu--trailing {
+      display: none;
+    }
+
+    .site-menu--leading {
+      display: block;
     }
   }
 
@@ -441,7 +473,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
   .site-header[data-search-open] > :global(.navigation-disclosure),
   .site-header[data-search-open] .home-link,
   .site-header[data-search-open] .page-links,
-  .site-header[data-search-open] .site-menu {
+  .site-header[data-search-open] .site-menu--trailing {
     display: none;
   }
 
