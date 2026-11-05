@@ -58,7 +58,7 @@ aside colors.
 | `--sf-link`, `--sf-link-hover`, `--sf-focus`, `--sf-boundary`                                                     | Links, focus indicators, and control boundaries               |
 | `--sf-nav-link-hover`                                                                                             | Header text-link hover color, distinct from the resting text  |
 | `--sf-shelly-surface`, `--sf-starfish-surface`, `--sf-aqueous-surface`, `--sf-pearl-surface`, `--sf-pori-surface` | Project-card backgrounds, named independently of their colors |
-| `--sf-card-ink`, `--sf-card-border`, `--sf-card-link`                                                             | Project-card text, borders, and links                         |
+| `--sf-card-ink`, `--sf-card-border`                                                                               | Project-card text and borders                                 |
 | `--sf-card-action-hover`, `--sf-card-action-pressed`, `--sf-on-card-action`                                       | Project-card action states                                    |
 | `--sf-hero-seafoam`, `--sf-hero-labs`                                                                             | The two hero-title color roles                                |
 
@@ -72,9 +72,9 @@ This darkens the fill while preserving its hue and follows future palette
 changes automatically. The label keeps `--sf-on-action` at full opacity;
 check its contrast in every state when changing a palette's base colors.
 
-The older product-page gradients and Devario showcase still use the legacy
-Tailwind colors in `global.css`, so changing the palette does not yet recolor
-every existing treatment.
+The older product-page gradients still use the legacy Tailwind colors in
+`global.css`, so changing the palette does not yet recolor every existing
+treatment. The replacement Devario showcase uses the semantic palette roles.
 
 ### Adding a palette
 
@@ -93,23 +93,20 @@ treatments, including hero actions on documentation and product pages.
 
 | Classes                          | Treatment                                                           |
 | -------------------------------- | ------------------------------------------------------------------- |
-| `sf-action sf-action--primary`   | Filled primary action                                               |
 | `sf-action sf-action--secondary` | Outlined action on a neutral surface                                |
 | `sf-action sf-action--card`      | Outlined action using the project-card color roles                  |
 | `sf-icon-control`                | Icon-only link or button with an accessible name                    |
 | `sf-link`                        | Underlined contextual link                                          |
-| `sf-link sf-link--card`          | Contextual link on a project card                                   |
 | `sf-nav-link`                    | Navigation link, underlined on hover and when `aria-current="page"` |
 
 Normal actions have a minimum height of 3rem and 1.5rem horizontal padding.
-Add `sf-action--compact` for a minimum height of 2.75rem and 1.25rem horizontal
-padding where the component guide calls for a compact control. Icon controls
-have a minimum 2.75rem square target; glyphs are 1.25rem with a 0.5rem gap to
-labels. Keep at least 0.75rem between adjacent controls in the owning layout.
+Icon controls have a minimum 2.75rem square target; glyphs are 1.25rem with a
+0.5rem gap to labels. Keep at least 0.75rem between adjacent controls in the
+owning layout.
 Labels wrap and controls grow with their content.
 
 Focus adds a separate 2px outline with a 3px offset, preserving the current fill
-and space around the control. Card actions and links use the card ink for focus.
+and space around the control. Card actions use the card ink for focus.
 Keep that outline clear of clipping containers. Contextual links retain their
 color after a visit; hover thickens the underline. Shared action and icon buttons
 transition their background, text, and border colors over 140ms with `ease-out`
@@ -270,8 +267,8 @@ inside the field clears the query and keeps search open, returning focus to the
 input. The X is hidden when the field is empty. The preview omits nested section
 matches and the provider's Load more button. When the preview cannot fit the available viewport
 height, including space lost to a software keyboard, it shows the result count
-and full-results link so the preview does not need scrolling. Focus moves to that
-link if resizing hides a focused preview result.
+and full-results link. A long summary can scroll within the available height.
+Focus moves to the full-results link if resizing hides a focused preview result.
 
 [The search route](src/pages/search/index.astro) uses the ordinary Starlight
 shell and [SearchPage.astro](src/components/search/SearchPage.astro) for results
@@ -450,7 +447,7 @@ or JavaScript is disabled. The setup documentation retains its checksum-file lin
 
 ## Typography and icons
 
-Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/600/700.
+Headings use Space Grotesk 600; body text and controls use DM Sans 400/500/600/700.
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with
 each family's SIL Open Font License retained alongside the fonts.
 

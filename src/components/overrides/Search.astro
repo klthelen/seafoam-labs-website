@@ -60,7 +60,6 @@ const isSearchPage =
       </label>
       <div
         id="starlight__search"
-        class="site-search-provider"
         data-bundle-path={bundlePath}
         data-translations={JSON.stringify(translations)}
         data-config={JSON.stringify(pagefindConfig)}
@@ -201,7 +200,7 @@ const isSearchPage =
               .querySelector(".pagefind-ui__results")
               ?.contains(document.activeElement)
           )
-            allResultsLink.focus({ preventScroll: true });
+            allResultsLink.focus();
         }
       };
 
@@ -460,6 +459,11 @@ const isSearchPage =
   }
   #starlight__search .pagefind-ui__button {
     display: none;
+  }
+  site-search[data-preview-limited] #starlight__search .pagefind-ui__drawer {
+    max-height: var(--search-height);
+    overflow: auto;
+    scroll-padding: 4px;
   }
   site-search[data-preview-limited] .pagefind-ui__results {
     display: none;

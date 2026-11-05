@@ -55,14 +55,6 @@
 
 @font-face {
   font-family: "Space Grotesk";
-  src: url("../assets/fonts/space-grotesk-500.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Space Grotesk";
   src: url("../assets/fonts/space-grotesk-600.woff2") format("woff2");
   font-style: normal;
   font-weight: 600;
@@ -183,6 +175,7 @@
   border-inline-start: 0;
   padding: 1rem;
   background-color: var(--sf-surface);
+  color: var(--sf-text);
   border-radius: 0.75rem;
 }
 
@@ -247,11 +240,6 @@
   }
 }
 
-.sf-action--compact {
-  min-block-size: 2.75rem;
-  padding: 0.5rem 1.25rem;
-}
-
 .sf-icon-control {
   min-inline-size: 2.75rem;
   min-block-size: 2.75rem;
@@ -265,13 +253,11 @@
   block-size: 1.25rem;
 }
 
-.sf-action--primary,
 .sl-link-button.primary {
   background: var(--sf-action);
   color: var(--sf-on-action);
 }
 
-.sf-action--primary:hover:not(:disabled),
 .sl-link-button.primary:hover {
   background: var(--sf-action-hover);
   color: var(--sf-on-action);
@@ -353,11 +339,6 @@
   text-decoration-thickness: 2px;
 }
 
-.sf-link--card,
-.sf-link--card:hover {
-  color: var(--sf-card-link);
-}
-
 .sf-nav-link {
   display: inline-flex;
   align-items: center;
@@ -387,7 +368,7 @@
   outline-offset: 3px;
 }
 
-:is(.sf-action--card, .sf-link--card):focus-visible {
+.sf-action--card:focus-visible {
   outline-color: var(--sf-card-ink);
 }
 
