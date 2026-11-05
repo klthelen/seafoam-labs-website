@@ -376,6 +376,18 @@ const currentPath = Astro.url.pathname.endsWith("/")
     }
   }
 
+  @container site-navigation (min-width: 80rem) {
+    .header-content {
+      padding-block: env(safe-area-inset-top) 0;
+      background: var(--sf-surface);
+    }
+
+    .site-header {
+      border-radius: 0;
+      background: transparent;
+    }
+  }
+
   .site-header[data-search-open] > :global(.navigation-disclosure),
   .site-header[data-search-open] .home-link,
   .site-header[data-search-open] .page-links,
@@ -413,6 +425,12 @@ const currentPath = Astro.url.pathname.endsWith("/")
   @media (min-width: 64rem) {
     :global(:root) {
       --sl-nav-height: calc(9rem + env(safe-area-inset-top));
+    }
+  }
+
+  @media (min-width: 80rem) {
+    :global(:root) {
+      --sl-nav-height: calc(6rem + env(safe-area-inset-top));
     }
   }
 

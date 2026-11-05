@@ -154,7 +154,7 @@ matching the header's icon controls, with no underline. The same fill marks the
 open state, and the shared keyboard focus outline remains visible.
 
 Use `align="start"` (the default) for Projects and `align="end"` for Site menu.
-Mark their containing header capsule with `data-navigation-header`. The popup
+Mark their containing navigation row with `data-navigation-header`. The popup
 starts 12px below that element's measured bottom, including when its controls
 wrap. Desktop placement follows the trigger; compact placement follows the capsule
 edge. The Header supplies its current arrangement and viewport gutter through
@@ -283,8 +283,14 @@ page and social links, uses a 6rem minimum height and 2rem horizontal padding,
 and centers within a 77.5rem maximum width to match the homepage content. Desktop
 text links and the search input use 1.25rem text. The logo grows to 2.5rem, and
 search and social icons use 1.5rem glyphs in targets of at least 3rem.
+From a container width of 80rem, the surface spans the full viewport and sits
+flush against the top edge, with safe-area clearance where needed. The navigation
+row keeps its centered 77.5rem maximum width and 6rem minimum height, and loses
+its rounded corners. Below that threshold, the header retains its pill shape
+and outer spacing, including in narrow or split-screen desktop windows.
+
 Home, Projects, Wiki, Blog, and About each have 1rem horizontal padding and
-a 1rem gap between controls. The page-links group inherits the capsule's gap
+a 1rem gap between controls. The page-links group inherits the header's gap
 so it keeps the same spacing as Home and Projects. Projects includes its label
 and chevron within that padding. Disclosure padding also uses rem so these
 insets stay equal when the root text size changes.
@@ -293,7 +299,7 @@ root text size so enlarged text keeps the compact arrangement longer. Controls
 can wrap without changing their reading order.
 
 The desktop header places a separate Home text link between the logo and
-Projects, using the capsule's ordinary spacing. The logo and text are independent
+Projects, using the header's ordinary spacing. The logo and text are independent
 links and keyboard stops, both using Starlight's `siteTitleHref`. The logo retains
 Starlight's SiteTitle component and accessible site name. Compact layouts keep
 the logo in the header and provide Home as the first site-menu entry. The desktop
