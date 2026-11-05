@@ -139,7 +139,13 @@ const isSearchPage =
       };
 
       const showAllResults = () => {
-        updateAllResultsLink(container.querySelector("input")?.value ?? "");
+        const input = container.querySelector("input");
+        const query = input?.value.trim();
+        if (!query) {
+          input?.focus();
+          return;
+        }
+        updateAllResultsLink(query);
         location.assign(allResultsLink.href);
       };
 
