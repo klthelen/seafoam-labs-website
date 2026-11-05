@@ -157,18 +157,10 @@ const isSearchPage =
         }
         if (!ready || reducedMotion.matches) return;
 
-        const collapsed = {
-          opacity: 0,
-          clipPath: "inset(0 0 0 100% round 999px)",
-        };
-        const expanded = {
-          opacity: 1,
-          clipPath: "inset(0 0 0 0 round 999px)",
-        };
         fieldAnimation = container.animate(
-          opening ? [collapsed, expanded] : [expanded, collapsed],
+          { opacity: opening ? [0, 1] : [1, 0] },
           {
-            duration: opening ? 200 : 140,
+            duration: opening ? 140 : 105,
             easing: "ease-out",
           },
         );
@@ -223,7 +215,7 @@ const isSearchPage =
         drawer?.hidePopover();
         if (restoreFocus) openButton.focus();
 
-        // Restore navigation after the field retracts, without delaying keyboard focus.
+        // Restore navigation after the field fades out, without delaying keyboard focus.
         const finishClose = () => {
           searchInterface.hidden = true;
           this.removeAttribute("data-closing");

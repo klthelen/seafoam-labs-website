@@ -288,8 +288,8 @@ keeps Starlight's production-only search notice. Indexed queries must be checked
 against a fresh production build and preview. The search page ships directly,
 without a feature flag.
 
-The search field reveals from the search control over 200ms and retracts over
-140ms when dismissed. Navigation returns after the closing animation, while
+The whole search field fades in over 140ms and fades out over 105ms when
+dismissed. Navigation returns after the closing animation, while
 Escape returns keyboard focus immediately. The closing interface is inert and
 its results are dismissed. Reduced-motion preferences skip both animations.
 
