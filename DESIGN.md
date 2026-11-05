@@ -275,7 +275,8 @@ Pagefind's Load more button exposes additional matches. Queries initialize from
 the URL, and edits replace the current query parameter without creating a browser
 history entry for every keystroke. The search page is excluded from the index.
 Its header search icon and Control/Command+K focus the page's field instead of
-opening a second search interface.
+opening a second search interface. The field's clear button uses the header's X
+icon, retains an accessible label, and returns focus to the field after clearing.
 
 Both presentations share [the Pagefind initializer](src/utils/pagefind.ts) and
 [search styles](src/styles/search.css), retaining translations and result URL
