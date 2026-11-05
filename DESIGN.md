@@ -267,6 +267,12 @@ before accepting a query. Initial loading failure asks the visitor to reload;
 the development server keeps Starlight's production-only search notice. Indexed
 queries must be checked against a fresh production build and preview.
 
+The search field reveals from the search control over 200ms and retracts over
+140ms when dismissed. Navigation returns after the closing animation, while
+Escape and the close control return keyboard focus immediately. The closing
+interface is inert and its results are dismissed. Reduced-motion preferences
+skip both animations.
+
 Pagefind 1.5.2 has a retained limitation after initialization: a failed index
 chunk download can appear as no results, while failed result-detail downloads
 can leave incomplete results. Its default UI does not expose these failures

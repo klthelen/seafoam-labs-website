@@ -95,6 +95,37 @@ const pagefindConfig =
       let ready = import.meta.env.DEV;
       let loading = false;
       let drawer: HTMLElement | null = null;
+      let fieldAnimation: Animation | undefined;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
+
+      const animateField = (opening: boolean) => {
+        if (fieldAnimation) {
+          fieldAnimation.onfinish = null;
+          fieldAnimation.cancel();
+          fieldAnimation = undefined;
+        }
+        if (!ready || reducedMotion.matches) return;
+
+        const collapsed = {
+          opacity: 0,
+          clipPath: "inset(0 0 0 100% round 999px)",
+        };
+        const expanded = {
+          opacity: 1,
+          clipPath: "inset(0 0 0 0 round 999px)",
+        };
+        fieldAnimation = container.animate(
+          opening ? [collapsed, expanded] : [expanded, collapsed],
+          {
+            duration: opening ? 200 : 140,
+            easing: "ease-out",
+          },
+        );
+        return fieldAnimation;
+      };
+
       const positionResults = () => {
         if (!this.hasAttribute("data-open")) return;
         const viewport = window.visualViewport;
@@ -121,12 +152,22 @@ const pagefindConfig =
       const close = (restoreFocus = false) => {
         if (!this.hasAttribute("data-open")) return;
         this.removeAttribute("data-open");
-        searchInterface.hidden = true;
+        this.setAttribute("data-closing", "");
+        searchInterface.inert = true;
         openButton.hidden = false;
         openButton.setAttribute("aria-expanded", "false");
         drawer?.hidePopover();
-        this.dispatchEvent(new Event("site-search-close", { bubbles: true }));
         if (restoreFocus) openButton.focus();
+
+        // Restore navigation after the field retracts, without delaying keyboard focus.
+        const finishClose = () => {
+          searchInterface.hidden = true;
+          this.removeAttribute("data-closing");
+          this.dispatchEvent(new Event("site-search-close", { bubbles: true }));
+        };
+        const animation = animateField(false);
+        if (animation) animation.onfinish = finishClose;
+        else finishClose();
       };
 
       const updateResults = () => {
@@ -201,11 +242,10 @@ const pagefindConfig =
           ready = true;
           feedback.hidden = true;
           status.textContent = "";
-          if (
-            this.hasAttribute("data-open") &&
-            document.activeElement === closeButton
-          )
-            input?.focus();
+          if (this.hasAttribute("data-open")) {
+            animateField(true);
+            if (document.activeElement === closeButton) input?.focus();
+          }
         } catch (error) {
           feedback.textContent =
             "Search could not load. Reload this page to try again.";
@@ -217,9 +257,11 @@ const pagefindConfig =
       };
 
       const open = () => {
+        this.removeAttribute("data-closing");
         this.setAttribute("data-open", "");
         openButton.hidden = true;
         openButton.setAttribute("aria-expanded", "true");
+        searchInterface.inert = false;
         searchInterface.hidden = false;
         this.dispatchEvent(new Event("site-search-open", { bubbles: true }));
         searchInterface.scrollIntoView({ block: "nearest" });
@@ -227,6 +269,7 @@ const pagefindConfig =
         (container.querySelector("input") ?? closeButton).focus();
         if (import.meta.env.DEV) feedback.hidden = false;
         updateResults();
+        animateField(true);
         void initialize();
       };
 
@@ -286,6 +329,7 @@ const pagefindConfig =
 <style>
   site-search {
     display: block;
+    position: relative;
     min-width: 0;
   }
   [hidden] {
@@ -303,6 +347,15 @@ const pagefindConfig =
   }
   .search-interface > button {
     flex: none;
+  }
+  site-search[data-closing] > [data-search-open] {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    transform: translateY(-50%);
+  }
+  site-search[data-closing] :is([data-search-close], .search-feedback) {
+    visibility: hidden;
   }
   .search-feedback {
     position: fixed;
