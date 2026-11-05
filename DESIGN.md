@@ -283,11 +283,19 @@ page and social links, uses a 6rem minimum height and 2rem horizontal padding,
 and centers within a 77.5rem maximum width to match the homepage content. Desktop
 text links and the search input use 1.25rem text. The logo grows to 2.5rem, and
 search and social icons use 1.5rem glyphs in targets of at least 3rem.
+
 From a container width of 80rem, the surface spans the full viewport and sits
-flush against the top edge, with safe-area clearance where needed. The navigation
-row keeps its centered 77.5rem maximum width and 6rem minimum height, and loses
-its rounded corners. Below that threshold, the header retains its pill shape
-and outer spacing, including in narrow or split-screen desktop windows.
+flush against the top edge when the page is at the top, with safe-area clearance
+where needed. A centered pill sits over that backdrop, using a 77.5rem maximum
+width, a 4.5rem minimum height, and 0.75rem space above and below. As the page
+scrolls, only the full-width backdrop moves away; the pill keeps its position,
+size, and rounded shape. A restrained shadow separates it from the content.
+Returning to the top brings the backdrop back behind the pill. The reserved
+height stays at 6rem so the page does not jump. Only the shadow fades, over 200ms;
+reduced motion disables that transition.
+
+Below that width, the header retains its pill shape and outer spacing, including
+in narrow or split-screen desktop windows.
 
 Home, Projects, Wiki, Blog, and About each have 1rem horizontal padding and
 a 1rem gap between controls. The page-links group inherits the header's gap
@@ -310,11 +318,12 @@ retaining the logo. When resizing hides the desktop Home link, focus moves to th
 site-menu trigger. When the compact menu disappears, its focused Home entry
 transfers focus to the desktop Home link.
 
-The homepage header stays in normal document flow. Other pages retain Starlight's
-fixed frame; a resize observer supplies its measured height to `--sl-nav-height`
-so the content, table of contents, and sidebar remain below it. CSS supplies the
-initial offsets. Without JavaScript, the header stays in normal flow so native
-disclosures can expand without covering page content.
+All pages use Starlight's fixed header frame; a resize observer supplies its
+measured height to `--sl-nav-height` so the content, table of contents, and sidebar
+remain below it. CSS supplies the initial offsets. Without JavaScript, the header
+stays in normal flow so native disclosures can expand without covering page
+content. The short-viewport layout also keeps the header in normal flow to leave
+room for reading.
 
 [MobileMenuToggle.astro](src/components/overrides/MobileMenuToggle.astro) preserves
 Starlight's native documentation-sidebar popover control, with a visible

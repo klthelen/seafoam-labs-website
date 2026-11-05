@@ -156,6 +156,14 @@ const currentPath = Astro.url.pathname.endsWith("/")
       getComputedStyle(header)
         .getPropertyValue("--sf-navigation-layout")
         .trim() === "desktop";
+    const updateScrollState = () => {
+      const scrollOffset = Math.min(
+        Math.max(0, window.scrollY),
+        frame.offsetHeight,
+      );
+      frame.style.setProperty("--sf-header-scroll", `${scrollOffset}px`);
+      frame.toggleAttribute("data-scrolled", scrollOffset > 0);
+    };
     const updateHeader = () => {
       const nextDesktop =
         getComputedStyle(header)
@@ -174,18 +182,17 @@ const currentPath = Astro.url.pathname.endsWith("/")
         }
         desktop = nextDesktop;
       }
-      if (!header.hasAttribute("data-homepage")) {
-        if (docsButton?.checkVisibility()) {
-          document.documentElement.style.setProperty(
-            "--sf-docs-control-height",
-            docsButton.getBoundingClientRect().height + "px",
-          );
-        }
+      if (docsButton?.checkVisibility()) {
         document.documentElement.style.setProperty(
-          "--sl-nav-height",
-          frame.getBoundingClientRect().height + "px",
+          "--sf-docs-control-height",
+          docsButton.getBoundingClientRect().height + "px",
         );
       }
+      document.documentElement.style.setProperty(
+        "--sl-nav-height",
+        frame.getBoundingClientRect().height + "px",
+      );
+      updateScrollState();
     };
 
     // Apply measured spacing after resize delivery; it can change the frame's size.
@@ -194,6 +201,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     });
     headerResize.observe(frame, { box: "border-box" });
     if (docsButton) headerResize.observe(docsButton, { box: "border-box" });
+    window.addEventListener("scroll", updateScrollState, { passive: true });
     updateHeader();
   }
 </script>
@@ -221,6 +229,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     border-radius: 999px;
     background: var(--sf-surface);
     color: var(--sf-text);
+    pointer-events: auto;
   }
 
   .site-header :global(.site-title) {
@@ -376,15 +385,51 @@ const currentPath = Astro.url.pathname.endsWith("/")
     }
   }
 
+  @container site-navigation (width < 80rem) {
+    .header-content[data-docs] {
+      background: var(--sf-canvas);
+      pointer-events: auto;
+    }
+  }
+
   @container site-navigation (min-width: 80rem) {
     .header-content {
-      padding-block: env(safe-area-inset-top) 0;
+      position: relative;
+      isolation: isolate;
+      padding-block: calc(0.75rem + env(safe-area-inset-top)) 0.75rem;
+      background: transparent;
+    }
+
+    .header-content::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
       background: var(--sf-surface);
+      pointer-events: none;
     }
 
     .site-header {
-      border-radius: 0;
-      background: transparent;
+      min-block-size: 4.5rem;
+    }
+
+    @media (height > 32rem) {
+      .header-content::before {
+        /* The backdrop scrolls away while the pill stays in place. */
+        transform: translateY(calc(-1 * var(--sf-header-scroll, 0px)));
+      }
+    }
+  }
+
+  @media (height > 32rem) {
+    :global(.header[data-scrolled]) .site-header {
+      box-shadow: var(--sl-shadow-sm);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .site-header {
+        transition: box-shadow 200ms ease;
+      }
     }
   }
 
@@ -404,16 +449,8 @@ const currentPath = Astro.url.pathname.endsWith("/")
     height: auto;
     padding: 0;
     border: 0;
-    background: var(--sf-canvas);
-  }
-
-  :global(.page > .header:has(.site-header[data-homepage])) {
-    position: static;
     background: transparent;
-  }
-
-  :global(.page:has(.site-header[data-homepage]) > .main-frame) {
-    padding-top: 0;
+    pointer-events: none;
   }
 
   @media (width < 50rem) {
