@@ -1,0 +1,9 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 400 200"
+  preserveAspectRatio="none"
+>
+  <path
+    d="M0 100C33 90 67 90 100 100S167 110 200 100 267 90 300 100 367 110 400 100V200H0Z"
+  />
+</svg>
