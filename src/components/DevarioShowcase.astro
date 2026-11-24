@@ -1,14 +1,30 @@
 ---
 import { Icon } from "@astrojs/starlight/components";
+import { getImage } from "astro:assets";
 import CopyChecksum from "./CopyChecksum.astro";
 import { isoDownloadUrl, isoSha256 } from "../consts";
-import fish from "../assets/images/fish-dithered-stronger-transparent.png";
+import logo from "../assets/images/devario-logo.png";
+import ditherMask from "../assets/images/devario-dither-mask.png";
+import buttonWave from "../assets/images/button-wave.svg?url";
+
+// The fish ends above row 640; the embedded DEVARIO wordmark starts below it.
+const logoMarkHeight = 640;
+const dither = await getImage({ src: ditherMask, format: "webp", quality: 90 });
 ---
 
-<section class="devario-showcase not-content" aria-labelledby="devario-title">
+<section
+  class="devario-showcase not-content"
+  aria-labelledby="devario-title"
+  style={{ "--wave-mask": `url("${buttonWave}")` }}
+>
   <div class="devario-content">
     <div class="devario-heading">
-      <h2 id="devario-title">Devario</h2>
+      <h2 id="devario-title">
+        <span class="devario-title-base">DEVARIO</span>
+        <span class="devario-title-wave" aria-hidden="true">
+          DEVARIO
+        </span>
+      </h2>
       <a class="sf-link devario-overview" href="/devario/overview/">
         Overview
         <Icon name="right-arrow" size="1.25rem" />
@@ -27,11 +43,12 @@ import fish from "../assets/images/fish-dithered-stronger-transparent.png";
     </div>
   </div>
   <span
-    class="devario-fish"
+    class="devario-logo"
     aria-hidden="true"
     style={{
-      "--fish-artwork": `url(${fish.src})`,
-      aspectRatio: `${fish.width} / ${fish.height}`,
+      "--devario-logo": `url(${logo.src})`,
+      "--devario-dither": `url(${dither.src})`,
+      aspectRatio: `${logo.width} / ${logoMarkHeight}`,
     }}
   ></span>
   <a
@@ -44,7 +61,16 @@ import fish from "../assets/images/fish-dithered-stronger-transparent.png";
 </section>
 
 <style>
+  @font-face {
+    font-family: "Poppins";
+    src: url("../assets/fonts/poppins-700.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+  }
+
   .devario-showcase {
+    --devario-gradient: linear-gradient(90deg in srgb, #5ec4b0, #0a9cf4);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
@@ -67,18 +93,86 @@ import fish from "../assets/images/fish-dithered-stronger-transparent.png";
     gap: 0.5rem 1.5rem;
   }
   h2 {
+    position: relative;
     margin: 0;
+    font-family: "Poppins", var(--sl-font-system);
     font-size: 2.125rem;
+    font-weight: 700;
+    letter-spacing: 0.23em;
     line-height: 1.235;
     overflow-wrap: anywhere;
   }
-  .devario-fish {
+  .devario-title-wave {
+    display: none;
+  }
+
+  @supports (background-clip: text) and (mask-composite: exclude) {
+    @media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+      .devario-title-base {
+        display: block;
+        /* Remove the solid glyphs wherever the gradient wave replaces them. */
+        mask-image: linear-gradient(#000 0 0), var(--wave-mask);
+        mask-mode: alpha;
+        mask-size:
+          100% 100%,
+          200% 240%;
+        mask-repeat: no-repeat;
+        mask-position:
+          0% 0%,
+          0% 0%;
+        mask-composite: exclude;
+      }
+      .devario-title-wave,
+      .devario-logo::after {
+        position: absolute;
+        inset: 0;
+        display: block;
+        background: var(--devario-gradient);
+        pointer-events: none;
+        mask-image: var(--wave-mask);
+        mask-mode: alpha;
+        mask-size: 200% 240%;
+        mask-repeat: no-repeat;
+        mask-position: 0% 0%;
+      }
+      .devario-title-wave {
+        background-clip: text;
+        color: transparent;
+        user-select: none;
+      }
+      .devario-logo::after {
+        content: "";
+      }
+      .devario-showcase:is(:hover, :focus-within) .devario-title-base {
+        mask-position:
+          0% 0%,
+          50% 100%;
+      }
+      .devario-showcase:is(:hover, :focus-within) .devario-title-wave,
+      .devario-showcase:is(:hover, :focus-within) .devario-logo::after {
+        mask-position: 50% 100%;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .devario-title-base,
+        .devario-title-wave,
+        .devario-logo::after {
+          transition: mask-position 360ms ease-out;
+        }
+      }
+    }
+  }
+
+  .devario-logo {
+    position: relative;
     display: block;
     justify-self: center;
     width: min(100%, 18rem);
-    background-color: currentColor;
-    mask: var(--fish-artwork) center / contain no-repeat;
-    mask-mode: alpha;
+    background-color: light-dark(#000, #fff);
+    mask:
+      var(--devario-logo) top / 100% auto no-repeat,
+      var(--devario-dither) center / 100% 100% no-repeat;
+    mask-mode: alpha, luminance;
+    mask-composite: intersect;
     pointer-events: none;
   }
   .devario-description {
@@ -138,7 +232,7 @@ import fish from "../assets/images/fish-dithered-stronger-transparent.png";
       font-size: 3rem;
       line-height: 1.167;
     }
-    .devario-fish {
+    .devario-logo {
       grid-column: 2;
       grid-row: 1;
       align-self: center;

@@ -420,10 +420,34 @@ the enlarged fish alongside this content, with View on GitHub in the upper
 right. Compact layouts wrap the heading and controls as needed, then place
 the fish and GitHub link below the introduction.
 
-The approved stronger dithered fish is used as an alpha mask in the current
-text color. The transparent derivative preserves all 4569 × 2533 source pixels:
-only the original blue background pixels become transparent; the shape and
-dithering are unchanged. No palette-specific image copies are needed.
+The feature title reads DEVARIO in self-hosted Poppins Bold (700) with 0.23em
+letter spacing, scoped to this block. The Latin WOFF2 comes from Google Fonts
+and its OFL license is stored alongside the font in `src/assets/fonts/`.
+The spacing matches the approximately 0.22985em measured from the raster
+wordmark and Poppins's glyph metrics.
+
+Hovering the Devario block or focusing one of its controls reveals a left-to-right
+sRGB gradient through the title and fish together, using the project buttons'
+SVG wave mask and 360ms ease-out transition. Leaving the block reverses the fill.
+The solid title uses the inverse of the wave mask, so it disappears wherever
+the gradient appears instead of leaving a dark or light fringe beneath its edges.
+The sampled visible wordmark endpoints are #5EC4B0 and #0A9CF4; these reproduce the raster
+colors rather than claiming the original design file's gradient stops.
+This branding treatment is an explicitly requested exception to the project's
+gradient-text restriction. Reduced motion makes the fill immediate. Touch,
+forced colors, and browsers without the required CSS retain the solid title
+and monochrome fish; the decorative duplicate stays hidden from assistive technology.
+
+The official Devario logo is used as an alpha mask with black ink in light mode
+and white ink in dark mode, in both palettes. The existing 1253 × 839 PNG matches the
+[upstream logo](https://raw.githubusercontent.com/Seafoam-Labs/devario-os/refs/heads/main/iso/late-airootfs/usr/share/devario/fastfetch/devario-logo.png).
+The mask displays only its top 640 source pixels, retaining the fish and
+excluding the embedded DEVARIO wordmark without modifying the source asset.
+A separate luminance mask intersects that silhouette, keeping the upper fish
+solid and dissolving the lower portion into fine stippling. The static texture
+is shared across themes and palettes; it does not change the logo's geometry.
+The gradient wave sits inside these masks, preserving the silhouette and
+dithering throughout the transition.
 
 The homepage footer uses the approved Seafoam Shore v2 artwork: daylight in
 light mode and twilight in dark mode, for both Classic and Sea Glass. Links,
