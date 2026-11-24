@@ -45,6 +45,7 @@ class PreferenceInput {
 }
 
 interface EnvironmentOptions {
+  enableCustomPalettes?: boolean;
   dark?: boolean;
   preferenceAvailable?: boolean;
   stored?: Record<string, string>;
@@ -118,6 +119,7 @@ function initializePreferences(options: EnvironmentOptions = {}) {
     window,
     localStorage,
     HTMLInputElement: PreferenceInput,
+    enableCustomPalettes: options.enableCustomPalettes ?? true,
     appearanceValues: appearanceOptions.map(({ value }) => value),
     paletteValues: paletteOptions.map(({ value }) => value),
   });
@@ -211,6 +213,98 @@ await test("invalid stored values fall back independently", () => {
   assert.deepEqual(invalidPalette.dataset, {
     appearance: "dark",
     palette: "classic",
+    theme: "dark",
+  });
+});
+
+await test("disabled custom palettes force Classic without changing saved appearance or palette", () => {
+  for (const dark of [false, true]) {
+    for (const appearance of appearanceOptions) {
+      const environment = initializePreferences({
+        enableCustomPalettes: false,
+        dark,
+        stored: {
+          "seafoam-appearance": appearance.value,
+          "seafoam-palette": "sea-glass",
+        },
+      });
+      let expectedTheme: string = appearance.value;
+      if (appearance.value === "auto") {
+        expectedTheme = dark ? "dark" : "light";
+      }
+      assert.deepEqual(environment.dataset, {
+        appearance: appearance.value,
+        palette: "classic",
+        theme: expectedTheme,
+      });
+      assert.deepEqual(environment.storageReads, ["seafoam-appearance"]);
+      assert.deepEqual(environment.storageWrites, []);
+      assert.equal(environment.storage.get("seafoam-palette"), "sea-glass");
+    }
+  }
+});
+
+await test("disabled palette controls cannot change Classic or overwrite a saved palette", () => {
+  const environment = initializePreferences({
+    enableCustomPalettes: false,
+    stored: { "seafoam-palette": "sea-glass" },
+  });
+  for (const palette of paletteOptions) {
+    environment.selectPreference("palette", palette.value);
+    assert.equal(environment.dataset.palette, "classic");
+    assert.equal(environment.storage.get("seafoam-palette"), "sea-glass");
+    assert.deepEqual(environment.storageWrites, []);
+  }
+});
+
+await test("theme selection, persistence, and device changes still work with custom palettes disabled", () => {
+  const environment = initializePreferences({
+    enableCustomPalettes: false,
+    stored: { "seafoam-palette": "sea-glass" },
+  });
+  for (const appearance of ["dark", "light"]) {
+    environment.selectPreference("appearance", appearance);
+    environment.changeDeviceTheme(true);
+    assert.equal(environment.dataset.theme, appearance);
+    environment.changeDeviceTheme(false);
+    assert.equal(environment.dataset.theme, appearance);
+    assert.equal(environment.dataset.palette, "classic");
+
+    const nextVisit = initializePreferences({
+      enableCustomPalettes: false,
+      stored: Object.fromEntries(environment.storage),
+    });
+    assert.deepEqual(nextVisit.dataset, environment.dataset);
+  }
+
+  environment.selectPreference("appearance", "auto");
+  environment.changeDeviceTheme(true);
+  assert.equal(environment.dataset.theme, "dark");
+  environment.changeDeviceTheme(false);
+  assert.equal(environment.dataset.theme, "light");
+  assert.equal(environment.dataset.appearance, "auto");
+  assert.equal(environment.dataset.palette, "classic");
+  assert.deepEqual(environment.storageWrites, [
+    ["seafoam-appearance", "dark"],
+    ["seafoam-appearance", "light"],
+    ["seafoam-appearance", "auto"],
+  ]);
+  assert.equal(environment.storage.get("seafoam-palette"), "sea-glass");
+});
+
+await test("reenabling custom palettes restores the preserved choice", () => {
+  const disabled = initializePreferences({
+    enableCustomPalettes: false,
+    stored: { "seafoam-palette": "sea-glass" },
+  });
+  disabled.selectPreference("appearance", "dark");
+  const enabled = initializePreferences({
+    enableCustomPalettes: true,
+    stored: Object.fromEntries(disabled.storage),
+  });
+  assert.deepEqual(enabled.dataset, {
+    appearance: "dark",
+    palette: "sea-glass",
     theme: "dark",
   });
 });

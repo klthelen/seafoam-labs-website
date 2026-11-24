@@ -1,4 +1,5 @@
 ---
+import { featureFlags } from "../../config/features";
 import { appearanceOptions, paletteOptions } from "../../data/appearance";
 ---
 
@@ -6,6 +7,7 @@ import { appearanceOptions, paletteOptions } from "../../data/appearance";
 <script
   is:inline
   define:vars={{
+    enableCustomPalettes: featureFlags.enableCustomPalettes,
     appearanceValues: appearanceOptions.map(({ value }) => value),
     paletteValues: paletteOptions.map(({ value }) => value),
   }}
@@ -18,10 +20,13 @@ import { appearanceOptions, paletteOptions } from "../../data/appearance";
 
     try {
       const storedAppearance = localStorage.getItem("seafoam-appearance");
-      const storedPalette = localStorage.getItem("seafoam-palette");
       if (appearanceValues.includes(storedAppearance))
         appearance = storedAppearance;
-      if (paletteValues.includes(storedPalette)) palette = storedPalette;
+      // Keep saved palettes intact while customization is disabled.
+      if (enableCustomPalettes) {
+        const storedPalette = localStorage.getItem("seafoam-palette");
+        if (paletteValues.includes(storedPalette)) palette = storedPalette;
+      }
     } catch {
       // Blocked browser storage leaves the device theme and Classic defaults usable.
     }
@@ -56,6 +61,7 @@ import { appearanceOptions, paletteOptions } from "../../data/appearance";
         syncTheme();
         storageKey = "seafoam-appearance";
       } else if (
+        enableCustomPalettes &&
         input.name === "palette" &&
         paletteValues.includes(input.value)
       ) {

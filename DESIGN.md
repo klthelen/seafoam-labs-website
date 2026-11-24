@@ -5,11 +5,18 @@ and commands are documented in [README.md](README.md).
 
 ## Appearance preferences
 
-The footer's **Appearance** menu contains two independently selected groups:
-**Theme**, with **Use device theme** (`auto`), **Dark theme**, and **Light theme**;
-and **Color palette**, with **Classic (Default)** and **Sea Glass**. Device theme
-follows system changes while the page is open, with light as the fallback.
+The footer's **Appearance** menu contains **Theme**, with **Use device theme**
+(`auto`), **Dark theme**, and **Light theme**. Device theme follows system changes
+while the page is open, with light as the fallback.
 Without JavaScript, the site uses Classic and the device theme.
+
+The build-time `enableCustomPalettes` flag in
+[features.ts](src/config/features.ts) defaults to `false`. While disabled, the
+site always uses Classic, omits the **Color palette** controls, and ignores
+palette changes without reading or overwriting saved palette preferences.
+Theme selection and device-theme updates are unaffected. Set the flag to `true`
+and rebuild and deploy to restore **Classic (Default)** and **Sea Glass** choices
+and apply saved palettes again. Verify both flag states when changing this behavior.
 
 Selections are stored under `seafoam-appearance` and `seafoam-palette`.
 Unrecognized values fall back to the defaults; legacy `starlight-theme` values
@@ -23,10 +30,10 @@ values to both the provider and controls.
 [ThemeProvider.astro](src/components/overrides/ThemeProvider.astro) restores
 preferences before first paint and owns state updates, persistence, and system
 theme changes. [SitePreferences.astro](src/components/SitePreferences.astro)
-renders one disclosure with separate, visibly labeled fieldsets for theme and
-palette, and handles its positioning, dismissal, and focus behavior. A native
-popover places the panel above Starlight's fixed header and isolated content
-pane. The default Starlight selector remains suppressed.
+renders one disclosure with a visibly labeled theme fieldset and, when enabled,
+a palette fieldset, and handles its positioning, dismissal, and focus behavior.
+A native popover places the panel above Starlight's fixed header and isolated
+content pane. The default Starlight selector remains suppressed.
 
 The root's `data-appearance` stores the choice (`auto`, `light`, or `dark`);
 `data-theme` stores only the resolved `light` or `dark` value for Starlight.

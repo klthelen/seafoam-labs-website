@@ -1,6 +1,7 @@
 ---
 import { Icon } from "@astrojs/starlight/components";
 import themeIcon from "../assets/icons/starfish-pearl.svg";
+import { featureFlags } from "../config/features";
 import { appearanceOptions, paletteOptions } from "../data/appearance";
 
 interface Props {
@@ -44,20 +45,22 @@ const { showLabel = false } = Astro.props;
           </label>
         ))}
       </fieldset>
-      <fieldset>
-        <legend>Color palette</legend>
-        {paletteOptions.map(({ value, label }) => (
-          <label>
-            <input
-              type="radio"
-              name="palette"
-              value={value}
-              checked={value === "classic"}
-            />
-            <span>{label}</span>
-          </label>
-        ))}
-      </fieldset>
+      {featureFlags.enableCustomPalettes && (
+        <fieldset>
+          <legend>Color palette</legend>
+          {paletteOptions.map(({ value, label }) => (
+            <label>
+              <input
+                type="radio"
+                name="palette"
+                value={value}
+                checked={value === "classic"}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </fieldset>
+      )}
     </div>
   </details>
   <p class="preference-status" role="status" aria-atomic="true"></p>
