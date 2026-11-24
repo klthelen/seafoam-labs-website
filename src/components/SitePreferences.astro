@@ -1,79 +1,48 @@
 ---
-import { getImage } from "astro:assets";
+import themeIcon from "../assets/icons/starfish-pearl.svg";
 import { appearanceOptions, paletteOptions } from "../data/appearance";
-
-const [themeIcon, paletteIcon] = await Promise.all([
-  getImage({
-    src: "https://cdn-icons-png.flaticon.com/512/16769/16769239.png",
-    width: 96,
-    height: 96,
-    format: "png",
-  }),
-  getImage({
-    src: "https://cdn-icons-png.flaticon.com/512/3917/3917392.png",
-    width: 96,
-    height: 96,
-    format: "png",
-  }),
-]);
 ---
 
 <site-preferences hidden>
-  <div class="preference-controls">
-    <details name="site-preferences">
-      <summary aria-label="Choose theme" title="Theme">
-        <span
-          class="preference-icon"
-          style={{ "--preference-icon": `url("${themeIcon.src}")` }}
-          aria-hidden="true"
-        ></span>
-      </summary>
-      <div class="preference-panel" popover="manual">
-        <fieldset>
-          <legend class="sr-only">Theme</legend>
-          {appearanceOptions.map(({ value, label }) => (
-            <label>
-              <input
-                type="radio"
-                name="appearance"
-                value={value}
-                checked={value === "auto"}
-              />
-              <span>{label}</span>
-            </label>
-          ))}
-        </fieldset>
-      </div>
-    </details>
-    <details name="site-preferences">
-      <summary aria-label="Choose color palette" title="Color palette">
-        <span
-          class="preference-icon"
-          style={{ "--preference-icon": `url("${paletteIcon.src}")` }}
-          aria-hidden="true"
-        ></span>
-      </summary>
-      <div class="preference-panel" popover="manual">
-        <fieldset>
-          <legend class="sr-only">Color palette</legend>
-          {paletteOptions.map(({ value, label }) => (
-            <label>
-              <input
-                type="radio"
-                name="palette"
-                value={value}
-                checked={value === "classic"}
-              />
-              <span>{label}</span>
-            </label>
-          ))}
-        </fieldset>
-      </div>
-    </details>
-  </div>
-  <p class="icon-credit">
-    Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
-  </p>
+  <details>
+    <summary aria-label="Choose appearance" title="Appearance">
+      <span
+        class="preference-icon"
+        style={{ "--preference-icon": `url("${themeIcon.src}")` }}
+        aria-hidden="true"
+      ></span>
+    </summary>
+    <div class="preference-panel" popover="manual">
+      <fieldset>
+        <legend>Theme</legend>
+        {appearanceOptions.map(({ value, label }) => (
+          <label>
+            <input
+              type="radio"
+              name="appearance"
+              value={value}
+              checked={value === "auto"}
+            />
+            <span>{label}</span>
+          </label>
+        ))}
+      </fieldset>
+      <fieldset>
+        <legend>Color palette</legend>
+        {paletteOptions.map(({ value, label }) => (
+          <label>
+            <input
+              type="radio"
+              name="palette"
+              value={value}
+              checked={value === "classic"}
+            />
+            <span>{label}</span>
+          </label>
+        ))}
+      </fieldset>
+    </div>
+  </details>
   <p class="preference-status" role="status" aria-atomic="true"></p>
 </site-preferences>
 
@@ -89,22 +58,17 @@ const [themeIcon, paletteIcon] = await Promise.all([
         input.checked = input.value === selected;
       }
 
-      const disclosures = Array.from(this.querySelectorAll("details"));
+      const disclosure = this.querySelector("details");
+      const trigger = this.querySelector("summary");
+      const panel = this.querySelector<HTMLElement>(".preference-panel");
+      if (!disclosure || !trigger || !panel) return;
 
-      const closeDisclosure = (
-        disclosure: HTMLDetailsElement,
-        restoreFocus = false,
-      ) => {
+      const closeDisclosure = (restoreFocus = false) => {
         disclosure.open = false;
-        if (restoreFocus) disclosure.querySelector("summary")?.focus();
+        if (restoreFocus) trigger.focus();
       };
 
-      const positionPanel = (disclosure: HTMLDetailsElement) => {
-        const trigger = disclosure.querySelector("summary");
-        const panel =
-          disclosure.querySelector<HTMLElement>(".preference-panel");
-        if (!trigger || !panel) return;
-
+      const positionPanel = () => {
         const viewport = window.visualViewport;
         const viewportTop = viewport?.offsetTop ?? 0;
         const viewportLeft = viewport?.offsetLeft ?? 0;
@@ -135,57 +99,46 @@ const [themeIcon, paletteIcon] = await Promise.all([
         panel.style.top = `${top}px`;
       };
 
-      // The top layer lets footer menus escape Starlight's isolated content pane.
-      for (const disclosure of disclosures) {
-        const panel =
-          disclosure.querySelector<HTMLElement>(".preference-panel");
-        disclosure.addEventListener("toggle", () => {
-          if (disclosure.open) {
-            panel?.showPopover();
-            positionPanel(disclosure);
-          } else {
-            panel?.hidePopover();
-          }
-        });
-      }
+      // The top layer lets the footer menu escape Starlight's isolated content pane.
+      disclosure.addEventListener("toggle", () => {
+        if (disclosure.open) {
+          panel.showPopover();
+          positionPanel();
+        } else {
+          panel.hidePopover();
+        }
+      });
 
       document.addEventListener("keydown", (event) => {
-        const disclosure = disclosures.find((item) => item.open);
-        if (event.key === "Escape" && disclosure) {
+        if (event.key === "Escape" && disclosure.open) {
           event.preventDefault();
-          closeDisclosure(disclosure, true);
+          closeDisclosure(true);
         }
       });
 
       document.addEventListener("pointerdown", (event) => {
-        for (const disclosure of disclosures) {
-          if (
-            disclosure.open &&
-            event.target instanceof Node &&
-            !disclosure.contains(event.target)
-          ) {
-            closeDisclosure(disclosure);
-          }
+        if (
+          disclosure.open &&
+          event.target instanceof Node &&
+          !disclosure.contains(event.target)
+        ) {
+          closeDisclosure();
         }
       });
 
       this.addEventListener("focusout", (event) => {
         // Label clicks can briefly blur the trigger before focusing their radio.
-        for (const disclosure of disclosures) {
-          if (
-            disclosure.open &&
-            event.relatedTarget instanceof Node &&
-            !disclosure.contains(event.relatedTarget)
-          ) {
-            closeDisclosure(disclosure);
-          }
+        if (
+          disclosure.open &&
+          event.relatedTarget instanceof Node &&
+          !disclosure.contains(event.relatedTarget)
+        ) {
+          closeDisclosure();
         }
       });
 
       const repositionOpenPanel = () => {
-        for (const disclosure of disclosures) {
-          if (disclosure.open) positionPanel(disclosure);
-        }
+        if (disclosure.open) positionPanel();
       };
       window.addEventListener("resize", repositionOpenPanel);
       window.addEventListener("scroll", repositionOpenPanel, { passive: true });
@@ -206,11 +159,6 @@ const [themeIcon, paletteIcon] = await Promise.all([
     gap: 0.5rem;
     margin-block: 1rem;
     color: var(--sf-text);
-  }
-
-  .preference-controls {
-    display: flex;
-    gap: 0.75rem;
   }
 
   summary {
@@ -252,8 +200,7 @@ const [themeIcon, paletteIcon] = await Promise.all([
   }
 
   summary:focus-visible,
-  label:has(input:focus-visible),
-  a:focus-visible {
+  label:has(input:focus-visible) {
     outline: 2px solid var(--sf-focus);
     outline-offset: 3px;
   }
@@ -295,8 +242,19 @@ const [themeIcon, paletteIcon] = await Promise.all([
     display: grid;
     gap: 0.25rem;
     min-width: 0;
+    margin: 0;
     padding: 0;
     border: 0;
+  }
+
+  fieldset + fieldset {
+    margin-block-start: 1rem;
+  }
+
+  legend {
+    margin-block-end: 0.5rem;
+    padding-inline: 0.75rem;
+    font-weight: 600;
   }
 
   label {
@@ -363,26 +321,11 @@ const [themeIcon, paletteIcon] = await Promise.all([
     }
   }
 
-  .icon-credit,
   .preference-status {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.5;
     color: var(--sf-text-muted);
-  }
-
-  .preference-status {
     max-width: 30ch;
-  }
-
-  a,
-  a:visited {
-    color: var(--sf-link);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  a:hover {
-    text-decoration-thickness: 2px;
   }
 </style>

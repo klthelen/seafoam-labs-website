@@ -5,10 +5,11 @@ and commands are documented in [README.md](README.md).
 
 ## Appearance preferences
 
-The footer offers two independent preferences: **Use device theme** (`auto`),
-**Dark theme**, or **Light theme**; and the **Classic (Default)** or **Sea Glass**
-palette. Device theme follows system changes while the page is open, with light
-as the fallback. Without JavaScript, the site uses Classic and the device theme.
+The footer's **Appearance** menu contains two independently selected groups:
+**Theme**, with **Use device theme** (`auto`), **Dark theme**, and **Light theme**;
+and **Color palette**, with **Classic (Default)** and **Sea Glass**. Device theme
+follows system changes while the page is open, with light as the fallback.
+Without JavaScript, the site uses Classic and the device theme.
 
 Selections are stored under `seafoam-appearance` and `seafoam-palette`.
 Unrecognized values fall back to the defaults; legacy `starlight-theme` values
@@ -22,10 +23,10 @@ values to both the provider and controls.
 [ThemeProvider.astro](src/components/overrides/ThemeProvider.astro) restores
 preferences before first paint and owns state updates, persistence, and system
 theme changes. [SitePreferences.astro](src/components/SitePreferences.astro)
-renders the footer controls and handles their disclosure positioning, dismissal,
-and focus behavior. Each disclosure uses a native popover to place its panel
-above Starlight's fixed header and isolated content pane. The default Starlight
-selector remains suppressed.
+renders one disclosure with separate, visibly labeled fieldsets for theme and
+palette, and handles its positioning, dismissal, and focus behavior. A native
+popover places the panel above Starlight's fixed header and isolated content
+pane. The default Starlight selector remains suppressed.
 
 The root's `data-appearance` stores the choice (`auto`, `light`, or `dark`);
 `data-theme` stores only the resolved `light` or `dark` value for Starlight.
@@ -409,10 +410,10 @@ dithering are unchanged. No palette-specific image copies are needed.
 
 The homepage footer uses the approved Seafoam Shore v2 artwork: daylight in
 light mode and twilight in dark mode, for both Classic and Sea Glass. Links,
-appearance controls, copyright, Flaticon attribution, and separate CDN77 sponsorship
-and JetBrains support credits
-are real content above the illustration. The original shellheart identifies
-the brand. Other routes retain the compact footer and Starlight's footer content.
+the appearance control, copyright, and separate CDN77 sponsorship and JetBrains
+support credits are real content above the illustration. The original shellheart
+identifies the brand. Other routes retain the compact footer and Starlight's
+footer content.
 
 The panoramic artwork is used at every viewport width. It scales from 1080px to
 its native 2172px width, preserving its aspect ratio. Narrower screens clip the
@@ -457,11 +458,11 @@ Headings use Space Grotesk 500/600; body text and controls use DM Sans 400/500/6
 The WOFF2 files are self-hosted in [src/assets/fonts/](src/assets/fonts/), with
 each family's SIL Open Font License retained alongside the fonts.
 
-Astro generates the two footer icons from their Flaticon sources at build time,
-so the published website serves them locally. Only those two remote image paths
-are authorized in the image configuration. The icons retain their visible
-attribution link; their sources and separate license are recorded in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The footer's appearance control uses the local
+[starfish-and-pearl SVG](src/assets/icons/starfish-pearl.svg) as a 24px alpha
+mask. It inherits the control's current color in both themes and palettes,
+including hover, focus, and open states. The pearl's curved highlight is a
+transparent cutout, so it works on each control background.
 
 ## Verification
 

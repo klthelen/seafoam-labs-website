@@ -9,20 +9,6 @@ import starlightChangelogs, {
 
 // https://astro.build/config
 export default defineConfig({
-  image: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "cdn-icons-png.flaticon.com",
-        pathname: "/512/16769/16769239.png",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn-icons-png.flaticon.com",
-        pathname: "/512/3917/3917392.png",
-      },
-    ],
-  },
   site: import.meta.env.PROD
     ? "https://www.seafoam-labs.org"
     : "http://localhost:4321",
