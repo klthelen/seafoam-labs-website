@@ -171,6 +171,11 @@
   color: var(--sl-color-asides-text-accent);
 }
 
+.starlight-aside__title,
+.card .title {
+  overflow-wrap: anywhere;
+}
+
 .sl-markdown-content :is(blockquote, details):not(:where(.not-content *)) {
   border-inline-start: 0;
   padding: 1rem;
