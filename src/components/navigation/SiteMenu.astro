@@ -3,7 +3,13 @@ import config from "virtual:starlight/user-config";
 import { Icon } from "@astrojs/starlight/components";
 import MenuLink from "./MenuLink.astro";
 import NavigationDisclosure from "./NavigationDisclosure.astro";
-import { sitePages } from "../../data/navigation";
+import { projectPages, sitePages } from "../../data/navigation";
+
+interface Props {
+  includeProjects?: boolean;
+}
+
+const { includeProjects = false } = Astro.props;
 
 const socialLinks = config.social || [];
 const { siteTitleHref } = Astro.locals.starlightRoute;
@@ -31,6 +37,23 @@ const currentPath = Astro.url.pathname.endsWith("/")
         current={siteTitleHref === currentPath}
       />
     </li>
+    {includeProjects && (
+      <li>
+        <details class="site-projects">
+          <summary class="site-projects-trigger">
+            Projects
+            <Icon name="down-caret" size="1.25rem" />
+          </summary>
+          <ul class="site-links site-project-links">
+            {projectPages.map(({ href, label }) => (
+              <li>
+                <MenuLink {href} {label} current={href === currentPath} />
+              </li>
+            ))}
+          </ul>
+        </details>
+      </li>
+    )}
     {sitePages.map(({ href, label }) => (
       <li>
         <MenuLink {href} {label} current={href === currentPath} />
@@ -80,5 +103,55 @@ const currentPath = Astro.url.pathname.endsWith("/")
     margin: 0.75rem 0;
     border: 0;
     border-block-start: 1px solid var(--sf-boundary);
+  }
+
+  .site-projects-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-block-size: 3.25rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    overflow-wrap: anywhere;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .site-projects-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .site-projects-trigger :global(svg) {
+    flex: none;
+  }
+
+  .site-projects[open] > summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) {
+    .site-projects-trigger:hover {
+      background: var(--sf-action);
+      color: var(--sf-on-action);
+    }
+  }
+
+  .site-projects-trigger:active {
+    background: var(--sf-action-pressed);
+    color: var(--sf-on-action);
+  }
+
+  .site-projects-trigger:focus-visible {
+    outline: 2px solid var(--sf-focus);
+    outline-offset: 3px;
+  }
+
+  .site-project-links {
+    margin-block-start: 0.75rem;
+    padding-inline-start: 0.75rem;
   }
 </style>

@@ -26,7 +26,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     aria-label="Primary"
   >
     <div class="site-menu site-menu--leading">
-      <SiteMenu />
+      <SiteMenu includeProjects />
     </div>
     <SiteTitle />
     <a
@@ -68,9 +68,15 @@ const currentPath = Astro.url.pathname.endsWith("/")
   for (const header of document.querySelectorAll<HTMLElement>(".site-header")) {
     const frame = header.closest<HTMLElement>(".page > .header");
     const siteTriggers = [
-      ...header.querySelectorAll<HTMLElement>(".site-menu summary"),
+      ...header.querySelectorAll<HTMLElement>(
+        ".site-menu > .navigation-disclosure > summary",
+      ),
     ];
     const logoLink = header.querySelector<HTMLAnchorElement>(".site-title");
+    const projectsDisclosure = header.querySelector<HTMLDetailsElement>(
+      ":scope > .navigation-disclosure",
+    );
+    const projectsTrigger = projectsDisclosure?.querySelector("summary");
     if (!frame || siteTriggers.length === 0 || !logoLink) continue;
 
     const disclosures = header.querySelectorAll<HTMLDetailsElement>(
@@ -144,7 +150,16 @@ const currentPath = Astro.url.pathname.endsWith("/")
       if (!(focused instanceof HTMLElement) || focused.checkVisibility())
         return;
 
-      if (focused.closest(".site-menu") || focused === logoLink) {
+      if (
+        focused.closest(".site-projects") &&
+        projectsTrigger?.checkVisibility()
+      ) {
+        projectsTrigger.focus();
+      } else if (
+        focused.closest(".site-menu") ||
+        focused === logoLink ||
+        projectsDisclosure?.contains(focused)
+      ) {
         if (siteTriggers.some((trigger) => trigger.checkVisibility())) {
           focusSiteMenu();
         } else {
@@ -181,14 +196,21 @@ const currentPath = Astro.url.pathname.endsWith("/")
         const focused = document.activeElement;
         const focusedMenu = focused?.closest(".site-menu");
         for (const disclosure of disclosures) {
-          const menu = disclosure.closest(".site-menu");
-          if (menu && !menu.checkVisibility()) disclosure.open = false;
+          if (!disclosure.querySelector("summary")?.checkVisibility())
+            disclosure.open = false;
         }
-        if (nextLayout === "desktop") {
+        if (
+          focused?.closest(".site-projects") &&
+          projectsTrigger?.checkVisibility()
+        ) {
+          projectsTrigger.focus();
+        } else if (nextLayout === "desktop") {
           if (focusedMenu) focusDesktopCounterpart(focused);
         } else if (
           (focusedMenu && !focusedMenu.checkVisibility()) ||
           (focused === logoLink && !logoLink.checkVisibility()) ||
+          (projectsDisclosure?.contains(focused) &&
+            !projectsDisclosure.checkVisibility()) ||
           [...desktopGroups].some((group) => group.contains(focused))
         ) {
           focusSiteMenu();
@@ -358,6 +380,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     }
 
     .site-header :global(.site-title),
+    .site-header > :global(.navigation-disclosure),
     .site-menu--trailing {
       display: none;
     }

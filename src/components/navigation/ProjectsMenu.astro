@@ -2,39 +2,7 @@
 import { Icon } from "@astrojs/starlight/components";
 import MenuLink from "./MenuLink.astro";
 import NavigationDisclosure from "./NavigationDisclosure.astro";
-
-const projects = [
-  {
-    label: "Devario",
-    description: "Linux desktop",
-    href: "/devario/overview/",
-  },
-  {
-    label: "Shelly ALPM",
-    description: "Visual package manager",
-    href: "/shelly-alpm/overview/",
-  },
-  {
-    label: "Starfish",
-    description: "Package dependency viewer",
-    href: "/starfish/overview/",
-  },
-  {
-    label: "Aqueous",
-    description: "Wayland compositor",
-    href: "/aqueous/overview/",
-  },
-  {
-    label: "Pearl",
-    description: "Desktop shell for Aqueous",
-    href: "/pearl/overview/",
-  },
-  {
-    label: "Pori",
-    description: "Persistent Linux mounts",
-    href: "/pori/overview/",
-  },
-];
+import { projectPages } from "../../data/navigation";
 
 const currentPath = Astro.url.pathname.endsWith("/")
   ? Astro.url.pathname
@@ -47,7 +15,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
     <Icon name="down-caret" size="32px" />
   </span>
   <ul class="projects-list">
-    {projects.map(({ href, label, description }) => (
+    {projectPages.map(({ href, label, description }) => (
       <li>
         <MenuLink {href} {label} {description} current={href === currentPath} />
       </li>

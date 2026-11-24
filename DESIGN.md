@@ -196,9 +196,9 @@ places any affected focus on a visible control.
 ## Projects menu
 
 [ProjectsMenu.astro](src/components/navigation/ProjectsMenu.astro) combines the
-shared disclosure and menu links. It owns the six project labels, descriptions,
-and overview destinations in this order: Devario, Shelly ALPM, Starfish, Aqueous,
-Pearl, and Pori. The current overview receives `aria-current="page"` and a label
+shared disclosure and menu links. It reads the six project labels, descriptions,
+and overview destinations from `navigation.ts` in this order: Devario, Shelly ALPM,
+Starfish, Aqueous, Pearl, and Pori. The current overview receives `aria-current="page"` and a label
 underline. Matching accepts either trailing-slash form; other pages, including
 documentation within a project, do not mark an overview as the current page.
 
@@ -225,6 +225,13 @@ retain the configured labels, icons, destinations, normal tab behavior, and
 `rel="me"`. Only an exact
 internal destination receives `aria-current="page"`, accepting either
 trailing-slash form.
+
+The narrow header includes a native Projects disclosure after Home, with the six
+project links from `navigation.ts`. Expanding it keeps the links inside the Site
+menu's existing scrollable panel. These rows use the ordinary link treatment;
+the wider standalone Projects menu retains its descriptions. Both placements
+identify the current overview. Escape closes the containing Site menu and
+returns focus to its trigger.
 
 The 20px hamburger and its accessible name, Open menu, become an X and Close menu
 when the native disclosure opens. CSS follows the `open` attribute, so both the
@@ -316,14 +323,16 @@ successful network request in failure tests.
 The compact capsule has a 4rem minimum height, 16px outer gutters, and 8px
 inner padding, increasing to 12px where space permits. Icon targets stay at least
 44px while text can grow. Below a container width of 22.5rem, the Site menu
-replaces the logo at the start of the row, followed by Projects and Search.
+replaces the logo at the start of the row, followed by Search. Projects moves
+into that menu as an expandable group; the standalone Projects trigger is hidden.
 Home remains the first link in that menu. The leading menu stays available
 while Search is open. Wider compact headers retain the logo and trailing menu.
 The two menu placements reuse the same component; only the appropriate instance
 is displayed or keyboard-accessible, including without JavaScript. Resizing
 closes a hidden menu and transfers affected focus to the visible menu trigger
-or desktop link. The rem breakpoint responds to enlarged text, and controls
-can still wrap when that text needs more space.
+or desktop link. Focus within Projects moves to the hamburger when narrowing
+and to the standalone Projects trigger when widening. The rem breakpoint responds
+to enlarged text, and controls can still wrap when that text needs more space.
 
 From a container width of 64rem, it shows the inline
 page and social links, uses a 6rem minimum height and 2rem horizontal padding,
