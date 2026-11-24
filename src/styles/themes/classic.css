@@ -22,7 +22,6 @@
   --sf-pori-surface: var(--sf-canvas);
   --sf-card-border: light-dark(#cbd5e1, #334155);
   --sf-card-ink: var(--sf-text);
-  --sf-card-link: var(--sf-link);
   --sf-card-action-hover: var(--sf-action);
   --sf-card-action-pressed: var(--sf-action-pressed);
   --sf-on-card-action: var(--sf-on-action);
