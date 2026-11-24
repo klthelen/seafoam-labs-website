@@ -42,32 +42,12 @@ const links = [
         </a>
         <p>Open-source tools for Arch Linux and beyond.</p>
       </div>
-      <nav class="footer-projects" aria-labelledby="footer-projects-title">
-        <h2 id="footer-projects-title">Projects</h2>
-        <ul>
-          <li>
-            <a href="/devario/overview/">Devario</a>
-          </li>
-          <li>
-            <a href="/shelly-alpm/overview/">Shelly ALPM</a>
-          </li>
-          <li>
-            <a href="/starfish/overview/">Starfish</a>
-          </li>
-          <li>
-            <a href="/aqueous/overview/">Aqueous</a>
-          </li>
-          <li>
-            <a href="/pearl/overview/">Pearl</a>
-          </li>
-          <li>
-            <a href="/pori/overview/">Pori</a>
-          </li>
-        </ul>
-      </nav>
       <nav class="footer-explore" aria-labelledby="footer-explore-title">
         <h2 id="footer-explore-title">Explore</h2>
         <ul>
+          <li>
+            <a href="#projects">Projects</a>
+          </li>
           <li>
             <a href="/welcome/">Wiki</a>
           </li>
@@ -93,10 +73,6 @@ const links = [
           </li>
         </ul>
       </nav>
-      <p class="footer-copyright">© {new Date().getFullYear()} Seafoam Labs</p>
-      <div class="footer-preferences">
-        <SitePreferences />
-      </div>
       <div class="footer-credits">
         <section class="footer-credit" aria-labelledby="footer-sponsors-title">
           <h2 id="footer-sponsors-title">Sponsored by</h2>
@@ -160,6 +136,14 @@ const links = [
             and the JetBrains logo are trademarks of JetBrains s.r.o.
           </p>
         </section>
+      </div>
+      <div class="footer-utilities">
+        <p class="footer-copyright">
+          © {new Date().getFullYear()} Seafoam Labs
+        </p>
+        <div class="footer-preferences">
+          <SitePreferences showLabel />
+        </div>
       </div>
     </div>
     <div class="shoreline" aria-hidden="true">
@@ -236,8 +220,8 @@ const links = [
     z-index: 1;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas: "brand brand" "projects explore" "projects community" "copyright copyright" "preferences preferences" "credits credits";
-    gap: 1.5rem 1rem;
+    grid-template-areas: "brand brand" "explore community" "credits credits" "utilities utilities";
+    gap: 2rem 1rem;
     width: calc(100% - 2 * var(--sl-content-pad-x));
     max-width: 77.5rem;
     margin-inline: auto;
@@ -273,9 +257,6 @@ const links = [
     font-size: 1.125rem;
     line-height: 1.556;
     color: var(--sf-text-muted);
-  }
-  .footer-projects {
-    grid-area: projects;
   }
   .footer-explore {
     grid-area: explore;
@@ -316,16 +297,25 @@ const links = [
     outline-offset: 3px;
     border-radius: 2px;
   }
+  .footer-utilities {
+    grid-area: utilities;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--sf-boundary);
+  }
+  .footer-utilities > * {
+    min-width: 0;
+    max-width: 100%;
+  }
   .footer-copyright {
-    grid-area: copyright;
     margin: 0;
-    align-self: end;
     color: var(--sf-text-muted);
     font-size: 0.875rem;
     line-height: 1.5;
-  }
-  .footer-preferences {
-    grid-area: preferences;
   }
   .footer-preferences :global(site-preferences:not([hidden])) {
     align-items: flex-start;
@@ -389,9 +379,27 @@ const links = [
       margin-top: 5rem;
     }
     .footer-content {
-      grid-template-columns: minmax(0, 1.8fr) repeat(3, minmax(0, 1fr));
-      grid-template-areas: "brand projects explore community" "copyright projects preferences preferences" "credits credits credits credits";
-      gap: 1rem 2.5rem;
+      grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+      grid-template-areas: "brand explore community" "credits credits credits" "utilities utilities utilities";
+      gap: 2.5rem;
+    }
+    .footer-wordmark {
+      font-size: 2.25rem;
+    }
+    .footer-brand p,
+    .footer-content nav a {
+      font-size: 1.25rem;
+    }
+    .footer-content h2 {
+      font-size: 1.5rem;
+      line-height: 1.25;
+    }
+    .footer-credit img {
+      width: auto;
+      height: 2.5rem;
+    }
+    .footer-copyright {
+      font-size: 1rem;
     }
   }
   @media (min-width: 2172px) {

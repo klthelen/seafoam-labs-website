@@ -1,16 +1,33 @@
 ---
+import { Icon } from "@astrojs/starlight/components";
 import themeIcon from "../assets/icons/starfish-pearl.svg";
 import { appearanceOptions, paletteOptions } from "../data/appearance";
+
+interface Props {
+  showLabel?: boolean;
+}
+
+const { showLabel = false } = Astro.props;
 ---
 
 <site-preferences hidden>
   <details>
-    <summary aria-label="Choose appearance" title="Appearance">
+    <summary
+      class:list={{ "summary-labeled": showLabel }}
+      aria-label={showLabel ? undefined : "Choose appearance"}
+      title={showLabel ? undefined : "Appearance"}
+    >
       <span
         class="preference-icon"
         style={{ "--preference-icon": `url("${themeIcon.src}")` }}
         aria-hidden="true"
       ></span>
+      {showLabel && (
+        <>
+          <span>Appearance</span>
+          <Icon name="down-caret" size="1.25rem" class="preference-chevron" />
+        </>
+      )}
     </summary>
     <div class="preference-panel" popover="manual">
       <fieldset>
@@ -174,6 +191,25 @@ import { appearanceOptions, paletteOptions } from "../data/appearance";
 
   summary::-webkit-details-marker {
     display: none;
+  }
+
+  .summary-labeled {
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    border: 1.5px solid currentColor;
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .summary-labeled .preference-icon,
+  .summary-labeled :global(.preference-chevron) {
+    flex-shrink: 0;
+  }
+
+  details[open] > summary :global(.preference-chevron) {
+    transform: rotate(180deg);
   }
 
   summary:hover,

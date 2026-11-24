@@ -432,6 +432,15 @@ support credits are real content above the illustration. The original shellheart
 identifies the brand. Other routes retain the compact footer and Starlight's
 footer content.
 
+The homepage footer groups Explore and Community beside the brand. A single
+Projects link returns to the homepage's project section; the header menu retains
+the individual project links. Sponsor and supporter credits share the next row.
+A final utility row places copyright beside a visibly labeled Appearance control,
+separated from the credits by one horizontal rule. The navigation and credits
+stack on narrow screens, and the utility row wraps without clipping its controls.
+Only the homepage enables the labeled appearance trigger; documentation keeps
+the compact icon trigger and the same preference menu behavior.
+
 The panoramic artwork is used at every viewport width. It scales from 1080px to
 its native 2172px width, preserving its aspect ratio. Narrower screens clip the
 sides around the shell, starfish, and pearl cluster, whose center is 75% across
