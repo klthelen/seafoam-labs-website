@@ -2,97 +2,200 @@
 title: Shelly Package Management
 sidebar:
   label: Package Management
-description: Browse, install, update, and remove ALPM repository packages in Shelly's GTK interface.
+description: Browse, install, update, and remove native repository packages in Shelly's GTK interface on Devario and Arch-based systems.
 tableOfContents:
   minHeadingLevel: 2
   maxHeadingLevel: 4
 ---
 
-The **Package** page is Shelly's home for ALPM (repository) packages: search your configured
-repositories, install what you need, and remove what you no longer want, all from one view.
-System-wide upgrades have their own [Update](#updating-packages) page, and AUR, Flatpak, and
-AppImage software are managed on their own pages.
+import { Image } from "astro:assets";
+import packageBrowse from "../../../../assets/screenshots/shelly/packages-devario-browse.png";
+import packageSelection from "../../../../assets/screenshots/shelly/packages-devario-selection.png";
+import packageUpdates from "../../../../assets/screenshots/shelly/packages-devario-updates.png";
+
+The **Package** page lets you browse and manage software from your configured native repositories.
+Use the [Update](#updating-packages) page for a full native system upgrade. Other software sources
+have separate pages when they are available in your build and enabled.
+
+Shelly normally uses `/etc/shelly.conf` on Devario and `/etc/pacman.conf` on Arch-based systems.
+See [Native package configuration](/shelly-alpm/docs/native-configuration/) for the active
+configuration and repository paths. Changing the package engine does not change the distribution's
+path profile. For software missing from Devario's repositories, you can [request a package](/devario/package-requests/).
+
+The screenshots use a Devario development setup. Treat the shown packages and repository names as
+examples, not repository setup instructions. Select an image to open it at full size.
 
 ## Browsing packages
 
-The Package page lists every package available from your configured repositories, with installed
-packages marked. The toolbar along the top controls what you see:
+The Package page lists repository packages and marks matching installed packages. Ignored packages
+are hidden unless **Show Hidden** is enabled. The toolbar controls what you see:
 
-- **Search** filters the list by package name and description; `Ctrl+F` jumps to the search field.
-- The **group filter** (defaults to `Any`) narrows the list to a single package group.
-- **Installed Only** hides packages that are not installed and adds an _Install Date_ column to the
-  list view.
-- The **grid/list toggle** switches between card and table layouts; the table shows Name, Version,
-  Size, and Repository.
-- The **cart button** (`N Selected`) lists every package you have checked. Click an entry there to
-  uncheck it.
+- **Search** filters by package name and description; `Ctrl+F` focuses the search field.
+- The **group filter** starts at `Any`; choose a group to narrow the list.
+- **Installed Only** shows installed matches and adds an _Install Date_ column in list view.
+- **Grid View** and **List View** switch layouts. The list includes Name, Version, Size and Repository.
+- **N Selected** opens the list of checked packages. Click an entry there to uncheck it.
 
-Selecting a package opens a detail pane beside the list with its description, version, size,
-dependencies, and related metadata. The pane can be hidden with **Hide Detail Pane** in the options
-(`⋮`) menu.
+This filtered repository list is not a complete inventory of the installed package database:
+installed packages absent from the repository results are not added to it. For a complete native
+package listing, see the [CLI reference](/shelly-alpm/docs/cli-reference/).
+
+Highlighting a row opens its details; checking its checkbox adds it to the selection used for
+installation or removal. These are separate actions. Changing a filter does not clear checked
+packages, so review **N Selected** before continuing.
+
+The detail pane shows the description, version, repository, sizes, dependencies and related metadata.
+Use **Hide Detail Pane** in **Additional Options** (`⋮`) to hide it.
+
+<figure>
+  <a href={packageBrowse.src}>
+    <Image
+      src={packageBrowse}
+      alt="Shelly Package page on Devario with helicoprion-git highlighted, its checkbox clear and package details on the right."
+    />
+  </a>
+  <figcaption>
+    A highlighted package shows its details without adding it to the checked
+    selection.
+  </figcaption>
+</figure>
 
 ### Options menu
 
-- **Perform Upgrade** - synchronize and upgrade the whole system as part of the next install.
-- **Show Hidden** - include packages listed in `IgnorePkg` in `pacman.conf`.
-- **Show Explicit Only** / **Show Dependency Only** - filter by install reason: packages you chose
-  to install versus packages pulled in as dependencies.
+- **Perform Upgrade** - synchronize and upgrade native system packages together with the selected
+  repository packages during the next install. This option is off by default.
+- **Show Hidden** - include packages matched by `IgnorePkg` in the active native configuration,
+  not necessarily `pacman.conf`.
+- **Show Explicit Only** / **Show Dependency Only** - filter by install reason. Combine these with
+  **Installed Only** when you want installed packages; **Show Dependency Only** alone can also show
+  packages that are not installed.
 
 ## Installing packages
 
-1. Check one or more available packages. Each checked package appears in the cart button.
-2. Select **Install Selected**.
-3. Shelly runs the transaction in a progress view and refreshes the list when it finishes.
+1. Check the available packages you want. Open **N Selected** to review the complete selection.
+2. Select **Install Selected** to start the installation workflow. Read any transaction questions before answering.
+3. Check the result in the progress view. After a successful operation, Shelly clears the selection
+   and refreshes the list. If it fails, read the error before retrying; see
+   [Troubleshooting](/shelly-alpm/docs/troubleshooting/).
 
-Installing, removing, and upgrading touch the system package database, so Shelly authorizes these
-operations through polkit and your desktop's usual authentication prompt appears. If polkit is not
-available, Shelly warns you and blocks privileged actions; see
-[Polkit Setup](/shelly-alpm/docs/polkit/).
+Package changes require administrator authorization. Shelly launches its CLI through `pkexec` and
+polkit, which may ask you to authenticate; cached authorization can avoid a new prompt. Interactive
+authorization also needs a desktop authentication agent. If Shelly reports a polkit or authorization
+problem, follow [Polkit Setup](/shelly-alpm/docs/polkit/) rather than assuming the daemon is stopped.
 
 :::note[One action per selection]
-
-The primary button follows your selection: available packages turn it into **Install Selected**,
-installed packages turn it into **Remove Selected**, and a mix of both disables it until the
-selection contains only one kind.
-
+The main button changes to **Install Selected** for available packages or **Remove Selected** for
+installed packages. A **Mixed selection** is disabled. Keep only the kind of packages needed for the
+action you intend to perform.
 :::
+
+<figure>
+  <a href={packageSelection.src}>
+    <Image
+      src={packageSelection}
+      alt="Shelly Package page with one available package checked, 1 Selected in the toolbar and Install Selected enabled."
+    />
+  </a>
+  <figcaption>
+    Checking a package changes only the selection. Install Selected starts the
+    installation workflow.
+  </figcaption>
+</figure>
 
 ## Removing packages
 
-1. Check the installed packages you want to remove - **Installed Only** makes them easy to find.
-2. Select **Remove Selected** and confirm in the **Remove Packages** dialog.
+1. Check the installed packages you want to remove. **Installed Only** helps you find them.
+2. Select **Remove Selected** and review the **Remove Packages** dialog.
+3. Confirm **Remove** only after checking the intended action, then review the transaction plan
+   and its final result.
 
-By default the removal also cascates dependencies that are no longer needed and removes unused
-optional dependencies. Turning on **Remove Cache on Uninstall** in Settings additionally deletes the
-packages' configuration files.
+The default removal settings also remove dependencies that are no longer needed, including eligible
+optional dependencies. The plan can therefore contain more packages than you checked; this is not
+a cleanup of every orphan on the machine.
+
+:::caution[Configuration cleanup]
+Despite its label, **Remove Cache on Uninstall** in Settings requests configuration cleanup.
+For native packages, Shelly attempts to remove a directory named after each requested package under
+the invoking user's configuration directory, normally `~/.config/<package-name>`.
+
+This is not package-download-cache cleanup, and it does not find every application's settings.
+It is separate from the handling of package-managed configuration files. Keep any data you need
+before enabling this option.
+:::
 
 ## Package actions
 
-The detail pane's actions menu operates on the selected package:
+The detail pane's **Package actions** menu operates on the highlighted package. Actions unavailable
+for that package are disabled:
 
-- **Reinstall** - reinstall the package.
-- **Add Ignore** - add it to `IgnorePkg` so upgrades skip it.
-- **Add Hold** - add it to `HoldPkg` so it is protected from removal.
-- **Make Explicit** / **Mark Dependency** - change its install reason.
+- **Install Optional Deps** - choose optional dependencies from the package's metadata.
+- **Reinstall** - reinstall an installed package.
+- **Add Ignore** - add it to `IgnorePkg`, excluding it from ordinary upgrades.
+- **Add Hold** - add it to `HoldPkg`, requiring confirmation before removal. This does not prevent upgrades.
+- **Make Explicit** / **Mark Dependency** - change an installed package's install reason.
+
+Ignore rules and install reasons affect later upgrades and cleanup. See
+[Native package configuration](/shelly-alpm/docs/native-configuration/) and
+[package marking](/shelly-alpm/docs/system-state/#package-pinning--marking-shelly-mark) before changing them.
 
 ## Updating packages
 
-Updates live on their own **Update** page, which checks the System (ALPM), AUR, and Flatpak sources
-and lists everything with a newer version.
+Open **Update** to view native **System** updates. Depending on the build, enabled features and
+available backends, the page can also show **AUR** and **Flatpak** updates. Their presence is not a
+promise that every optional backend is installed or supported on Devario.
 
-- The **System**, **AUR**, and **Flatpak** toggles choose which sources are included. Everything is
-  included by default, and the summary line shows how many of the found updates are included.
-- **Check Again** re-runs the check.
-- **Upgrade** updates everything included in one transaction. System packages are always upgraded as
-  a full-system upgrade - there are no per-package checkboxes for them, matching Arch Linux's advice
-  against partial upgrades. AUR and Flatpak entries have an individual update button on their row.
+<figure>
+  <a href={packageUpdates.src}>
+    <Image
+      src={packageUpdates}
+      alt="Shelly Update page showing no listed updates, System, AUR and Flatpak source controls, and the Check Again button."
+    />
+  </a>
+  <figcaption>
+    The Update page showing no listed updates. Check Again refreshes the check;
+    the available sources depend on the build and configuration.
+  </figcaption>
+</figure>
+
+- The visible **System**, **AUR** and **Flatpak** toggles control which returned updates the page
+  includes. Enabled visible sources start included; optional sources may be absent.
+- **Check Again** re-runs Shelly's update check. Turning a source toggle off does not prevent that
+  backend from being queried. For a failed check, see
+  [Shelly upgrade-check troubleshooting](/shelly-alpm/docs/troubleshooting/#shelly-cannot-check-for-upgrades).
+- The main action is labelled **Upgrade All** or **Upgrade Selected (N)**, depending on the displayed
+  selection. Review the intended scope before selecting the action. Selecting it starts the upgrade
+  workflow; read any transaction questions before answering.
+
+System packages are upgraded as a full native system upgrade, without per-package System
+checkboxes. AUR and Flatpak rows have an individual **Update this package** action when available.
+
+:::caution[Upgrade Selected can include unchecked packages]
+Do not rely on individual optional-package checkboxes to exclude packages from
+the combined upgrade. The builds checked through Shelly 3.4.0 pass
+[source-level flags, not the checked row names](https://github.com/Seafoam-Labs/Shelly-ALPM/blob/v3.4.0/Shelly.Ui.Gtk/src/pages/update_page.zig#L659-L705).
+Use the row's individual update action when you need to update one supported
+AUR or Flatpak package.
+
+The combined CLI workflow can also include AppImage updates when that backend is enabled, although
+the page does not list AppImage rows. For explicit backend controls, read the
+[upgrade command reference](/shelly-alpm/docs/cli-reference/#shelly-upgrade-all).
+:::
+
+The combined upgrade is **not atomic across backends**. Backend steps run in sequence and can
+succeed or fail separately; a later failure does not undo an earlier successful step. Review the
+individual results instead of assuming a failed combined operation changed nothing.
+
+For update preparation and desktop-session checks, see
+[upgrade without losing your settings](/aqueous/desktop-session/#upgrade-without-losing-your-settings).
 
 ## Local package archives
 
-The GTK interface does not handle local package archives; use the `shelly` CLI for those:
+The Package page does not offer a local native-package archive installer in this version. Use the
+CLI with an archive built for your distribution. Sharing an archive format does not make Arch or
+CachyOS packages suitable for Devario.
 
 ```sh
-# Install a local Arch package archive (or an HTTP(S) URL)
+# Install a compatible local native archive (or an HTTP(S) URL)
 shelly install ./example-1.0-1-x86_64.pkg.tar.zst
 
 # List Shelly binary packages installed under /opt/shelly
@@ -102,6 +205,10 @@ shelly search --local <term>
 shelly remove --local <name>
 ```
 
-Shelly binary packages are archive-based standalone applications: they unpack into `/opt/shelly`,
-their executables are symlinked into `/usr/bin`, and icons and desktop entries are installed
-system-wide. They are not tracked by ALPM.
+**Install Local** on the optional Flatpak page is a separate feature for `.flatpak` or `.flatpakref`
+files, not a native package-archive picker.
+
+Standalone Shelly binary archives are also different from ordinary native package archives. They
+unpack into `/opt/shelly`, link executables into `/usr/bin`, and install desktop integration
+system-wide. They are not recorded in the native package database. See the
+[CLI reference](/shelly-alpm/docs/cli-reference/) for archive commands and options.

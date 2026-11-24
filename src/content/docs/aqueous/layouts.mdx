@@ -264,7 +264,7 @@ the exception: they require the workspace itself to use stacking.
 column_fraction = 0.5
 center_focused = true
 follow_new_windows = true
-open_new_windows_to_right = false
+new_window_position = "append"
 prefer_vertical_on_portrait = false
 snap_to_columns = false
 allow_overscroll = true
@@ -276,12 +276,16 @@ windows normally create columns; portrait-aware mode appends them to the active
 column when that scrolling instance is taller than wide. This works inside
 composable regions and Game Mode remainders as well as on a full output.
 
-Set `open_new_windows_to_right = true` to insert each new column immediately
+Set `new_window_position = "right"` to insert each new column immediately
 after the focused column: opening D with B focused changes `A B C` to
 `A B D C`. This takes precedence over portrait stacking and also applies to
 windows entering a workspace or composable region. Reloading it leaves existing
 columns in place. `focus_new_windows` controls keyboard focus independently;
 `follow_new_windows` controls viewport following.
+
+`new_window_position` also accepts `left`, `above`, and
+`below`. The deprecated `open_new_windows_to_right` still maps `true` to
+`right` and `false` to `append`. If both keys are present, the later one wins.
 
 Focus left/right crosses columns and up/down crosses members. The built-ins can
 consume the first window from the right, expel a member into a new column, move

@@ -95,9 +95,10 @@ rate = 0.0
 ```
 
 `rate = 0` uses the compiled default; a larger positive value settles the
-slide more quickly. Workspace transitions retain the outgoing workspace until
-the slide completes and use inert surface clones, so clients are not repeatedly
-configured during motion.
+slide more quickly. Workspace and scrolling slides display live
+client content during motion while input geometry stays at the settled
+destination. Workspace transitions keep the outgoing workspace until the
+slide completes.
 
 Fullscreen windows participate in workspace slides with an opaque backing
 behind transparent content. Transitions stay clipped to their owning output,

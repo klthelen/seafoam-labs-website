@@ -1,0 +1,59 @@
+---
+interface Props {
+  legacyPage?: boolean;
+}
+
+const { legacyPage = false } = Astro.props;
+const routes = {
+  "install-the-tools": "/sched-ext/installation/#choose-your-distribution",
+  "install-sched_ext-from-devario-repos":
+    "/sched-ext/installation/#choose-your-distribution",
+  "check-your-running-kernel-and-the-tools":
+    "/sched-ext/installation/#check-your-running-kernel-and-the-tools",
+  "development-builds": "/sched-ext/installation/#development-builds",
+  "development-builds-and-other-distributions":
+    "/sched-ext/installation/#development-builds",
+  "switch-schedulers": "/sched-ext/docs/usage/",
+  "use-scxtui": "/sched-ext/docs/usage/#use-scxtui",
+  "use-the-command-line": "/sched-ext/docs/usage/#use-the-command-line",
+  "start-automatically-at-boot":
+    "/sched-ext/docs/usage/#start-automatically-at-boot",
+  "choosing-a-scheduler": "/sched-ext/docs/usage/#choosing-a-scheduler",
+  "which-scheduler-should-i-try": "/sched-ext/docs/usage/#choosing-a-scheduler",
+  "advanced-usage": "/sched-ext/docs/configuration/",
+  "service-and-configuration":
+    "/sched-ext/docs/configuration/#service-and-configuration",
+  "custom-options-and-profiles":
+    "/sched-ext/docs/configuration/#custom-options-and-profiles",
+  "temporary-service-overrides":
+    "/sched-ext/docs/configuration/#temporary-service-overrides",
+  troubleshooting: "/sched-ext/docs/troubleshooting/",
+  "developer-references": "/sched-ext/overview/#developer-references",
+};
+---
+
+<script define:vars={{ routes, legacyPage }}>
+  (() => {
+    function followLegacyLink() {
+      let fragment;
+      try {
+        fragment = decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        fragment = window.location.hash.slice(1);
+      }
+      const known = Object.prototype.hasOwnProperty.call(routes, fragment);
+      if (!known && !legacyPage) return;
+      const target = new URL(
+        known ? routes[fragment] : "/sched-ext/overview/",
+        window.location.origin,
+      );
+      target.search = window.location.search;
+      if (!known) target.hash = window.location.hash;
+      if (target.href !== window.location.href) {
+        window.location.replace(target.href);
+      }
+    }
+    followLegacyLink();
+    window.addEventListener("hashchange", followLegacyLink);
+  })();
+</script>

@@ -6,6 +6,8 @@ import SitePreferences from "../SitePreferences.astro";
 import shellheart from "../../assets/images/shellheart-small.webp";
 import jetbrains from "../../assets/icons/jetbrains.svg";
 import jetbrainsWhite from "../../assets/icons/jetbrains-white.svg";
+import cdn77 from "../../assets/icons/cdn77.svg";
+import cdn77White from "../../assets/icons/cdn77-white.svg";
 
 const { siteTitle } = Astro.locals.starlightRoute;
 const isHomepage = Astro.url.pathname === "/";
@@ -95,23 +97,70 @@ const links = [
       <div class="footer-preferences">
         <SitePreferences />
       </div>
-      <a class="footer-credit sf-link" href="https://jb.gg/OpenSource">
-        <span>Powered by</span>
-        <Image
-          src={jetbrains}
-          alt="JetBrains"
-          width={149}
-          height={32}
-          class="dark:hidden"
-        />
-        <Image
-          src={jetbrainsWhite}
-          alt="JetBrains"
-          width={149}
-          height={32}
-          class="hidden dark:block"
-        />
-      </a>
+      <div class="footer-credits">
+        <section class="footer-credit" aria-labelledby="footer-sponsors-title">
+          <h2 id="footer-sponsors-title">Sponsored by</h2>
+          <a
+            class="footer-credit-logo sf-link"
+            href="https://www.cdn77.com/sponsorship"
+          >
+            <Image
+              src={cdn77}
+              alt="CDN77"
+              width={109}
+              height={32}
+              class="dark:hidden"
+            />
+            <Image
+              src={cdn77White}
+              alt="CDN77"
+              width={109}
+              height={32}
+              class="hidden dark:block"
+            />
+          </a>
+          <p>
+            CDN77 supports Seafoam Labs through their open-source sponsorship
+            program.
+          </p>
+        </section>
+        <section
+          class="footer-credit"
+          aria-labelledby="footer-supporters-title"
+        >
+          <h2 id="footer-supporters-title">Supported by</h2>
+          <a
+            class="footer-credit-logo sf-link"
+            href="https://www.jetbrains.com/"
+          >
+            <Image
+              src={jetbrains}
+              alt="JetBrains"
+              width={149}
+              height={32}
+              class="dark:hidden"
+            />
+            <Image
+              src={jetbrainsWhite}
+              alt="JetBrains"
+              width={149}
+              height={32}
+              class="hidden dark:block"
+            />
+          </a>
+          <p>
+            Product subscriptions provided by JetBrains'{" "}
+            <a class="sf-link" href="https://jb.gg/OpenSource">
+              open-source support program
+            </a>
+            .
+          </p>
+          <p class="footer-trademark">
+            Copyright © {new Date().getFullYear()} JetBrains s.r.o. JetBrains
+            and the JetBrains logo are trademarks of JetBrains s.r.o.
+          </p>
+        </section>
+      </div>
     </div>
     <div class="shoreline" aria-hidden="true">
       <img
@@ -282,20 +331,32 @@ const links = [
     align-items: flex-start;
     margin: 0;
   }
-  .footer-credit {
+  .footer-credits {
     grid-area: credits;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .footer-credit {
+    min-width: 0;
+  }
+  .footer-credit-logo {
     display: inline-flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-self: start;
-    gap: 0.75rem;
     min-height: 2.75rem;
     max-width: 100%;
-    font-size: 0.875rem;
   }
   .footer-credit img {
     max-width: 100%;
     height: auto;
+  }
+  .footer-credit p {
+    margin: 0.75rem 0 0;
+    color: var(--sf-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .footer-credit .footer-trademark {
+    font-size: 0.75rem;
   }
   .shoreline {
     --shoreline-image-width: clamp(1080px, 100vw, 2172px);
@@ -316,6 +377,12 @@ const links = [
       calc(50% - var(--shoreline-image-width) * 0.75),
       0px
     );
+  }
+  @media (min-width: 48rem) {
+    .footer-credits {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.5rem;
+    }
   }
   @media (min-width: 64rem) {
     .homepage-footer {

@@ -121,8 +121,11 @@ transform.
 ## Adaptive sync
 
 Enable **Adaptive sync** in Pearl or set the policy below. The monitor and mode
-must support VRR. Set `adaptive_sync = false` to turn it off. Fullscreen-only VRR
-requires a fullscreen window; the Game Mode layout alone does not activate it.
+must support VRR. It is off by default. Set `adaptive_sync = true` to turn it
+on for that output or `adaptive_sync = false` to keep it off. Set it explicitly if you use an
+older build that [inherits the previous hardware state](https://github.com/Seafoam-Labs/Aqueous/releases/tag/v1.0.21).
+Fullscreen-only VRR requires a fullscreen window; the Game Mode layout alone
+does not activate it.
 
 ```toml
 [[output]]
@@ -183,7 +186,7 @@ section to apply saved changes through configuration hot reload.
 [[output]]
 name = "DP-1"
 hdr = true
-hdr_level = "auto" # auto | 100 | 400 | 1000 cd/m²
+hdr_level = "auto" # auto | 100 | 400 | 600 | 1000 cd/m²
 sdr_white_level = 200 # 80–1000 cd/m²
 auto_hdr = false # Optional SDR highlight expansion; see Auto HDR below.
 ```
@@ -200,9 +203,10 @@ unless the connector, renderer color transform, and primary scanout path expose
 the required capabilities. Disabling HDR restores the normal 8-bit sRGB
 profile.
 
-`hdr_level` chooses the mastering/target peak. `auto` selects the nearest
-100/400/1000 preset from the display's EDID desired-content peak and falls back
-to 1000 when unavailable. `sdr_white_level` maps SDR diffuse white on the HDR
+`hdr_level` chooses the mastering/target peak. `auto` uses the display's
+EDID desired-content peak to select 100 up to 250 nits,
+400 up to 500, 600 up to 800, or 1000 above that. It falls back to 1000 when
+the value is unavailable. `sdr_white_level` maps SDR diffuse white on the HDR
 output; the Windows-scRGB protocol description retains its defined
 `1.0 = 80 cd/m²` scale independently.
 
@@ -267,8 +271,9 @@ used by Direct3D 12 games such as Stellar Blade.
 
 For wrong HDR colors, report the game, Proton version, PQ/scRGB mode, GPU/driver
 and `aqueousctl outputs --json`.
-[Aqueous #104](https://github.com/Seafoam-Labs/Aqueous/issues/104) tracks scRGB
-channel crosstalk in Cyberpunk 2077 and remains open as of 24 October 2026.
+[Aqueous #104](https://github.com/Seafoam-Labs/Aqueous/issues/104) covered scRGB
+channel crosstalk in Cyberpunk 2077. The compositor fix shipped in v1.0.19;
+other HDR issues can have different causes.
 Compare the game's SDR mode; Auto HDR does not repair native HDR.
 
 ## Auto HDR

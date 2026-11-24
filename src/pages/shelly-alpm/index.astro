@@ -54,18 +54,22 @@ import shellyLogo from "../../assets/images/shelly-logo.webp";
   </AnchorHeading>
 
   <p>
-    The recommended installation for Shelly is for CachyOS or using CachyOS
-    packages:
+    Shelly is included in{" "}
+    <a href="/shelly-alpm/installation/#devario">Devario</a>. CachyOS provides a
+    prebuilt package. On other Arch-based systems, the AUR
+    <code>shelly</code> recipe builds from source; see the
+    <a href="/shelly-alpm/installation/#arch-linux">installation guide</a> for
+    the separate binary recipe and other options.
   </p>
 
   <Tabs>
-    <TabItem label="pacman">
+    <TabItem label="CachyOS">
       <Code code="sudo pacman -S shelly" lang="sh" />
     </TabItem>
-    <TabItem label="yay">
+    <TabItem label="AUR (yay)">
       <Code code="yay -S shelly" lang="sh" />
     </TabItem>
-    <TabItem label="paru">
+    <TabItem label="AUR (paru)">
       <Code code="paru -S shelly" lang="sh" />
     </TabItem>
   </Tabs>

@@ -50,24 +50,23 @@ import {
     <a href="https://repo.seafoam-labs.org/setup">Seafoam Labs repository</a>:
   </p>
 
+  <p>
+    The stable desktop preset includes a greeter and can change the display
+    manager selected for the next boot. Read the
+    <a href="/pearl/docs/greeter/#installing-the-package">greeter guide</a>
+    before installing it on an existing desktop.
+  </p>
+
   <Tabs>
     <TabItem label="Seafoam Labs repository">
       <Code code="shelly install standard aqueous-desktop" lang="sh" />
     </TabItem>
-    <TabItem label="Build from source">
-      <Code
-        code={`git clone https://github.com/Seafoam-Labs/pearl.git
-cd pearl/packaging/arch-git
-shelly build --sync-deps --install`}
-        lang="sh"
-      />
-    </TabItem>
   </Tabs>
 
   <p>
-    Building from a checkout requires Zig 0.16.0 exactly. See the
-    <a href="/pearl/installation/">installation guide</a> for the package list,
-    the login greeter and optional runtime dependencies.
+    See the <a href="/pearl/installation/">installation guide</a> for the
+    required build toolchain, package list, login greeter and optional runtime
+    dependencies.
   </p>
 
   <AnchorHeading level="2" id="why-pearl">

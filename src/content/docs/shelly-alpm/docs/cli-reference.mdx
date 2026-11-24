@@ -243,7 +243,7 @@ Options:
 | `--build-deps, -b` | `bool` | Install build dependencies for the requested packages |
 | `--make-deps, -m` | `bool` | Install make dependencies for the requested packages |
 | `--no-deps, -d` | `bool` | Pass the ALPM nodeps transaction flag when installing repository packages |
-| `--upgrade, -u` | `bool` | After confirmation, synchronize and upgrade the standard system before installing the requested repository packages |
+| `--upgrade, -u` | `bool` | Synchronize repositories and resolve the system upgrade and requested repository packages together in one transaction |
 | `--needed` | `bool` | Skip reinstalling ALPM packages that are already up to date |
 
 #### `shelly install appimage`
@@ -539,7 +539,8 @@ Arguments:
 
 ### `shelly news`
 
-Read Arch Linux news and track viewed entries.
+Read Arch Linux news and track viewed entries. This command is available on
+builds using the pacman path profile, not the Devario path profile.
 
 Usage:
 
@@ -751,7 +752,7 @@ Options:
 | Option | Type | Description |
 | --- | --- | --- |
 | `--fix-permissions, -f` | `bool` | Restore the invoking user's ownership of Shelly's configuration, cache, and data directories |
-| `--repair-db, -r` | `bool` | Remove a stale database lock |
+| `--repair-db, -r` | `bool` | Remove system or user update-check database locks; first confirm no package operation is running |
 | `--docs, -d` | `bool` | Write Markdown CLI reference documentation to standard output |
 | `--completions, -c <completions>` | `string` | Write a Bash, Fish, or Zsh completion script to standard output Choices: `bash`, `fish`, `zsh`. |
 | `--pacfiles, -p` | `bool` | Run the pacdiff-compatible pacnew, pacorig, and pacsave maintenance workflow |

@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install Pearl from the Seafoam Labs package repository, or build the stable and Git packages from a checkout.
+description: Install Pearl from the Seafoam Labs package repository and start an Aqueous session.
 sidebar:
   label: Installation
   order: 1
@@ -15,7 +15,14 @@ newer. The shell package bundles `pearl`, `pearlctl`, `pearl-lock`,
 and the Phyto, Dome, and Coral companion applications. The login greeter is a
 separate package that runs on ordinary Aqueous and is independent of the shell.
 
-## Seafoam Labs repository (Recommended)
+## Devario
+
+The Devario desktop already includes Pearl and Pearl Greeter. Use Shelly and
+the configured Devario repositories to update it. The
+[`devario-desktop` package](https://repo.seafoam-labs.org/package/devario-core/x86_64/devario-desktop)
+pulls in the matching Aqueous session and Pearl components.
+
+## Seafoam Labs repository for Arch-based systems
 
 The `seafoam-labs` repository publishes stable and Git Pearl packages, the
 optional Qt style package, and Aqueous desktop components. Select the
@@ -27,14 +34,14 @@ Add it to Shelly by following the
 import, repository entry and sync commands there are generated from the
 repository's published address and current signing key.
 
-Then install:
+For stable Pearl, use the [Aqueous desktop preset](/aqueous/installation/#pearl-desktop-preset).
+It includes Pearl Greeter and can change the display manager selected for the
+next boot. Read [the greeter setup and recovery notes](/pearl/docs/greeter/#installing-the-package)
+before installing it on an existing desktop.
 
-<Card title="Pearl shell (Git)" icon="download">
+<Card title="Opt-in: Pearl Git shell only" icon="download">
   <Code code="shelly install standard pearl-git" lang="sh" />
 </Card>
-
-For stable Pearl, install `pearl` with the matching Aqueous preset. Stable
-v0.3.0 is available in both Seafoam Labs and Devario core repositories.
 
 Git Pearl uses suffixed commands but shares `~/.config/pearl/` preferences
 with stable. Choose the [Aqueous Git desktop](/aqueous/installation/)
@@ -42,15 +49,12 @@ carefully: one replaces stable Aqueous, the other uses a separate session.
 
 ## Version and distribution differences
 
-These guides follow Pearl main
-[`6cb9b55`](https://github.com/Seafoam-Labs/pearl/tree/6cb9b5526fd4998ccaee2fae3a9ceabdd52636f1)
-and Aqueous
-[`71c0e72`](https://github.com/Seafoam-Labs/Aqueous/tree/71c0e722648b93f2f9fc32fbc9a4e6417cccb672),
-checked October 24, 2026. Both latest releases,
-[Pearl v0.3.0](https://github.com/Seafoam-Labs/pearl/releases/tag/v0.3.0) and
-[Aqueous v1.0.5](https://github.com/Seafoam-Labs/Aqueous/releases/tag/v1.0.5),
-were published October 22. Pearl main has newer features; Aqueous packaging
-has changed since its release.
+For the package offered by your repository, check the Pearl listing in
+[Devario core](https://repo.seafoam-labs.org/package/devario-core/x86_64/pearl)
+or the [general Seafoam Labs repository](https://repo.seafoam-labs.org/package/default/x86_64/pearl).
+These can differ from the [upstream Pearl releases](https://github.com/Seafoam-Labs/pearl/releases)
+and from what's installed on your system. An installation image can contain
+older packages than the repository.
 
 - **Devario:** use Shelly and the configured Devario repositories. Images and
   stable/bleeding-edge channels can contain different versions.
@@ -59,7 +63,8 @@ has changed since its release.
 - **Git builds:** check the installed revision with `pearlctl-git status` and
   your package manager; Git packages can lag behind main.
 
-If a documented control is missing, check the version and
+The desktop walkthroughs describe the controls in Devario's supported packages.
+Other repositories can ship older builds. If a documented control is missing, check the version and
 [helper status](/aqueous/settings/) before changing configuration.
 See [updates and recovery](/aqueous/desktop-session/#upgrade-without-losing-your-settings).
 
@@ -67,10 +72,9 @@ See [updates and recovery](/aqueous/desktop-session/#upgrade-without-losing-your
 
 Optional packages in the same repository:
 
-- `pearl-greeter-git`: the greetd login screen. Installing it selects Pearl
-  Greeter as the display manager for the next boot and backs up an existing
-  `/etc/greetd/config.toml`. Nothing is restarted; reboot when ready. See the
-  [greeter documentation](https://github.com/Seafoam-Labs/pearl/blob/main/docs/GREETER.md).
+- `pearl-greeter-git`: the greetd login screen. It conflicts with the stable
+  greeter and is not needed for a shell-only installation. See the
+  [greeter guide](/pearl/docs/greeter/#installing-the-package) before installing it.
 - `pearl-darkly-style` with `qtengine`: Darkly application styles for shared
   Qt 5/6 appearance management.
 
@@ -85,37 +89,12 @@ You can browse the full catalog at
 
 ## Build from a checkout
 
-| Recipe                         | Packages                                                                      | Purpose                                                                |
-| ------------------------------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `packaging/arch`               | `pearl`                                                                       | Stable shell built from the published release tag.                     |
-| `packaging/arch-git`           | `pearl-git`, `pearl-greeter-git`                                              | Split Git build from upstream; co-installable with the stable package. |
-| `packaging/arch-darkly-style*` | `pearl-darkly-style` variants                                                 | Optional Qt Darkly application styles.                                 |
-| `packaging/Devario`            | `pearl`, `pearl-greeter`, `pearl-git`, `pearl-greeter-git`, `devario-desktop` | Stable and Git recipes used to build the Devario desktop.              |
+If you are developing Pearl, follow the
+[build instructions in Pearl’s README](https://github.com/Seafoam-Labs/pearl#development-commands)
+and use the toolchain required by your checkout. Before installing a greeter
+package you built, read the [greeter setup and recovery notes](/pearl/docs/greeter/#installing-the-package).
 
-Building requires **Zig 0.16.0 exactly**, plus `git`, `pkgconf`, `gcc`,
-`qt5-base`, `qt6-base`, Python, `rust`, `rust-wasm`, and `librsvg`; `shelly build --sync-deps`
-resolves these together with the GTK 4 runtime libraries.
-
-Build the Git shell and greeter:
-
-```sh
-git clone https://github.com/Seafoam-Labs/pearl.git
-cd pearl/packaging/arch-git
-shelly build --sync-deps --install
-```
-
-To install only the greeter, use the [greeter build instructions](/pearl/docs/greeter/#installing-the-package). The Git
-package suffixes its binaries (`pearl-git`, `pearlctl-git`, and so on), so it
-can coexist with a stable installation. The stable recipe in `packaging/arch`
-fetches the release tag, which must be published before the build succeeds.
-
-A plain development build without packaging:
-
-```sh
-ZIG_GLOBAL_CACHE_DIR="$PWD/.cache/zig" zig build -Doptimize=ReleaseSafe
-```
-
-### Optional runtime dependencies
+## Optional runtime dependencies
 
 Enable the desktop services you want; Pearl degrades gracefully without them:
 

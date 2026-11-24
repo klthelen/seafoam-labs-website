@@ -1,0 +1,132 @@
+---
+title: Using schedulers
+description: Choose, switch and pause sched_ext schedulers, manage boot persistence, and return to the kernel default.
+sidebar:
+  label: Using schedulers
+---
+
+Start with the [installation checks](/sched-ext/installation/#check-your-running-kernel-and-the-tools).
+These instructions use `scxtui` and `scxcli` with `scx.service`.
+
+## Use scxtui
+
+Open a terminal as your normal desktop user and run:
+
+```sh
+scxtui
+```
+
+1. Use **↑ / ↓** to choose an entry in the recommended list.
+2. Press **Enter** to start it, or to switch from the scheduler already running.
+3. Check the status panel to confirm the scheduler is running.
+4. Press **q** in the recommended list to close the menu. The scheduler keeps running.
+
+The service is enabled to try the saved selection at boot.
+
+Switching normally needs no password in an active local session with `pkexec`
+and the packaged polkit policy. Remote sessions and local administrator policies
+can require authentication.
+
+| Task                                                             | In scxtui                                         |
+| ---------------------------------------------------------------- | ------------------------------------------------- |
+| Return to the kernel scheduler and keep that choice after reboot | Select **Default**, then press **Enter**.         |
+| Pause the selected scheduler without forgetting it               | Press **s**. It can start again at the next boot. |
+| Restart a paused listed profile                                  | Select the same profile and press **Enter**.      |
+| Browse more installed schedulers                                 | Press **A** to toggle the full list.              |
+| Read the service log                                             | Press **l**, then **q** to return.                |
+| Refresh the display                                              | Press **R**.                                      |
+
+In the full list, **Enter** selects a scheduler with its defaults, replacing
+any saved custom options. To resume the exact saved selection instead, use
+`pkexec scxcli start` as described below.
+
+From the full list or log view, **q** returns to the recommended list. Viewing
+service logs requires permission to read the system journal.
+
+**Default** and **stop** are different: Default disables the scx service;
+stopping it keeps the selected scheduler and its boot setting.
+
+## Use the command line
+
+List the recommended entries and check what is running:
+
+```sh
+scxcli list
+scxcli get
+```
+
+Start a scheduler by the ID shown in the list. For example:
+
+```sh
+pkexec scxcli start scx_lavd
+scxcli get
+```
+
+To switch, run `start` again with another listed ID and check the result with
+`scxcli get`. The selection is saved for later boots. To pause it and resume
+it later:
+
+```sh
+pkexec scxcli stop
+pkexec scxcli start
+```
+
+To return to the kernel scheduler and disable scx at boot instead:
+
+```sh
+pkexec scxcli start default
+```
+
+Default clears the saved selection. To use scx again afterwards, choose an
+entry with `start ID`. Running `start` without an ID cannot restore a cleared
+selection.
+
+`start` without an ID validates and starts the saved selection without
+changing whether the service is enabled at boot. If custom options no longer
+match an installed profile, use `start ID` or the
+[administrator-authorized `run` command](/sched-ext/docs/configuration/#custom-options-and-profiles).
+
+Read-only commands do not need `pkexec`. Commands that change the scheduler
+need root privileges; `pkexec` applies the installed polkit policy.
+
+## Start automatically at boot
+
+Choosing a scheduler with `scxtui` or `scxcli start ID` saves the selection
+and enables `scx.service` to try the selection at boot. An incompatible kernel
+or a missing scheduler binary can prevent it from attaching. You do not need
+a separate autostart command. Run `scxcli get` after reboot to verify what attached.
+
+Check the boot setting and current scheduler with:
+
+```sh
+systemctl is-enabled scx.service
+scxcli get
+```
+
+Selecting **Default** (or running `pkexec scxcli start default`) clears the
+saved selection and disables the service at boot. **Stop** only pauses the
+scheduler: it keeps the saved selection and boot setting, so the scheduler
+can start again after a reboot.
+
+## Choosing a scheduler
+
+Keep **Default** as your baseline. A different scheduler is not automatically
+faster; the result depends on your CPU, applications and workload.
+
+Use `scxtui` or `scxcli list` to see what your installed package offers. Try
+one scheduler at a time and compare the same game or application under the
+same load against Default. Keep the option that works better on your system.
+
+To run the same benchmark workloads across schedulers on your machine, see
+[Compare schedulers with helicoprion](/helicoprion/overview/#compare-schedulers-on-the-same-machine).
+
+For help choosing, ask in the [Seafoam Labs Fluxer community](https://fluxer.gg/vOjrMXcE)
+and include your CPU, workload and what you want to improve. A useful
+comparison needs workload- and hardware-specific measurements, not just
+labels such as “responsive” or “gaming.” See the
+[scheduler documentation](https://github.com/sched-ext/scx/blob/main/scheds/rust/README.md)
+for individual scheduler designs.
+
+For custom arguments or catalog profiles, see
+[Configuration and profiles](/sched-ext/docs/configuration/). If a command fails,
+follow [Troubleshooting](/sched-ext/docs/troubleshooting/).

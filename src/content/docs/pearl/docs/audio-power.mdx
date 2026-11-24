@@ -183,49 +183,39 @@ click-through, never takes focus, and is dismissed by locking the session.
 
 ## System and scheduling
 
-Choose a CPU scheduler profile in **Settings → System**, or add **CPU Scheduler**
-under **Settings → Bar & dock → Add widget**. The widget needs an installed
-profile file.
+Open **Settings → System** to view and select a CPU scheduler. Pearl builds
+with the scx backend use `scxcli` and share its catalog with `scxtui`.
+To manage custom profiles, open **CPU Scheduler → Edit profiles** in Settings.
 
-<Aside type="caution">
-  Scheduler profiles apply to every user and persist across boots. Pearl's
-  helper uses polkit authorization to replace `/etc/default/scx` and
-  enable/restart `scx.service`. **Default** disables the service and returns to
-  the kernel scheduler. Selecting a profile replaces hand edits to that file.
-</Aside>
-
-Pearl v0.3.0 uses `scx.service`, not the older `scxctl`/`scx_loader` backend.
-It needs a sched_ext-capable kernel, scheduler binaries, Pearl's helper/polkit
-files and a version-2 profile file. Pearl reads
-`/etc/pearl/scheduling-profiles.json` before
-`/usr/share/pearl/scheduling-profiles.json`; Git builds use `pearl-git` in these
-paths.
-
-After selecting a profile, wait for **Running** and the scheduler's identity.
-**Custom** means a scheduler is running outside these profiles. If a profile
-fails, Pearl reports the error and attempts to return to **Default**.
+The configured profile is not necessarily running. If `scx.service` has not
+started, Pearl can show **Default** as active while another profile is
+configured. Use `scxcli get` to check the active scheduler before benchmarking.
+Scheduler changes are system-wide. See the [switching guide](/sched-ext/docs/usage/)
+for boot persistence and how to return to the kernel scheduler.
 
 ### Profiles installed but unavailable
 
-Check the message in **Settings → System**, then inspect the kernel and service:
+Check the message in **Settings → System**. Follow the
+[sched_ext installation guide](/sched-ext/installation/) to check for a
+compatible kernel, scheduler binaries, `/usr/bin/scxcli` with JSON schema
+version 2, the catalog, `scx.service`, and the packaged polkit policy.
+Then inspect the running system:
 
 ```sh
 uname -r
+scxcli list
+scxcli get
 systemctl status scx.service --no-pager
 cat /sys/kernel/sched_ext/state
 cat /sys/kernel/sched_ext/root/ops
 journalctl -b -u scx.service --no-pager -n 80
 ```
 
-`root/ops` can be absent when no sched_ext scheduler is attached. Check the
-profile file and `/usr/lib/pearl/pearl-scheduling-helper`
-(Git: `/usr/lib/pearl-git/`). Check your distribution's package instructions for
-missing profiles, binaries, helper files or `scx.service`. A scheduler binary
-alone is not enough.
+`root/ops` can be absent when no sched_ext scheduler is attached. If a
+scheduler appears in the catalog but does not start, see
+[sched_ext troubleshooting](/sched-ext/docs/troubleshooting/).
 
 When requesting help, include the Pearl, scx, scheduler and kernel versions.
-See the [profile format and backend details](https://github.com/Seafoam-Labs/pearl/blob/6cb9b5526fd4998ccaee2fae3a9ceabdd52636f1/docs/SCHEDULING_PROFILES.md)
-for administrator setup.
 
 ## Command line
 

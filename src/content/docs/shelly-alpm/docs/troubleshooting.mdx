@@ -57,6 +57,20 @@ directory instead of `~/.cache/Shelly/db/`. For custom XDG directories, check
 that the ownership-repair output names the directories you actually use;
 privilege-elevation tools can filter environment variables.
 
+### A previous update check left a lock
+
+If Shelly reports a database lock, first close the graphical window and confirm
+no package manager or update check is still running. Run the following as
+your normal user:
+
+```sh
+shelly utility --repair-db
+```
+
+Shelly reports the system and per-user paths it checks. It requests elevation
+only when the system database lock is present. For an ownership error, use
+the permissions procedure above instead.
+
 ### Collect details if recovery fails
 
 If errors remain, report the exact error, `shelly --version`, and the output of

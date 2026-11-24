@@ -30,7 +30,13 @@ Instead of manually editing `/etc/fstab`, Pori creates and enables native system
 
 ## Installation
 
-<Card title="CachyOS / Shelly / pacman (Recommended)" icon="download">
+<Card title="Devario" icon="download">
+  Install the signed [Pori package from
+  devario-core](https://repo.seafoam-labs.org/package/devario-core/x86_64/pori).
+  <Code code="shelly install standard pori" lang="sh" />
+</Card>
+
+<Card title="CachyOS" icon="download">
   Install Pori directly from CachyOS repositories.
   <Tabs>
     <TabItem label="shelly">
@@ -43,7 +49,10 @@ Instead of manually editing `/etc/fstab`, Pori creates and enables native system
 </Card>
 
 <Card title="AUR Helpers" icon="cloud-download">
-  Use your preferred AUR helper:
+  On Arch-based systems, check the [AUR package
+  listing](https://aur.archlinux.org/packages/pori) before choosing this route.
+  It can be older than the packages in Devario and CachyOS; the
+  [walkthrough](/pori/user-guide/) describes Pori v0.2.0.
   <Tabs>
     <TabItem label="shelly">
       <Code code="shelly -Ia pori" lang="sh" />
@@ -57,15 +66,17 @@ Instead of manually editing `/etc/fstab`, Pori creates and enables native system
   </Tabs>
 </Card>
 
-For manual build and installation steps, see the
-[GitHub repository](https://github.com/Seafoam-Labs/Pori#installation).
+For manual builds, see the [upstream instructions](https://github.com/Seafoam-Labs/Pori/tree/v0.2.0#installation).
+Use Zig 0.17.x for v0.2.0, as used by
+[the release build](https://github.com/Seafoam-Labs/Pori/blob/v0.2.0/.github/actions/setup-zig/action.yml).
+The older Zig requirement in that tag's README does not apply.
 
 ## Why Use Pori?
 
 - **Persistent mounts made simple**: Configure a disk once and keep it mounted after reboot.
 - **Systemd-native setup**: Uses `.mount` units rather than legacy `fstab` entries.
 - **Guided workflow**: Choose a disk, confirm options, and apply.
-- **Sudo-based privileged actions**: Performs required root operations securely.
+- **Root access without `sudo`**: Pori uses polkit to authorize system mount changes. Open it as your normal user; save `sudo` for manual terminal commands that require root.
 
 ## How It Works
 
@@ -80,15 +91,14 @@ For a mount at `/mnt/backup`, Pori generates `/etc/systemd/system/mnt-backup.mou
 ```ini
 [Unit]
 Description=Mount for /mnt/backup
-Requires=local-fs-pre.target
-After=local-fs-pre.target
+
 
 [Mount]
-What=/dev/sdb1
+What=/dev/disk/by-uuid/11111111-2222-4333-8444-555555555555
 Where=/mnt/backup
 Type=ext4
 Options=defaults,noatime
-ForceUnmount=no
+
 
 [Install]
 WantedBy=multi-user.target

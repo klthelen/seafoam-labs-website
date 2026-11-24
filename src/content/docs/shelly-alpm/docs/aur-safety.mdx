@@ -136,8 +136,10 @@ Periodically list packages that are not in the official repositories:
 shelly list aur
 ```
 
-Remove packages you no longer need and review unfamiliar entries. Keep the system updated with `shelly upgrade`, and
-check Arch news with `shelly news` before major upgrades.
+Remove packages you no longer need and review unfamiliar entries. Keep the
+system updated with `shelly upgrade`. On builds using the pacman path profile,
+check Arch news with `shelly news` before major upgrades. Builds using the
+Devario path profile do not fetch or display Arch news.
 
 Filesystem snapshots with Snapper or Timeshift can make recovery easier after a broken package. They **cannot** recover
 credentials or private data that malware has already stolen.

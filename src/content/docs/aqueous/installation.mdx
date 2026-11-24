@@ -26,7 +26,9 @@ version before installing.
 ## Choose a distribution and package family
 
 [Devario](/devario/setup/) already includes Aqueous and Pearl. Update it through
-its configured repositories. Use the Arch instructions below for Arch/CachyOS, not Devario.
+its configured repositories. Its desktop package is
+[`devario-desktop`](https://repo.seafoam-labs.org/package/devario-core/x86_64/devario-desktop),
+not the `aqueous-desktop` package used in the Arch instructions below.
 
 On Arch/CachyOS, use your distribution's published package or the Seafoam Labs
 repository documented under [Pearl installation](/pearl/installation/).
@@ -129,7 +131,7 @@ bash scripts/fedora-install.sh
 
 It fetches current upstream `master` into a separate build directory, installs
 build dependencies through DNF, and builds a local desktop RPM. It uses sudo
-for package transactions. Fedora must provide Zig 0.16 or newer and
+for package transactions. Fedora must provide Zig 0.17 or newer and
 wayland-protocols 1.49 or newer.
 
 Useful options include `--build-only`, `--skip-deps`, and `--core-only`. Core-only
@@ -186,16 +188,16 @@ Use `"none"` for a managed session without a shell. The old
 `noctalia.enable` setting is deprecated, and conflicting choices fail validation.
 An existing per-user `session.toml` takes precedence over the system default.
 
-`programs.aqueous.welcome.enable` optionally adds Welcome. Its package-install
-workflow requires Shelly to be available separately. Installing
-`pkgs.aqueousCore` alone installs the tools without enabling the session module.
+Installing `pkgs.aqueousCore` alone installs the tools without enabling the
+session module.
 
 ## Build from source
 
-Building requires Zig 0.16 or newer, wayland-protocols 1.49 or newer, wlroots
+Building v1.0.21 requires Zig 0.17 or newer, wayland-protocols 1.49 or newer, wlroots
 0.20 build dependencies, libxkbcommon, libinput, libevdev, pixman, Vulkan
 headers and loader, Meson, Ninja, pkg-config, and glslang. XWayland builds also
 need the `Xwayland` executable. Man-page builds use `scdoc`.
+For a package build, use the exact Zig pin from the recipe for your checkout.
 
 The repository helper builds the patched wlroots render hook and stages
 `aqueous` and `aqueousctl` under `bin/`:
@@ -212,7 +214,7 @@ For a direct development build:
 cd compositor
 scripts/build-wlroots-render-hook.sh
 export PKG_CONFIG_PATH="$PWD/.deps/wlroots-render-hook/lib/pkgconfig"
-zig build -Doptimize=ReleaseSafe -Dxwayland -Dllvm
+zig build -Doptimize=safe -Dxwayland -Dllvm
 ```
 
 Useful build switches are:

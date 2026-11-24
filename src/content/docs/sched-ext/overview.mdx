@@ -1,0 +1,89 @@
+---
+title: sched_ext
+description: Understand sched_ext CPU schedulers and find installation, everyday use, configuration and troubleshooting guides.
+sidebar:
+  label: Overview
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import SchedExtLegacyRedirect from "../../../components/SchedExtLegacyRedirect.astro";
+
+<SchedExtLegacyRedirect />
+
+[sched_ext](https://github.com/sched-ext/scx) lets you run alternative CPU
+schedulers on Linux. A CPU scheduler decides how processor time is shared
+between applications. Different schedulers can change how your system responds
+under load; a different scheduler is not automatically faster.
+
+Keep the kernel's default scheduler as your baseline. Compare alternatives
+with the same applications and workload, and keep the one that works better
+on your hardware.
+
+## How the tools fit together
+
+- **Scheduler binaries** implement the scheduling behavior.
+- **`scx.service`** starts the selected scheduler and supports starting it at boot.
+- **`scxcli`** selects schedulers, manages their saved configuration and reports status.
+- **`scxtui`** provides a terminal menu for the same switching workflow.
+
+The upstream project develops sched_ext schedulers and tools. The
+[Seafoam Labs fork](https://github.com/Seafoam-Labs/scx) provides Devario's
+integration. Package contents vary by distribution: these guides cover the
+`scxtui` / `scxcli` / `scx.service` workflow.
+A scheduler that exits returns control to the kernel's own scheduler.
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    description="Choose Devario or Arch-based instructions and check your kernel and tools."
+    href="/sched-ext/installation/"
+  />
+  <LinkCard
+    title="Using schedulers"
+    description="Switch schedulers, manage boot persistence and return to Default."
+    href="/sched-ext/docs/usage/"
+  />
+  <LinkCard
+    title="Benchmarking with helicoprion"
+    description="Compare installed schedulers against the kernel default on your own machine."
+    href="/helicoprion/overview/"
+  />
+  <LinkCard
+    title="Configuration and profiles"
+    description="Set custom options, manage profiles and test service overrides."
+    href="/sched-ext/docs/configuration/"
+  />
+  <LinkCard
+    title="Troubleshooting"
+    description="Read status, investigate failures and collect useful diagnostics."
+    href="/sched-ext/docs/troubleshooting/"
+  />
+</CardGrid>
+
+## Pearl desktop controls
+
+Pearl builds with the scx backend use the same scheduler catalog as `scxcli`
+and `scxtui`.
+See [Pearl's scheduling guide](/pearl/docs/audio-power/#system-and-scheduling)
+for the graphical controls and for the difference between a configured and an
+active scheduler.
+
+## Developer references
+
+This page adapts the **sched_ext guide for Devario by [sir_lucjan](https://github.com/sirlucjan)**. It describes the
+`scxtui` / `scxcli` / `scx.service` workflow shipped in Devario's
+[`scx-scheds` package](https://repo.seafoam-labs.org/package/devario-core/x86_64/scx-scheds).
+See the [Devario package recipe](https://github.com/Seafoam-Labs/devario-custom-packagbuilds/blob/HEAD/devario-core/scx-scheds/PKGBUILD)
+for the source tag used by the recipe.
+On other distributions, check the installed package rather than assuming the
+same tools and service are available.
+
+- [scxcli reference](https://github.com/sched-ext/scx/blob/main/tools/scxcli/README.md): commands, privileges and custom profiles.
+- [scxtui reference](https://github.com/sched-ext/scx/blob/main/tools/scxtui/README.md): requirements, keyboard controls and interface behavior.
+- [Catalog contract](https://github.com/sched-ext/scx/blob/main/services/CATALOG.md): schema, trust rules, status detection and client integration.
+- [Scheduler descriptions](https://github.com/sched-ext/scx/blob/main/scheds/rust/README.md): individual schedulers and their intended workloads.
+- [Upstream installation](https://github.com/sched-ext/scx/blob/main/INSTALL.md): source builds and other distributions. A tools-only build does not install scheduler binaries.
+- [Seafoam Labs scx fork](https://github.com/Seafoam-Labs/scx): Devario integration and scheduler development.
+- [Devario package recipes](https://github.com/Seafoam-Labs/devario-custom-packagbuilds): package contents and build configuration.

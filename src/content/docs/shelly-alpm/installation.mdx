@@ -25,14 +25,29 @@ how the two engines compare.
 Shelly runs on Arch Linux and Arch-based distributions. To build it from source,
 you need:
 
-- Zig 0.16.0
+- The Zig version pinned by the selected recipe (for example, Zig 0.17.1 in the
+  [stable release recipe](https://github.com/Seafoam-Labs/Shelly-ALPM/blob/v3.4.0/PKGBUILD)).
 - `libalpm`, provided by `pacman` (default builds; an RLPM-only source build omits the
   `pacman` dependency)
 
+## Devario
+
+Devario includes Shelly. Use its configured repositories for upgrades. To add
+the optional [terminal interface](https://repo.seafoam-labs.org/package/devario-core/x86_64/shelly-tui):
+
+```sh
+shelly install standard shelly-tui
+```
+
+Run it with `shelly-tui`. Some recipes bundle it in the main `shelly` package
+instead; check your distribution's package listing.
+
 ## Arch Linux
 
-Prebuilt Shelly packages are available from CachyOS and the AUR. The package
-includes the graphical interface and command-line tools.
+CachyOS offers a prebuilt `shelly` package. The AUR has a
+[`shelly` source recipe](https://aur.archlinux.org/packages/shelly) and a
+separate [`shelly-bin` recipe](https://aur.archlinux.org/packages/shelly-bin)
+that repackages upstream binaries. Check availability for your architecture.
 
 <Card title="CachyOS / pacman (Recommended)" icon="download">
   Install Shelly directly from CachyOS repositories.
@@ -53,7 +68,10 @@ includes the graphical interface and command-line tools.
 
 ### Build from source
 
-Clone the repository and use its git `PKGBUILD`:
+For a stable source build, use the `PKGBUILD` from a
+[release tag](https://github.com/Seafoam-Labs/Shelly-ALPM/releases) and match
+its build dependencies. The example below instead uses `PKGBUILD-git`, which
+builds the development branch. Use that recipe only to test development changes:
 
 ```sh
 git clone https://github.com/Seafoam-Labs/Shelly-ALPM.git

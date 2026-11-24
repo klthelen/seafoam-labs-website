@@ -51,9 +51,11 @@ and a local user account. Installation copies the prepared live filesystem,
 so the base desktop can be installed offline.
 
 The image targets **x86-64-v3 hardware**. Live media can boot through BIOS or
-UEFI, but installation requires **64-bit UEFI** and uses systemd-boot. Btrfs
-is the default filesystem; ext4, XFS, and F2FS are also offered.
-See [Setup and defaults](/devario/setup/) before installing.
+UEFI, but installation requires **64-bit UEFI** and uses systemd-boot.
+
+For **Erase disk** installs, Calamares defaults to **ext4** for the system
+partition. Btrfs, XFS, and F2FS are also available. See
+[Setup and defaults](/devario/setup/) before installing.
 
 ## What else is included
 
@@ -69,7 +71,8 @@ See [Setup and defaults](/devario/setup/) before installing.
 | Graphics                 | Mesa and Vulkan drivers, XWayland, and NVIDIA open kernel modules for supported GPUs                         |
 
 The [ISO package list](https://github.com/Seafoam-Labs/devario-os/blob/main/iso/packages.x86_64)
-is the full inventory. The [OS README](https://github.com/Seafoam-Labs/devario-os#readme)
+lists the build inputs, not the resolved inventory of a published image. The
+[OS README](https://github.com/Seafoam-Labs/devario-os#readme)
 explains how those packages are integrated; individual project guides may
 describe features newer than the packages in a particular image.
 

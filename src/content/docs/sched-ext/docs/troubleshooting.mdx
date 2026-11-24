@@ -1,0 +1,93 @@
+---
+title: Troubleshooting sched_ext
+description: Diagnose missing tools, failed sched_ext starts, authorization problems, invalid profiles and scheduler-manager conflicts.
+sidebar:
+  label: Troubleshooting
+---
+
+Check the [installation requirements](/sched-ext/installation/) first. Use the
+read-only commands below to identify the failure before changing configuration.
+
+## Read the current state
+
+```sh
+scxcli get
+systemctl status scx.service
+journalctl -u scx.service -b 0
+```
+
+In `scxcli get`, **state** identifies a scheduler when the service process
+and kernel agree. **kernel** shows the kernel observation, **running**
+describes the service process, and **configured** describes the resolved
+next-start configuration.
+They can differ after a manual edit, failed start or scheduler launched outside
+the service. `scxcli get --json` exposes the status for scripts.
+
+Reading service logs requires permission to read the system journal. If your
+account cannot see the logs, ask an administrator to collect them; switching
+authorization does not grant journal access.
+
+## Tools or kernel support are missing
+
+If `scxcli` or `scxtui` is not found, check the contents of your distribution's
+package. The [installation guide](/sched-ext/installation/) distinguishes the
+Devario tools from releases with a different management interface. Do not add
+a second scheduler manager to supply a missing command.
+
+If the kernel check does not print `sched_ext available`, or the service is
+skipped, boot a kernel with sched_ext support. Installing tools alone does not
+add kernel support.
+
+## A scheduler fails to start
+
+Read `scxcli get` and `journalctl -u scx.service -b 0`. Systemd limits the
+service to two start attempts within 30 seconds. It restarts on failure, not
+on a clean exit. An explicit `start ID` or no-ID resume attempts to reset the
+failed state and start counter before starting again. Select a known working entry or
+[return to Default](/sched-ext/docs/usage/#use-the-command-line).
+
+## Switching asks for a password
+
+Check that `scxcli` is installed at `/usr/bin/scxcli` and that
+`/usr/share/polkit-1/actions/org.sched_ext.scxcli.policy` is installed. A local
+policy or a non-console session can also require authentication.
+
+## Resume refuses custom options
+
+Use `pkexec scxcli start ID` to select a listed entry, or repeat the
+administrator-authorized `run` command. Resume validates the saved command
+even when run as root; custom options must exactly match an installed
+catalog profile. See
+[custom options and profiles](/sched-ext/docs/configuration/#custom-options-and-profiles).
+
+## A scheduler is missing from the list
+
+Try `scxcli list all`. Some schedulers are deliberately hidden because they
+need their own configuration; use an administrator profile or `run` with the
+required options.
+
+## Commands refuse the custom catalog
+
+Check both `/etc/scx` and `/etc/scx/catalog.json`: ownership, permissions,
+symlinks or invalid contents can make the override unusable. There is no
+automatic fallback to the shipped catalog. `sudo scxcli catalog reset`
+removes an override file, including a file symlink, but refuses a symlinked
+`/etc/scx` directory; correct that directory separately. See
+[catalog ownership and overrides](/sched-ext/docs/configuration/#custom-options-and-profiles).
+
+## Configured and running schedulers differ
+
+Check for active overrides, another scheduler manager, a failed start, or a
+scheduler launched manually. Do not start a second manager to fix the mismatch.
+To remove test overrides, follow
+[temporary service overrides](/sched-ext/docs/configuration/#temporary-service-overrides).
+
+**Default** stops `scx.service`; it cannot stop a scheduler launched outside
+that service. Stop such a scheduler through the tool or process that launched
+it, then check the state again.
+
+## Ask for help
+
+Include the package version, running kernel, `scxcli get` output and relevant
+service log when asking in the [Fluxer community](https://fluxer.gg/vOjrMXcE).
+Review logs for personal information before sharing them.

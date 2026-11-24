@@ -1,0 +1,165 @@
+---
+title: Dracut on Devario
+description: Inspect, rebuild, and troubleshoot the Devario initramfs, with command equivalents for Arch Linux users.
+sidebar:
+  label: Dracut and initramfs
+---
+
+An **initramfs** is the small filesystem Linux starts with before it can mount
+your real root filesystem. It provides the drivers and tools needed to find the
+root disk, unlock it if it is encrypted, and start the installed system.
+
+This guide is for an **installed Devario Community system** using systemd-boot.
+`boot-update` is Devario's wrapper: it calls dracut to build the images, then
+refreshes the systemd-boot entries. Shelly runs the wrapper after relevant
+package changes, so you do not normally need to run either tool by hand.
+
+## Coming from Arch Linux
+
+| Task          | Arch                 | Devario                             |
+| ------------- | -------------------- | ----------------------------------- |
+| Rebuild all   | `sudo mkinitcpio -P` | `sudo /usr/lib/devario/boot-update` |
+| Inspect image | `lsinitcpio IMAGE`   | `sudo lsinitrd IMAGE`               |
+| List features | `mkinitcpio -L`      | `dracut --list-modules`             |
+
+`mkinitcpio -P` processes every configured preset under `/etc/mkinitcpio.d/`.
+Devario's updater instead finds the installed kernels it can boot, rebuilds
+normal and fallback images, then refreshes the systemd-boot entries.
+The generic `dracut --force --regenerate-all` command does **not** run that
+Devario update sequence. For a one-image rebuild when the wrapper is not
+usable, see [Build a rescue initramfs with dracut](#build-a-rescue-initramfs-with-dracut).
+
+Replace `IMAGE` with the file to inspect. The usual Arch `linux` image is
+`/boot/initramfs-linux.img`; Devario's `linux-devario` image is
+`/boot/initramfs-linux-devario.img`.
+
+## Rebuild and verify
+
+If you changed an initramfs setting or need to retry a failed boot update, first
+check that the EFI System Partition is mounted at `/boot`. This read-only check
+should show `/boot` with filesystem type `vfat` on a standard installation.
+
+```sh
+findmnt -no TARGET,FSTYPE --mountpoint /boot
+```
+
+:::caution
+If the check prints nothing or shows a different filesystem, stop and check your
+mounts. The next command writes boot files. Run it in the installed system, not
+in the live USB session.
+:::
+
+```sh
+sudo /usr/lib/devario/boot-update
+```
+
+Use the full path: the `devario-boot` package installs this helper under
+`/usr/lib/devario/`, not on the standard `PATH`.
+
+After a successful rebuild, inspect the image and verify that systemd-boot lists
+the regular and fallback entries. The filename below is for `linux-devario`;
+if you use `linux-devario-lts`, substitute that name.
+
+```sh
+sudo lsinitrd /boot/initramfs-linux-devario.img
+sudo bootctl list
+```
+
+## Where configuration goes
+
+On up-to-date Devario installations, put local dracut settings in a drop-in such
+as `/etc/dracut.conf.d/90-local.conf`. The installed-system builder layers
+`/etc/dracut.conf` and its drop-ins over Devario's packaged profile. Leave
+`/usr/share/devario/dracut/installed.conf` alone; package updates own it.
+
+In Arch terms, a dracut _module_ is closer to a `HOOKS=()` entry than a
+`MODULES=()` entry. `add_dracutmodules` adds boot features; `add_drivers` adds
+kernel drivers without forcing them to load. Use `force_drivers` only if a driver
+must be loaded early. Do not copy your mkinitcpio configuration into dracut.
+
+## If Devario will not boot
+
+- **The rebuild reported an error:** save the error from Shelly or `boot-update`.
+  If the system is still running, resolve the error before rebooting.
+- **The normal entry fails:** select **Devario Linux (fallback initramfs)** in
+  the systemd-boot menu. It uses the same kernel with a less hardware-specific
+  image. If **Devario Linux (previous kernel and initramfs)** is present, that is
+  a separate recovery entry using a saved older pair.
+- **Dracut drops you into an emergency shell:** save
+  `/run/initramfs/rdsosreport.txt` if present.
+
+### Build a rescue initramfs with dracut
+
+Try the fallback or previous-kernel entry first. Use this procedure if
+`boot-update` is unavailable or fails, but the installed kernel and its
+systemd-boot entry are intact. The example is for the standard `linux-devario`
+entry.
+
+If you use the [Devario live USB](/devario/installation/), boot it in UEFI mode.
+Mount the installed root and its EFI System Partition, then enter the installed
+system's chroot with `/dev`, `/proc`, `/sys`, and `/run` available. Inside that shell,
+`/boot` must be the installed system's EFI partition, not the USB's. Omit
+`sudo` if you are already root. If you cannot identify the right partitions,
+stop and get recovery help before writing anything.
+
+First confirm `/boot` is the correct mounted `vfat` partition and has enough
+free space for another image. Use the exact installed `KERNEL_VERSION`
+directory name from `/usr/lib/modules`; `uname -r` in a chroot still reports
+the running kernel, which may be the live USB's.
+
+```sh
+findmnt -no SOURCE,TARGET,FSTYPE --mountpoint /boot
+df -h /boot
+ls /usr/lib/modules
+```
+
+Replace `KERNEL_VERSION` below. The comparison stops the build if the kernel
+in `/boot` does not match the selected module tree. Dracut writes a **separate**
+generic image using Devario's packaged profile. Leave out `--force` so an
+existing image of the same name is not overwritten.
+
+```sh
+sudo cmp /usr/lib/modules/KERNEL_VERSION/vmlinuz /boot/vmlinuz-linux-devario && \
+  sudo dracut --conf /usr/share/devario/dracut/installed.conf \
+    --kver KERNEL_VERSION --no-hostonly --no-hostonly-cmdline --no-uefi \
+    /boot/initramfs-linux-devario-rescue.img
+```
+
+Inspect the image before using it: `-m` lists dracut modules, and omitting it
+lists the files and drivers. This direct build still reads dracut drop-ins,
+but it does not merge `/etc/dracut.conf` or apply wrapper-specific settings
+such as automatic NVIDIA early KMS. If your root disk needs custom
+drivers or encryption support, check that the image includes them.
+
+```sh
+sudo lsinitrd -m /boot/initramfs-linux-devario-rescue.img
+sudo lsinitrd /boot/initramfs-linux-devario-rescue.img
+```
+
+Dracut does not create a boot entry. If the image checks out, copy the
+existing entry to a new file. This fails rather than replacing an existing
+rescue entry.
+
+```sh
+sudo cp --update=none-fail /boot/loader/entries/devario.conf \
+  /boot/loader/entries/local-devario-rescue.conf
+```
+
+Edit **only the new file**. Set `title Devario Linux (manual dracut rescue)` and
+change the `initrd` line to `initrd /initramfs-linux-devario-rescue.img`. Leave
+`linux` and `options` unchanged so the copy uses the same kernel and root disk.
+Verify the new entry with `sudo bootctl list`, then select it in the boot menu.
+Once the system is bootable again, use the [packaged updater](#rebuild-and-verify)
+to restore the managed images and entries rather than relying on the rescue image
+for updates.
+
+<details id="sources">
+  <summary>Sources</summary>
+
+**Devario:** [Boot package](https://repo.seafoam-labs.org/package/devario-core/x86_64/devario-boot) · [Package recipe](https://github.com/Seafoam-Labs/devario-os/blob/e51aaeb62e755aeba2a53646a00eff7931e3fdf1/packages/devario-boot/PKGBUILD) · [Update hook](https://github.com/Seafoam-Labs/devario-os/blob/e51aaeb62e755aeba2a53646a00eff7931e3fdf1/packages/devario-boot/95-devario-boot.hook) · [Boot updater](https://github.com/Seafoam-Labs/devario-os/blob/e51aaeb62e755aeba2a53646a00eff7931e3fdf1/packages/devario-boot/boot-update) · [Initramfs builder](https://github.com/Seafoam-Labs/devario-os/blob/e51aaeb62e755aeba2a53646a00eff7931e3fdf1/packages/devario-boot/initramfs-update) · [systemd-boot updater](https://github.com/Seafoam-Labs/devario-os/blob/e51aaeb62e755aeba2a53646a00eff7931e3fdf1/packages/devario-boot/systemd-boot-update)
+
+**Dracut:** [dracut(8)](https://man.archlinux.org/man/dracut.8.en) · [dracut.conf(5)](https://man.archlinux.org/man/dracut.conf.5.en) · [lsinitrd(1)](https://man.archlinux.org/man/lsinitrd.1.en)
+
+**Arch and boot entries:** [mkinitcpio(8)](https://man.archlinux.org/man/mkinitcpio.8.en) · [ArchWiki: mkinitcpio](https://wiki.archlinux.org/title/Mkinitcpio) · [bootctl(1)](https://man.archlinux.org/man/bootctl.1.en) · [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification)
+
+</details>

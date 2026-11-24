@@ -54,10 +54,14 @@ contents across your computer.
 
 ## Start an application at login
 
-Follow [Start an application at login](/aqueous/configuration/#start-an-application-at-login)
-to add, check or disable an Aqueous startup command. Window rules do not launch
-applications. Check existing XDG autostart entries to avoid starting the same
-app twice, and use your session's configuration root.
+Open **Settings → Startup** to add, remove, or toggle XDG autostart entries.
+Disabling a system entry creates a per-user
+override; it does not change the system file.
+
+For commands launched by the compositor itself, use
+[Aqueous startup commands](/aqueous/configuration/#start-an-application-at-login).
+Use one method per application to avoid starting it twice. Window rules do
+not launch applications.
 
 ## The bar
 
@@ -124,6 +128,66 @@ scrolls along its length instead of growing wider.
 Each clock instance has its own time zone, label, format and date setting, added
 and configured in Settings → Bar & dock. Every clock button opens the calendar
 and anchors it to the clicked button.
+
+#### Custom time and date patterns
+
+Each clock definition accepts optional `time_format` and `date_format`
+[strftime-style](https://docs.gtk.org/glib/method.DateTime.format.html)
+patterns (up to 64 UTF-8 bytes each; every `%` must be followed by a known
+specifier). When a pattern is empty, the built-in patterns apply: the time
+follows the 12/24-hour setting (`%H:%M` or `%I:%M %p`) and the date is
+`%a %d %b`. The optional `separator` (up to 16 bytes, default `·`) is rendered
+between the date and the time on horizontal bars. Common specifiers:
+
+| Specifier          | Meaning                                     | Example              |
+| ------------------ | ------------------------------------------- | -------------------- |
+| `%H` / `%I`        | Hour, 24-hour / 12-hour                     | `14` / `02`          |
+| `%M` / `%S`        | Minute / second                             | `05`                 |
+| `%p`               | AM/PM                                       | `PM`                 |
+| `%a` / `%A`        | Weekday, short / full                       | `Sun` / `Sunday`     |
+| `%d` / `%-d`       | Day of month, padded / unpadded             | `01` / `1`           |
+| `%b` / `%B`        | Month, short / full                         | `Nov` / `November`   |
+| `%m` / `%Y` / `%y` | Month / 4-digit year / 2-digit year         | `11` / `2026` / `26` |
+| `%F`               | ISO 8601 date, same as `%Y-%m-%d`           | `2026-11-01`         |
+| `%R` / `%T`        | ISO 8601 time, same as `%H:%M` / `%H:%M:%S` | `14:05` / `14:05:09` |
+| `%Z` / `%:z`       | Zone name / UTC offset                      | `JST` / `+09:00`     |
+| `%%`               | Literal `%`                                 | `%`                  |
+
+For an ISO 8601 clock use `"time_format": "%T"` (or `%H:%M`) with
+`"date_format": "%F"`; any separator works, for example `"separator": "|"` or a
+space. Custom patterns are used verbatim on both horizontal and vertical bars;
+only the built-in patterns stack their fields on vertical bars. The Settings
+preview shows the result live, and invalid patterns are rejected before saving.
+
+Patterns live in the `bar.clocks` definitions:
+
+```json
+{
+  "bar": {
+    "clocks": [
+      {
+        "id": "tokyo",
+        "timezone": "Asia/Tokyo",
+        "label": "Tokyo",
+        "hour_format": "12h",
+        "show_date": false,
+        "time_format": "%H:%M:%S",
+        "date_format": "%Y-%m-%d",
+        "separator": "•"
+      }
+    ]
+  }
+}
+```
+
+### Layout presets
+
+Open **Settings → Bar & dock → Layout presets** to
+start from a shipped bar and dock arrangement. Select the **macOS** or
+**Windows** tile to stage a draft, then review it and use **Apply & save**.
+If the picker is missing, check [package versions](/pearl/installation/#version-and-distribution-differences):
+it requires Pearl v0.3.11 or newer. Presets change the bar and dock
+fields they own without replacing unrelated settings or per-display overrides.
 
 ## Bar widgets
 
@@ -329,6 +393,11 @@ and desktop actions. A rejected, dropped or unknown compositor action shows a
 non-focusable on-screen message.
 
 ### Choose the right search
+
+To search local documents, enable **Settings → Assistant → Semantic search**
+and select only the folders you want indexed.
+The launcher shows ordinary results first and document matches as they become
+available. Embedding and ranking run locally; the feature is off by default.
 
 Open Launcher, then type an application name or window title. Use
 [Calculator](#calculator) for arithmetic,

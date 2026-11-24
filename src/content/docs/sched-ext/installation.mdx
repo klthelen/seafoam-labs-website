@@ -1,0 +1,100 @@
+---
+title: Install sched_ext
+description: Install sched_ext packages on Devario or Arch-based systems and check kernel and tool requirements.
+sidebar:
+  label: Installation
+---
+
+import { Code, Steps, Tabs, TabItem } from "@astrojs/starlight/components";
+
+Install the scheduler tools and check that your kernel supports sched_ext.
+The package manager and repository instructions depend on your distribution.
+
+## Choose your distribution
+
+Choose the instructions for your distribution. Use the release package,
+**`scx-scheds`**, for everyday use rather than a Git build.
+
+<Tabs>
+  <TabItem label="Devario (Shelly)">
+
+    Install from [devario-core](https://repo.seafoam-labs.org/package/devario-core/x86_64/scx-scheds).
+    The regular `linux-devario` kernel supports sched_ext. You do not need a
+    development kernel or repository.
+
+    <Steps>
+
+    1. **Check your repository configuration.** Devario uses Shelly and
+       `/etc/shelly.conf`. If you need to add the repository, follow the
+       [devario-core setup page](https://repo.seafoam-labs.org/setup/devario-core)
+       for its signing key and current configuration. See
+       [native repository configuration](/shelly-alpm/docs/native-configuration/)
+       for Shelly configuration details.
+
+    2. **Update your system and install `scx-scheds`.**
+
+       <Code code={"shelly upgrade standard\nshelly install standard scx-scheds polkit"} lang="sh" />
+
+    </Steps>
+
+  </TabItem>
+  <TabItem label="Arch-based (pacman)">
+
+    Use your distribution's repositories and `/etc/pacman.conf`, not Shelly's
+    configuration. On Arch, the release package is available from the official
+    repositories; you do not need to add a Devario development repository.
+
+    <Code code="sudo pacman -Syu scx-scheds" lang="sh" />
+
+    The [official Arch package](https://archlinux.org/packages/extra/x86_64/scx-scheds/files/)
+    provides scheduler binaries, not this guide's catalog tools or service.
+    Arch's separate `scx-tools` package ships a different `scxtui` based on
+    `scx_loader`. Follow the [switching instructions](/sched-ext/docs/usage/)
+    only if your distribution provides the catalog-based tools and supporting
+    files listed below. The [upstream catalog build guide](https://github.com/sched-ext/scx/blob/main/INSTALL.md#the-scheduler-catalog-scxcli-and-scxtui)
+    describes development builds. Do not add Devario repositories to Arch.
+
+  </TabItem>
+</Tabs>
+
+`polkit` supplies `pkexec`, which the tools need for switching as a normal user.
+It may already be installed with your desktop.
+
+## Check your running kernel and the tools
+
+This workflow requires systemd and `/bin/bash`, plus the packaged
+`scx.service`, `/etc/default/scx`, `/usr/share/scx/catalog.json` and polkit
+policy. The supplied policy expects `scxcli` at `/usr/bin/scxcli`. Installing
+the binaries with Cargo alone does not install these supporting files.
+
+```sh
+test -d /sys/kernel/sched_ext && echo "sched_ext available"
+test -x /usr/bin/scxcli && echo "scxcli installed"
+command -v scxtui
+/usr/bin/scxcli list
+/usr/bin/scxcli get
+```
+
+The first command should print `sched_ext available`. If it does not, boot
+a kernel with sched_ext support before continuing. Check that the tools are
+found and `scxcli list` loads the catalog before following the switching
+steps. `scxtui` finds its helper programs through systemd's default binary
+search path, not custom additions to your shell's `PATH`.
+`state: default (kernel scheduler)` is normal when no scx scheduler is running.
+
+## Development builds
+
+`scx-scheds-git` follows development rather than a release. Use it only if you
+want to test development changes, not as the default installation. Choose one
+scx repository and follow its setup page:
+
+- [devario-scx](https://repo.seafoam-labs.org/setup/devario-scx): upstream
+  `main`, without extra scheduler backports.
+- [devario-scx-dev](https://repo.seafoam-labs.org/setup/devario-scx-dev):
+  scheduler backports not yet merged upstream; also offers `linux-devario-dev`.
+
+Both contain Git builds and can introduce regressions. Install
+`scx-scheds-git` **instead of** `scx-scheds`, not alongside it. Review any
+package replacement prompt before proceeding.
+
+Next, [choose and start a scheduler](/sched-ext/docs/usage/).

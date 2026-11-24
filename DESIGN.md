@@ -409,7 +409,8 @@ dithering are unchanged. No palette-specific image copies are needed.
 
 The homepage footer uses the approved Seafoam Shore v2 artwork: daylight in
 light mode and twilight in dark mode, for both Classic and Sea Glass. Links,
-appearance controls, copyright, Flaticon attribution, and the JetBrains credit
+appearance controls, copyright, Flaticon attribution, and separate CDN77 sponsorship
+and JetBrains support credits
 are real content above the illustration. The original shellheart identifies
 the brand. Other routes retain the compact footer and Starlight's footer content.
 
@@ -431,14 +432,16 @@ The homepage frame lets the illustration span the viewport while its hero,
 project content, and footer links share a 77.5rem maximum width. The former
 resource cards and standalone Powered by block are removed. Their useful
 destinations and credit remain in the footer or Wiki; the package repository
-is still linked from the Wiki introduction.
+is still linked from the Wiki introduction. The footer distinguishes CDN77 under
+"Sponsored by" from JetBrains under "Supported by" and retains the JetBrains
+subscription attribution and trademark notice.
 
 ## Release checksum
 
 [consts.ts](src/consts.ts) keeps the ISO URL, checksum-file URL, and published
 SHA-256 together while preserving the existing documentation imports. The
-digest for `devario-2026.10.28-x86_64.iso` was verified against its mirror file
-on 3 November 2026. Update these values together when changing the release.
+digest for `devario-2026.11.18-x86_64.iso` was verified against its CDN77 checksum file
+on 24 November 2026. Update these values together when changing the release.
 No download size is displayed without verified metadata.
 
 [CopyChecksum.astro](src/components/CopyChecksum.astro) copies the digest through

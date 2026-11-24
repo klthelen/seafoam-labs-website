@@ -25,6 +25,11 @@ shell, services and locker.
 
 ## Installing the package
 
+The greeter package can change the display manager used at the next boot.
+Back up your greetd configuration and confirm you can sign in from a console
+before switching. The stable and Git greeter packages conflict; you do not
+need either package to try just the Git shell on an existing session.
+
 Install `pearl-greeter-git` from the
 [seafoam-labs repository](/pearl/installation/), or build it from the
 repository's `packaging/arch-git` recipe, which produces both `pearl-git` and
@@ -47,17 +52,17 @@ Installation selects the login screen for a later boot; it does not restart the 
    Aqueous desktop as the preferred session.
 2. It provisions the dedicated `pearl-greeter` system account and its
    directories.
-3. An existing `/etc/greetd/config.toml` is copied to `config.toml.bak`
-   first, then replaced with Pearl's configuration, which runs greetd on VT7.
-   VT1 stays available for console login.
+3. Current packages preserve an existing `/etc/greetd/config.toml`, including
+   the greeter command. If no file exists, the package installs Pearl's VT7
+   template. Older packages could back up and replace the existing file.
 4. It selects `pearl-greeter.service` as the display manager for the next
    boot and records the previous selection. No service is stopped or
    restarted; reboot when you are ready.
 
-On Arch upgrades, the package rewrites `/etc/greetd/config.toml` and keeps
-the original `.bak`. Review local changes afterward. It preserves
-`/etc/pearl/greeter.json` and may start the appearance-sync socket without
-restarting the display manager.
+Current packages preserve existing greetd configuration and backups. Review
+the selected greeter command before rebooting, especially if another greeter
+was configured. The appearance-sync socket can start without restarting the
+display manager.
 
 Removing the package, or running
 `sudo /usr/lib/pearl/pearl-greeter-setup restore`, brings back the previous
@@ -90,9 +95,10 @@ appearance; it does not set the greeter's keyboard layout.
 1. Check the username, selected desktop and Caps Lock. To check key positions,
    type harmless text in a visible username field, then clear it. Never reveal
    your password to test a layout.
-2. If you still cannot sign in, try another installed desktop or press
-   `Ctrl+Alt+F1` for console login. Pearl Greeter uses VT7. Console layout is
-   separate; use your distribution's recovery route if console login fails too.
+2. If you still cannot sign in, try another installed desktop or switch to
+   a console VT, for example with `Ctrl+Alt+F1` if VT1 is free. The Pearl template uses
+   VT7, but a preserved greetd configuration can choose another VT. Console
+   layout is separate; use your distribution's recovery route if console login fails too.
 3. From a working console, check the service and current boot logs:
 
    ```sh

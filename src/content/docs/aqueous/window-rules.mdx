@@ -54,6 +54,29 @@ aqueousctl scene
 `app_id`; XWayland applications use `class`. `scene` reveals layer-shell
 namespaces.
 
+## Open an XWayland game on a specific monitor
+
+Use a window rule so the game opens on the same monitor even if your pointer
+is on another screen.
+
+1. With the game open, run `aqueousctl inspect --rule` and copy the `class`
+   from the game's window, not the Steam launcher's.
+2. Run `aqueousctl outputs` and note the exact connector name of the monitor
+   you want, such as `DP-1`.
+3. Add this to your active `rules.toml` (usually `~/.config/aqueous/rules.toml`).
+   Replace both values and put the rule before any broader match. If the game
+   already has its own rule, add `output` to that rule instead.
+
+   ```toml
+   [[window]]
+   class = "steam_app_123456"
+   output = "DP-1"
+   ```
+
+4. Save the file, then quit and relaunch the game while the pointer is on the
+   other monitor. The game should open on the target monitor's active
+   workspace. If that monitor is unavailable, Aqueous uses normal placement.
+
 ## Matching
 
 Rules are evaluated from top to bottom and the **first match wins**. Every
@@ -61,6 +84,13 @@ managed `[[window]]` block needs at least one of `app_id`, `class`, `title`,
 `tag`, or `content_type`; a matcher-free block is discarded. Unmanaged X11
 rules use the separate scope described below and can also match `window_type`.
 When several matchers are present, all must match.
+
+`matching` controls when a rule can apply:
+
+- `always` is the default and continues to evaluate the matcher as the window changes.
+- `once` binds to the first window that claims the rule and survives hot reloads
+  until its matcher is edited.
+- `startup` applies during the first 10 seconds after compositor startup.
 
 String matchers are anchored, case-sensitive globs: `*` matches any number of
 characters and `?` matches one. A string without wildcards must match the
@@ -105,9 +135,9 @@ An unset layout in the first matching rule does not inherit a later rule's layou
 | `content_type` | `none`, `photo`, `video`, or `game`, matching the client's `wp_content_type_v1` commit. |
 
 Any rule containing `content_type` is deliberately restricted to `blur`,
-`opacity`, `hdr_expand`, `buffer_scale_policy`, and `overlay_plane`, even when
-it also contains an identity matcher. Content type often arrives after map, so
-it must not move or rearrange an established window.
+`opacity`, `hdr_expand`, `buffer_scale_policy`, `scale_filter`, `overlay_plane`,
+and `keep_render`, even when it also contains an identity matcher. Content type
+often arrives after map, so it must not move or rearrange an established window.
 
 ### Layout, placement, and state
 
@@ -201,13 +231,21 @@ side, and the fallback fills the output when no anchor matches.
 
 ### Visual, buffer, HDR, and overlay policy
 
-| Field                 | Values and behavior                                            |
-| --------------------- | -------------------------------------------------------------- |
-| `blur`                | Per-window blur eligibility; global blur must also be enabled. |
-| `opacity`             | `0.0` through `1.0`, overriding global/focus opacity.          |
-| `buffer_scale_policy` | `native` or `integer-ceil`.                                    |
-| `hdr_expand`          | Force or suppress Auto HDR highlight expansion.                |
-| `overlay_plane`       | `off` or `prefer`.                                             |
+| Field                 | Values and behavior                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `blur`                | Per-window blur eligibility; global blur must also be enabled.                           |
+| `opacity`             | `0.0` through `1.0`, overriding global/focus opacity.                                    |
+| `buffer_scale_policy` | `native` or `integer-ceil`.                                                              |
+| `scale_filter`        | Override the global [resampling filter](/aqueous/compatibility/#troubleshoot-soft-text). |
+| `hdr_expand`          | Force or suppress Auto HDR highlight expansion.                                          |
+| `overlay_plane`       | `off` or `prefer`.                                                                       |
+| `keep_render`         | `true` keeps a hidden managed window receiving frame callbacks (v1.0.21 or later).       |
+
+`keep_render` does not make a window visible or eligible for capture. It keeps
+a cooperative client rendering even on an inactive workspace, when minimized,
+or while the session is locked. Use a narrow matcher, such as one game's app ID:
+rendering while hidden costs GPU time and battery. Do not use this field on an
+`override_redirect` rule; that rejects the reload.
 
 `integer-ceil` requests a larger integer-scale client buffer without changing
 logical geometry. It can sharpen some toolkit output while increasing memory

@@ -1,0 +1,392 @@
+---
+title: Install Devario
+description: Download and verify Devario, prepare a USB drive, follow the graphical installer, and check your first login.
+sidebar:
+  label: Installation guide
+---
+
+import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+import { Image } from "astro:assets";
+import welcome from "../../../assets/images/devario/installation/01-welcome.webp";
+import location from "../../../assets/images/devario/installation/02-location.webp";
+import keyboard from "../../../assets/images/devario/installation/03-keyboard.webp";
+import partitions from "../../../assets/images/devario/installation/04-partitions.webp";
+import users from "../../../assets/images/devario/installation/05-users.webp";
+import summary from "../../../assets/images/devario/installation/06-summary.webp";
+import install from "../../../assets/images/devario/installation/07-install.webp";
+import finish from "../../../assets/images/devario/installation/08-finish.webp";
+
+Install Devario from a USB drive, then check your first login.
+
+The screenshots use **Devario 2026.10.31** and show the English installer, an
+erased disk and an encrypted ext4 system. Choose your own language, keyboard and
+disk. Select a screenshot to open it at full size.
+
+<Aside type="danger" title="Back up before installing">
+  The **Erase disk** path below deletes every partition and all data on the
+  selected disk, including any existing operating system. Back up your files to
+  another device and check that you can open them. If you want to keep Windows,
+  dual boot or preserve existing partitions, stop before the disk step. This
+  guide does not cover that setup.
+</Aside>
+
+## Before you start
+
+- Check [Hardware and status](/devario/readiness/), especially the x86-64-v3 CPU
+  target and graphics support. Installation requires **64-bit UEFI**, not legacy
+  BIOS mode. Devario does not configure Secure Boot for this image.
+- Use a USB drive you can erase; **8 GB or larger** is a practical choice.
+  You also need a separate disk for the Devario installation.
+- The installer checks for at least **2 GiB of RAM** and **12 GiB of storage**.
+  These are the installer's minimum checks, not a recommendation for everyday
+  use. Leave more space for applications, updates and your files.
+- Connect a laptop to power. Internet access allows the installer to update
+  packages; the base system is included on the image and can be installed offline.
+- If your existing system uses BitLocker or device encryption, save its recovery
+  key before changing firmware settings. Keep backups disconnected while choosing
+  the installation disk.
+
+## Download and verify the image
+
+Open the [Seafoam Labs homepage](https://www.seafoam-labs.org/) and find the
+Devario section. Select **Get the ISO** to download the image and **SHA-256**
+beside it to download the matching checksum. Save both files in the same folder.
+
+Open a terminal in the download folder. In the examples below, replace
+`IMAGE.iso` or `IMAGE.iso.sha256` with the exact name of the file you
+downloaded. Keep the quotes around the filename.
+
+<Tabs>
+  <TabItem label="Linux">
+    ```sh
+    sha256sum -c -- "IMAGE.iso.sha256"
+    ```
+
+    Continue only if it reports `OK` for your ISO filename.
+
+  </TabItem>
+  <TabItem label="macOS">
+    ```sh
+    shasum -a 256 -c -- "IMAGE.iso.sha256"
+    ```
+
+    Continue only if it reports `OK` for your ISO filename.
+
+  </TabItem>
+  <TabItem label="Windows PowerShell">
+    ```powershell
+    Get-FileHash -LiteralPath ".\IMAGE.iso" -Algorithm SHA256
+    ```
+
+    Open the `.sha256` file in a text editor and compare its entire hash with
+    PowerShell's result. Letter case does not matter; every digit must match.
+
+  </TabItem>
+</Tabs>
+
+Do not write or boot an image that fails verification. Check that both files
+belong to the same release. If needed, download them again using the homepage
+buttons.
+
+## Prepare the USB drive
+
+<Aside type="caution" title="Writing the image erases the USB drive">
+  Check the USB drive's model and capacity before flashing. Do not select your
+  internal system disk or a backup drive. Copy anything you need off the USB
+  first.
+</Aside>
+
+Use a disk-image writer such as [balenaEtcher](https://etcher.balena.io/), available
+for Linux, Windows and macOS:
+
+1. Insert the USB drive and open the writer.
+2. Select **Flash from file** and choose the verified `.iso` file.
+3. Select **Select target**, then identify your USB drive by model and capacity.
+4. Recheck the target, select **Flash!**, and wait for writing and validation to
+   finish. Allow the writer's administrator prompt only after checking the target.
+5. Safely eject the USB drive when the writer has finished.
+
+Do not simply copy the ISO file onto a normally formatted USB drive. If your
+system offers to format the drive after flashing, cancel that prompt.
+
+## Boot the live desktop
+
+1. Insert the USB into the computer where you want to install Devario and restart.
+2. Open its one-time boot menu. Check your computer's instructions for the key
+   to press.
+3. If Secure Boot is enabled, disable it in the firmware settings for this image,
+   following your device's instructions and any administrator policy.
+4. Choose the USB's **UEFI** entry, not its legacy/BIOS entry, then start Devario
+   from the image's boot menu.
+5. Wait for the live desktop. Test your keyboard, display, pointer and networking
+   before changing the disk. The live session uses `liveuser`; it is not your
+   future installed account.
+6. Open **Install Devario** from the application launcher.
+
+If you are unsure about the boot mode, open a terminal in the live desktop and run:
+
+```sh
+test -d /sys/firmware/efi && cat /sys/firmware/efi/fw_platform_size
+```
+
+The check must print `64`. Otherwise, stop and restart using the USB's 64-bit
+UEFI entry. The installer checks this before partitioning.
+
+## Follow the installer
+
+### 1. Welcome
+
+Choose the language at the bottom of the welcome page, then select **Next**.
+This controls the installer interface; review the installed system's language
+and regional formats on the next page too.
+
+<figure className="my-6">
+  <a href={welcome.src} aria-label="Open Welcome screenshot at full size">
+    <Image
+      src={welcome}
+      alt="Devario installer Welcome page with the language selector at the bottom and Next in the lower-right corner."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Welcome, with American English selected for this example.
+  </figcaption>
+</figure>
+
+### 2. Location
+
+Select your **Region** and **Zone** using the map or the lists. Check the system
+language and the date and number formats below the map. Use **Change…** to adjust
+them, then select **Next**.
+
+<figure className="my-6">
+  <a href={location.src} aria-label="Open Location screenshot at full size">
+    <Image
+      src={location}
+      alt="Location page showing Europe and Prague, with separate system-language and numbers-and-dates settings."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Example: Prague time zone, English system language and Czech date formats.
+  </figcaption>
+</figure>
+
+### 3. Keyboard
+
+Choose your keyboard model, layout and variant. Type in the test field to check
+letters, numbers and symbols, especially characters you plan to use in passwords.
+Do not enter a real password into the visible test field. Select **Next** when
+the layout behaves as expected.
+
+<figure className="my-6">
+  <a href={keyboard.src} aria-label="Open Keyboard screenshot at full size">
+    <Image
+      src={keyboard}
+      alt="Keyboard page with model, layout and variant selectors, a keyboard preview and a test field."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Example: Generic 105-key PC, Czech layout and Default variant.
+  </figcaption>
+</figure>
+
+### 4. Partitions
+
+<Aside type="danger" title="Check the selected storage device">
+  **Erase disk deletes all data on the selected device.** Match its model and
+  capacity to the disk you intend to erase. The Samsung SSD and device name in
+  this screenshot are examples, not a target to select on your computer. If you
+  cannot identify the correct disk with confidence, stop here.
+</Aside>
+
+1. Use **Select storage device** to choose the installation disk. Do not select
+   the installer USB or a backup drive.
+2. For a clean installation that replaces everything on that disk, choose
+   **Erase disk**. **Replace a partition** and **Manual partitioning** are
+   different workflows and are not covered here.
+3. Choose the filesystem and swap option. This ISO defaults to **ext4** and
+   **No swap**; Btrfs, XFS and F2FS are also available. **No swap** means the
+   installer will not create disk swap. Do not assume hibernation will work
+   with this layout.
+4. If you want an encrypted system partition, enable **Encrypt system**, enter
+   a strong passphrase twice and store it safely. If you leave it unchecked,
+   the system partition will not be encrypted by this option.
+5. Check the **Current** and **After** diagrams, then select **Next**.
+
+The encryption passphrase unlocks your disk; it is separate from your account
+password. Keep a safe copy you can access before logging in. Losing it can make
+your data inaccessible.
+
+The EFI boot partition remains unencrypted. The example shows a 4 GiB FAT32 boot
+partition and a LUKS system partition; sizes depend on your disk.
+
+<figure className="my-6">
+  <a href={partitions.src} aria-label="Open Partitions screenshot at full size">
+    <Image
+      src={partitions}
+      alt="Partitions page showing the target-device selector, Erase disk, ext4, No swap, Encrypt system and before-and-after partition diagrams."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Example only: erase one SSD, use ext4 without disk swap, and encrypt the
+    system partition. Passphrase indicators are obscured.
+  </figcaption>
+</figure>
+
+### 5. Users
+
+Enter your name, login name and computer name. Choose a strong account password
+and enter it twice. This image requires at least eight characters and rejects
+weak passwords.
+
+**Use the same password for the administrator account** sets the administrator
+password to match your account password. If you turn it off, enter a separate
+administrator password when prompted. This does not change your disk-encryption
+passphrase. Remember your login name, then select **Next**.
+
+<figure className="my-6">
+  <a href={users.src} aria-label="Open Users screenshot at full size">
+    <Image
+      src={users}
+      alt="Users page with fields for name, login, computer name and account password, plus the administrator-password reuse option."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Enter your own account details. Example identity fields and password
+    indicators are obscured for privacy.
+  </figcaption>
+</figure>
+
+### 6. Summary
+
+Before selecting **Install**, read the whole summary. Check the time zone,
+language, keyboard, disk model, partitions to be removed and the new layout.
+Make sure nothing you need will be erased.
+
+Use **Back** to correct anything that is wrong. When everything is right, select
+**Install** and read the final confirmation before accepting it. Once disk
+changes begin, cancelling or restarting does not restore erased data.
+
+<figure className="my-6">
+  <a href={summary.src} aria-label="Open Summary screenshot at full size">
+    <Image
+      src={summary}
+      alt="Summary page listing location, keyboard and destructive disk operations, with Install at the bottom-right."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Final review before installation. Read your own disk operations, not just
+    whether the diagram resembles this example.
+  </figcaption>
+</figure>
+
+### 7. Install
+
+Keep the USB connected and leave the computer powered on while the installer
+runs. Installation time depends on your hardware and any package downloads.
+Use **Toggle log** to see what it is doing.
+
+The installer also tries to update packages. If it cannot reach or synchronize
+the repositories, updates may be left for after the restart. A failed package
+transaction or boot setup is an installation error: save the message and log
+before rebooting, then ask for help. Do not treat that as a successful installation.
+
+<figure className="my-6">
+  <a
+    href={install.src}
+    aria-label="Open installation-progress screenshot at full size"
+  >
+    <Image
+      src={install}
+      alt="Installation in progress, showing a progress bar, current task and Toggle log control."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    Wait for the Finish page. Do not remove the USB or interrupt power here.
+  </figcaption>
+</figure>
+
+### 8. Finish
+
+When the installer reports **All done**, enable **Restart now** to restart, then
+select **Done**. **Restart now** starts unchecked. Leave it unchecked to stay in
+the live session and restart later.
+
+Remove the USB after the live system has shut down, before the next boot starts.
+If necessary, choose the internal disk's UEFI boot entry. If you return to the
+live desktop, check the boot device rather than running the installer again.
+
+<figure className="my-6">
+  <a href={finish.src} aria-label="Open Finish screenshot at full size">
+    <Image
+      src={finish}
+      alt="Finish page reporting All done, with Restart now unchecked and Done at the bottom-right."
+    />
+  </a>
+  <figcaption className="text-(length:--sl-text-sm) text-(--sl-color-gray-3)">
+    The installer has finished. Next, check that Devario boots from the internal
+    disk.
+  </figcaption>
+</figure>
+
+## Check your first login
+
+1. If you enabled encryption, unlock the system with your **disk passphrase**
+   when prompted. Check the keyboard layout if it is not accepted.
+2. At the login screen, use the **account you created**, not `liveuser`. Choose
+   **Aqueous** if a session selector is shown, then enter your account password.
+3. Check networking, sound, screen resolution and keyboard input. Check the
+   installer, disk-unlock, login-screen and desktop layouts separately; a correct
+   layout in one place does not prove the others are correct.
+4. Open a terminal, normally with `Super+Return`, and run `pearlctl status`.
+   Open **Settings → Aqueous → Input** if the desktop keyboard needs adjustment.
+5. Open Shelly's **Update** page, check for updates and install them, especially
+   if the installer could not reach the repositories. Restart if an update asks
+   you to. Installer update results and logs are kept under
+   `/var/log/devario-installer-update/` on the installed system.
+
+For login trouble, see [greeter recovery](/pearl/docs/greeter/#wrong-keyboard-layout-or-failed-login).
+Continue with [Setup and defaults](/devario/setup/#make-it-yours) to personalize
+the desktop, or [NVIDIA and laptop GPUs](/devario/graphics/) for GPU selection.
+
+## Try Devario in a virtual machine
+
+Devario is designed for bare metal, which is the current
+[development priority](https://web.fluxer.app/channels/1491098623729061280/1491098625683606948/1561096014658543616).
+VM support has a lower priority, so it may or may not work with your setup.
+
+[Zoey reported a successful QEMU installation on October 27, 2026](https://web.fluxer.app/channels/1491098623729061280/1491098625683606948/1564727213549428736).
+Compatibility still depends on the image, hypervisor and graphics setup.
+
+Use the same verified ISO, but attach it as the VM's virtual optical disk instead
+of writing a USB. Create a **new, disposable virtual disk**, not a physical-disk
+passthrough device, so the erase-disk step cannot target your host's data.
+
+- Zoey's [October 19 VM troubleshooting guidance](https://web.fluxer.app/channels/1491098623729061280/1561630367343968256/1561721471561109504)
+  was **8 GB RAM and four virtual CPUs**. This is dated guidance, not a measured
+  universal minimum or a compatibility guarantee. The installer's lower resource
+  checks do not establish usable VM sizing.
+- Enable **64-bit UEFI** firmware. Legacy BIOS mode is not an installation path.
+- Choose a CPU model that exposes the image's required x86-64-v3 features. A
+  virtual CPU can hide features that your host supports.
+- The graphics path must support Vulkan. A generic **3D acceleration** checkbox
+  alone is not a complete setup; see the
+  [VM graphics notes](/devario/readiness/#trying-a-live-image-or-virtual-machine)
+  for Zoey's QEMU/Virtio/Venus guidance. Do not assume enabling or disabling 3D is
+  correct for every backend.
+- After installation, detach the ISO from the virtual optical drive before
+  booting the installed system.
+
+The QEMU report does not validate the **2026.10.31** image used in this guide.
+The cited discussions do not establish successful VMware or VirtualBox installations.
+An [October 28 VM greeter regression](https://web.fluxer.app/channels/1472973037999210525/1472996386160074782/1565067583500070912)
+also shows why the exact package versions matter. Historical launch scripts and
+workarounds are not a verified recipe for this image.
+
+## If something goes wrong
+
+Stop at the failed step and record the image date, error message, boot mode and
+relevant hardware. Use **Toggle log** for an installer failure. Do not repeat
+disk erasure to investigate a login or update problem. The
+[diagnostics guide](/devario/readiness/#diagnostics) explains how to collect a
+local report; review it for personal information before sharing it with
+[Devario support](https://fluxer.gg/vOjrMXcE).

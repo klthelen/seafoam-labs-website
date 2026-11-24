@@ -117,9 +117,12 @@ export default defineConfig({
           label: "Devario",
           items: [
             "devario/overview",
+            "devario/installation",
             "devario/setup",
+            "devario/package-requests",
             "devario/graphics",
             "devario/platform",
+            "devario/dracut",
             "devario/readiness",
             {
               label: "For organizations",
@@ -197,6 +200,31 @@ export default defineConfig({
             ]),
           ],
         },
+        {
+          label: "sched_ext",
+          items: [
+            "sched-ext/overview",
+            "sched-ext/installation",
+            {
+              label: "Documentation",
+              items: [
+                "sched-ext/docs/usage",
+                "sched-ext/docs/configuration",
+                "sched-ext/docs/troubleshooting",
+              ],
+            },
+            {
+              label: "helicoprion",
+              items: [
+                {
+                  slug: "helicoprion/overview",
+                  label: "Benchmarking guide",
+                },
+              ],
+            },
+          ],
+        },
+
         {
           label: "Pori",
           items: [

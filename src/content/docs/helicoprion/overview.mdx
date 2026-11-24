@@ -1,0 +1,126 @@
+---
+title: helicoprion
+description: Compare Linux CPU schedulers on your own hardware, choose a workload and check which results repeat across benchmark sessions.
+---
+
+helicoprion is a benchmarking tool for sched_ext. It runs the same workloads with each scheduler and puts the results side by side in an HTML report. Start by [comparing an installed scheduler with the kernel default](#compare-schedulers-on-the-same-machine).
+
+## Install helicoprion
+
+The examples on this page target [helicoprion 0.5.0](https://github.com/Seafoam-Labs/helicoprion/tree/0.5.0).
+Install the [helicoprion release on crates.io](https://crates.io/crates/helicoprion) with Cargo:
+
+```sh
+cargo install --locked helicoprion
+helicoprion --version
+```
+
+If the command is not found, check that Cargo's binary directory (`~/.cargo/bin` by default) is on your `PATH`. To build from source, check out one of the [helicoprion release tags](https://github.com/Seafoam-Labs/helicoprion/tags) and run `cargo build --release --locked`. The binary is `target/release/helicoprion`.
+
+## Compare schedulers on the same machine
+
+`matrix` switches the active scheduler during the test. Run it when you can leave the machine idle.
+
+### 1. Check what you can test
+
+Follow the [sched_ext installation guide](/sched-ext/installation/) if you still need `scxcli`, `scx.service` or a scheduler to test. Then [check your kernel and switching tools](/sched-ext/installation/#check-your-running-kernel-and-the-tools). To see which scheduler is running and which alternatives the catalog recommends, run:
+
+```sh
+helicoprion info
+scxcli list recommended
+```
+
+If none of the recommended schedulers is installed, use `scxcli list` to find an installed alternative and [pick it by name](#pick-the-schedulers-yourself). If you don't have the switching tools yet, you can still [measure the running scheduler](#measure-the-running-scheduler).
+
+`matrix` also needs compatible JSON from both `scxcli get --json` and
+`scxcli list --json`. Both must report top-level `"version": 2`. If either
+command is unavailable or reports a different schema, use [`run`](#measure-the-running-scheduler)
+without switching schedulers.
+
+### 2. Run the comparison
+
+Close builds, games and other background jobs. Keep the same power settings throughout the test. This command compares the installed recommendations with the kernel default using the `quick` suite:
+
+```sh
+sudo -- "$(command -v helicoprion)" matrix --recommended --simple -o comparison/
+```
+
+The explicit path lets `sudo` find a Cargo installation. Use a new or empty output directory. Before starting, helicoprion prints a time estimate. It runs five rounds by default and [reverses the scheduler order each round](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md#rounds), so the same scheduler does not always go first as the machine warms up.
+
+Before switching, `matrix` checks whether it can reconstruct the starting state.
+It can refuse to start when there are active service overrides, runtime-only
+enablement, or a mismatch between the service and the running scheduler. See
+[sched_ext troubleshooting](/sched-ext/docs/troubleshooting/) before retrying.
+
+On completion, error, or the first Ctrl+C, helicoprion
+[attempts and checks restoration](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md#restoring-the-previous-state).
+To stop early, press Ctrl+C once and wait. A second Ctrl+C exits without
+restoring. If restoration fails, use the recovery commands printed at the
+start, then check `scxcli get` and `helicoprion info`.
+
+### 3. Open the report
+
+Open `comparison/report.html` in your browser and start with **In short**. If you care about responsiveness under load, look at the slowest wake-ups in the **Busy system** result. Completing more round trips per second does not necessarily mean shorter delays. **No clear difference** means the results did not meet the report's [criteria for a clear change](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md#when-a-change-is-clear), not that the schedulers performed identically. Expand **Full report** for the metrics and check **Conditions** for changes in temperature, CPU frequency or load.
+
+### Pick the schedulers yourself
+
+To test just one alternative against the kernel default, use `--sched` instead of `--recommended`. The first entry is the baseline. Replace `scx_lavd` with an installed scheduler from `scxcli list` if needed:
+
+```sh
+sudo -- "$(command -v helicoprion)" matrix --sched default --sched scx_lavd \
+  --simple -o default-vs-lavd/
+```
+
+Open `default-vs-lavd/report.html` for this comparison. Add another `--sched` entry to include another scheduler in the same rounds.
+
+### Choose a workload
+
+- `quick` (default) measures thread hand-offs on an idle and a busy system.
+- `periodic` measures timer wake-ups and missed deadlines, with and without background CPU load. Start here for a workload closer to regular frame or audio deadlines.
+- `bursts` measures how quickly groups of workers start and finish when woken together.
+- `cgroups` checks how the scheduler divides CPU time between groups with different weights and thread counts. It needs root and cgroup v2 with the `cpu` controller available.
+- `all` runs every suite above, including `cgroups`.
+
+Pass `--suite periodic`, for example, to either `run` or `matrix`. See [what each workload measures](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md#what-is-measured) before choosing which results to compare.
+
+## Measure the running scheduler
+
+You don't need sched_ext tools or `sudo` to measure the current scheduler with the default workload:
+
+```sh
+helicoprion info
+helicoprion run -o current.json
+```
+
+`info` shows the kernel, CPU and active scheduler. `run` writes a JSON result without switching schedulers. The kernel's fair scheduler name (CFS or EEVDF) is inferred from the kernel version. BORE and attached sched_ext schedulers are detected separately. For comparing schedulers, prefer `matrix`: separate runs can be affected by changes in temperature or background activity.
+
+## Read and reuse the results
+
+helicoprion checks the scheduler before and after each run and leaves invalid runs out of the comparison. If the kernel does not expose `enable_seq`, it cannot detect a restart of the same sched_ext scheduler between those checks.
+
+The report counts clear changes per workload rather than ranking schedulers by a single score. A better result in one workload is a reason to try the scheduler with your own applications, not a guarantee that it will be better for everything.
+
+To compare saved JSON files without switching schedulers, pass them to `compare`. This example uses the files from the `default-vs-lavd/` comparison above. The first file is the baseline unless you set `--baseline`. Add `--svg-dir charts/` to save the charts separately:
+
+```sh
+helicoprion compare default-vs-lavd/00-default.json default-vs-lavd/01-scx_lavd.json \
+  -o report.html --svg-dir charts/
+```
+
+To see whether two sessions agree, run the same `matrix` command again with a new output directory. For example, repeat the first comparison with `-o comparison-repeat/`, then pass both directories to `sessions`:
+
+```sh
+helicoprion sessions comparison/ comparison-repeat/ -o sessions.html
+```
+
+Two sessions show whether those runs agree. Use at least five comparable
+sessions to judge how often a result repeats; that is a practical minimum,
+not a statistical guarantee.
+
+`sessions` reports [setup differences that prevent comparison and fields it could not check](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md#comparing-sessions). When the setups match, it shows the results side by side without pooling the runs. To see how much the benchmark varies without a scheduler change, run a separate comparison with `--sched default --sched default`. This A/A check uses six rounds by default. If you set `--rounds` yourself, use an even number.
+
+## Developer references
+
+- [helicoprion README](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/README.md) for installation, diagnostics and the JSON result format.
+- [Benchmark methodology](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/METHODOLOGY.md) for workload details, report thresholds and the limits of comparisons.
+- [Scheduler switching and restoration](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/crates/cli/src/matrix.rs) and [session compatibility checks](https://github.com/Seafoam-Labs/helicoprion/blob/fbf0b3f011e5e6ea5e1fbf8508d672356772ece0/crates/report/src/sessions.rs) in the implementation.

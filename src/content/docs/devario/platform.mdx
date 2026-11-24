@@ -59,10 +59,11 @@ included.
 
 ## Kernel, installation, and boot
 
-Devario uses Seafoam Labs' **`linux-devario`** kernel for x86-64-v3 systems,
-with matching headers. Kernel development lives in the
-[Linux project](https://github.com/Seafoam-Labs/linux); the OS image consumes
-the built kernel packages.
+Devario uses Seafoam Labs' [`linux-devario` kernel package](https://repo.seafoam-labs.org/package/devario-core/x86_64/linux-devario)
+for x86-64-v3 systems, with matching headers. The regular kernel supports
+sched_ext; a development kernel is not required. See the
+[kernel releases](https://github.com/Seafoam-Labs/linux/releases) for source
+changes. The repository listing does not identify the version in a given ISO.
 
 Calamares unpacks the prepared SquashFS filesystem and configures the target
 disk and user account. It does not download and assemble the base system
@@ -73,6 +74,9 @@ EFI System Partition mounted at `/boot`.
 the normal and fallback images, boot entries, and update hooks, so kernel,
 driver, and boot-related package changes refresh the boot artifacts together.
 Plymouth supplies the themed boot splash.
+
+See [Dracut on Devario](/devario/dracut/) to inspect or rebuild the initramfs
+and compare commands with Arch's mkinitcpio.
 
 ## Find the implementation
 

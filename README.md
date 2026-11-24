@@ -5,7 +5,7 @@ Website for Seafoam Labs, built with [Astro](https://github.com/withastro/astro)
 
 ## Requirements
 
-- Node.js 24.x
+- Node.js 26.x
 - pnpm (pinned in `package.json`)
 
 Keep the `packageManager` and `engines.pnpm` pins aligned. The deployment

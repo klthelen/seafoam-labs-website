@@ -11,12 +11,12 @@ This guide covers normal day-to-day use of Pori.
 
 ## Before You Start
 
-| Requirement               | How to Verify                     | What to Look For                                                                    |
-| ------------------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
-| Sudo access               | `groups` command                  | Your username appears in `sudo` or `wheel` group                                    |
-| Disk healthy state        | `sudo fsck -n /dev/sdXn`          | No "dirty bit" or error messages (run on unmounted disk)                            |
-| Disk visible to system    | `lsblk -f`                        | Your device appears in the list with filesystem type (ext4, ntfs, etc.)             |
-| Mount point parent exists | `ls -la /mnt` or your chosen path | Parent directory exists (Pori creates the final mount point, but not the full path) |
+| Requirement                                    | How to Verify                                                                                                                                                                        | What to Look For                                                                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Permission to make system changes              | Open Pori as your normal user in a desktop session with a polkit authentication agent.                                                                                               | You can authorize mount changes when prompted. You don't need to launch Pori with `sudo`.                                                      |
+| Disk health (if you suspect filesystem errors) | On an unmounted ext4 partition, run `sudo e2fsck -n /dev/sdXN`, replacing `/dev/sdXN` with the partition you verified in `lsblk -f`. Use the appropriate tool for other filesystems. | The check reports no filesystem errors. The `-n` flag checks without making repairs.                                                           |
+| Disk visible to the system                     | Run `lsblk -f`.                                                                                                                                                                      | The partition appears with its filesystem type and UUID.                                                                                       |
+| Suitable mount point                           | Check the intended path, for example with `ls -ld /mnt/backup`.                                                                                                                      | Choose a new path or an empty directory so the mount doesn't hide existing files. systemd creates missing directories when it mounts the disk. |
 
 ## Mount a Disk
 
@@ -24,13 +24,13 @@ This guide covers normal day-to-day use of Pori.
 
 - **Double-check the device**: Pori shows disk sizes and labels, but verify you're selecting the correct physical disk.
 - **Avoid system directories**: Never mount to `/home`, `/usr`, `/var`, or other system paths unless you know exactly what you're doing.
-- **Unmount before unplugging**: Always use Pori's unmount (or `systemctl stop`) before physically disconnecting USB drives to prevent corruption.
+- **Unmount before unplugging**: Close files on the disk and stop its `.mount` unit with `sudo systemctl stop UNIT.mount`, replacing `UNIT.mount` with the actual unit name. Check that the disk is unmounted before disconnecting it. Pori's **Remove mount** deletes the persistent unit; use it only if you also want to forget the mount.
 
 :::
 
 1. Open Pori.
 2. Select a drive that is not already mounted.
-3. Click **Mount Disk**.
+3. Click **Mount**.
 4. In the dialog:
    - Confirm or edit the mount point.
    - (Optional) add a description.
@@ -45,14 +45,22 @@ If successful, Pori refreshes the device list and the disk appears as mounted.
 
 ## Mount Options
 
-Pori pre-selects recommended options based on filesystem type:
+When creating a mount, Pori preselects the recommended options shown for the
+detected filesystem. Review the checked options before saving. These are
+examples of what the dialog offers, not a complete list:
 
-| Filesystem | Default Options              | Notes                                                                   |
-| ---------- | ---------------------------- | ----------------------------------------------------------------------- |
-| `ext4`     | `defaults`                   | Standard POSIX permissions                                              |
-| `ntfs`     | `defaults,uid=1000,gid=1000` | Placeholders resolved to your actual UID/GID at mount time              |
-| `exfat`    | `defaults,uid=1000,gid=1000` | Same UID/GID resolution                                                 |
-| `udf`      | `defaults,uid=1000,gid=1000` | For if you want to game from the same partition on both linux & windows |
+| Filesystem | Example options                         | What they do                                                                                           |
+| ---------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| ext4       | `noatime`, `errors=remount-ro`          | Skip access-time updates; remount read-only on filesystem errors. Ownership comes from the filesystem. |
+| Btrfs      | `compress=zstd:3`, `noatime`            | Enable transparent compression and skip access-time updates.                                           |
+| NTFS       | `windows_names`, `uid=$UID`, `gid=$GID` | Keep new filenames Windows-compatible and map ownership to your user and group.                        |
+| exFAT      | `uid=$UID`, `gid=$GID`, `sync`          | Map ownership to your user and group; use synchronous writes if `sync` is selected.                    |
+| UDF        | `unhide`, `uid=$UID`, `gid=$GID`        | Show otherwise hidden files and set the default user and group IDs.                                    |
+| ZFS        | `defaults`, `x-gvfs-show`               | Use standard mount defaults and ask compatible file managers to show the mount.                        |
+
+Pori replaces `$UID` and `$GID` with your numeric IDs before writing the mount
+unit. The [tagged option list](https://github.com/Seafoam-Labs/Pori/blob/v0.2.0/Pori.Ui/src/helpers/options.zig#L24-L106)
+shows the full set for this release.
 
 ### Extra Options
 
@@ -102,7 +110,9 @@ Pori creates native systemd `.mount` units. It does **not**:
   - `systemctl status <unit>.mount`
 - Check logs:
   - `journalctl -u <unit>.mount`
-- If authentication fails:
-  - Retry with the correct sudo password.
+- If authentication fails, check that your session is running a polkit
+  authentication agent and that the account you select can authorize the
+  action. Use the credentials requested by the dialog. This is a polkit
+  prompt, not a `sudo` prompt; don't retry by launching Pori with `sudo`.
 - If a disk is missing:
   - Confirm it appears in `lsblk -f`.

@@ -1,31 +1,31 @@
 ---
-title: System Upgrades, Rollbacks & Backups
+title: System Upgrades, Rollbacks & Package Lists
 sidebar:
-  label: Upgrades & Backups
-description: Manage system transitions, recover from package regressions with shelly downgrade, pin versions with shelly mark, and export declarative backups with shelly backup.
+  label: Upgrades & Package Lists
+description: Coordinate enabled package backends, follow scoped Arch-based rollback examples, and export or import package-selection TOML manifests.
 ---
 
 import { Steps, Tabs, TabItem, Code } from "@astrojs/starlight/components";
 
-Arch Linux is a fast-moving, rolling-release operating system. To manage system evolution safely, Shelly provides
-unified tools for coordinated multi-backend upgrades, interactive version rollbacks, package pinning, and declarative
-system state backups:
+Shelly provides tools for coordinating upgrades, selecting older package versions, managing package rules and saving
+package selections:
 
-- **`shelly upgrade`** - Synchronize and update official ALPM packages, AUR recipes, Flatpaks, and AppImages in a single
-  coordinated action.
-- **`shelly downgrade`** - Interactively roll back packages to older versions using local caches or the Arch Linux
-  Archive.
+- **`shelly upgrade`** - Coordinate updates across enabled standard-package, AUR, Flatpak and AppImage backends.
+- **`shelly downgrade`** - On Arch-based systems, select older packages from matching local caches or distribution archives.
 - **`shelly mark`** - Control upgrade exclusions (`IgnorePkg`), prevent accidental removals (`HoldPkg`), and change
   install reasons.
-- **`shelly backup`** - Export your installed package state to reproducible TOML manifests and restore them on new
-  systems.
+- **`shelly backup`** - Export package selections to TOML manifests and install the listed packages on a compatible setup.
+
+:::note[Using Devario?]
+Devario uses Shelly's native RLPM backend and its own repositories. The archive, package-name and manifest examples below describe **Arch-based** setups, not Devario recovery procedures. For Devario, start with [package management](/shelly-alpm/docs/packages/) and [native package configuration](/shelly-alpm/docs/native-configuration/). For failed update checks, use [Shelly troubleshooting](/shelly-alpm/docs/troubleshooting/).
+:::
 
 ---
 
 ## Coordinated System Upgrades (`shelly upgrade`)
 
-Instead of juggling separate commands for `pacman`, AUR helpers, and `flatpak`, Shelly coordinates updates across all
-active package managers.
+Shelly coordinates updates across the package backends enabled on your installation. Optional backends and their
+software sources must be available before they can be used.
 
 ### Upgrading All Backends in One Command
 
@@ -36,7 +36,8 @@ shelly upgrade all
 ```
 
 Shelly queries each package backend in parallel, presents an aggregated summary of available updates, and coordinates
-the transactions:
+the transactions. Backends have independent results: check the error and completion summary even if another backend
+succeeded. See the [upgrade command reference](/shelly-alpm/docs/cli-reference/#shelly-upgrade-all).
 
 If Shelly cannot prepare an upgrade check, see
 [Shelly upgrade-check recovery](/shelly-alpm/docs/troubleshooting/#shelly-cannot-check-for-upgrades).
@@ -45,7 +46,7 @@ If Shelly cannot prepare an upgrade check, see
 
 <Tabs>
   <TabItem label="Official Packages Only">
-    Synchronize repository databases and perform a standard ALPM system upgrade:
+    Synchronize repository databases and perform a full standard-package upgrade:
 
     <Code
       code={"# Synchronize databases and upgrade official packages\nshelly upgrade standard\n\n# Or with shortcode:\nshelly -Us"}
@@ -83,15 +84,20 @@ shared library incompatibilities. When updating official repository packages, al
 
 ## Package Rollbacks (`shelly downgrade`)
 
-If an upstream update introduces a bug or regression, `shelly downgrade` allows you to immediately roll back to a
-previous working version.
+On an **Arch-based system**, `shelly downgrade` lets you select an earlier package version when investigating an update
+regression.
 
-Shelly searches both your **local package cache** (`/var/cache/pacman/pkg/`) and the
+:::caution[Arch-based archives, not Devario]
+Do not use the Arch Linux Archive or CachyOS archives as Devario package sources. Devario has its own repositories; this section does not provide a Devario rollback procedure. See [Devario software sources](/devario/platform/#shelly-and-software-sources).
+:::
+
+For Arch Linux, Shelly searches both your **local package cache** (`/var/cache/pacman/pkg/` by default) and the
 **official Arch Linux Archive (ALA)** to locate older package releases.
 
 ### Interactive Downgrade
 
-Run `shelly downgrade` followed by the package name:
+Run `shelly downgrade` followed by the package name. This example uses a CachyOS kernel and its matching archive, not a
+Devario package:
 
 ```sh
 shelly downgrade linux-cachyos
@@ -139,7 +145,9 @@ shelly downgrade mesa --oldest
 
 ## Package Pinning & Marking (`shelly mark`)
 
-`shelly mark` modifies package state flags and rules in your ALPM configuration.
+`shelly mark` manages upgrade exclusions, removal protection and installation reasons. The examples below use
+Arch-based package names; see [native package configuration](/shelly-alpm/docs/native-configuration/) for your
+distribution's configuration file and paths.
 
 ### 1. Managing Upgrade Exclusions (`IgnorePkg`)
 
@@ -184,7 +192,7 @@ shelly mark hold --list
 
 ### 3. Changing Installation Reasons
 
-ALPM tracks whether a package was installed **explicitly** by you or automatically as a **dependency**. This metadata
+The package database tracks whether a package was installed **explicitly** by you or automatically as a **dependency**. This metadata
 determines whether `shelly purify` considers the package an orphan when other software is removed.
 
 <Tabs>
@@ -212,14 +220,22 @@ determines whether `shelly purify` considers the package an orphan when other so
 
 ---
 
-## Declarative System Backups (`shelly backup`)
+<span id="declarative-system-backups-shelly-backup" />
 
-Setting up a new machine or backing up your package configuration is seamless with `shelly backup`. It exports all
-explicitly installed packages across native ALPM, AUR, and Flatpak into a structured, portable TOML file.
+## Package Selection Backups (`shelly backup`)
 
-### 1. Exporting Your System State
+`shelly backup` exports installed package selections to a TOML manifest. The example below lists Arch-based repository
+packages, AUR recipes and Flatpak applications.
 
-Export your installed packages to TOML:
+:::note[Package list, not a full system backup]
+The manifest does not contain personal files, application data, configuration files, credentials or boot files, and it does not preserve historical package versions. Back up data and configuration separately; exporting or importing this list does not restore a complete system.
+:::
+
+<span id="1-exporting-your-system-state" />
+
+### 1. Exporting Your Package Selection
+
+Export your installed package selections to TOML:
 
 ```sh
 shelly backup --export
@@ -232,7 +248,9 @@ customize the name and directory:
 shelly backup --export --name workstation-setup --directory ~/dotfiles/
 ```
 
-### Example Backup File (`workstation-setup.toml`)
+<span id="example-backup-file-workstation-setuptoml" />
+
+### Example Package List (`workstation-setup.toml`)
 
 ```toml
 standard = [
@@ -258,9 +276,11 @@ flatpak = [
 ]
 ```
 
-### 2. Restoring on a New System
+<span id="2-restoring-on-a-new-system" />
 
-To replicate your environment on a fresh Arch installation:
+### 2. Installing the Saved Package Selection
+
+To install the listed packages on a fresh Arch-based installation with the required backends available:
 
 ```sh
 shelly backup --import --name workstation-setup --directory ~/dotfiles/
@@ -274,6 +294,10 @@ Shelly reads the declarative manifest and coordinates the installation:
 2. Clones, reviews, and compiles AUR packages.
 3. Installs Flatpak applications from configured remotes.
 
+Review the manifest before importing it. Package names and backend entries must be available on the destination;
+a list from another distribution is not automatically compatible. Import installs available packages, not the original
+application data or historical package versions.
+
 ---
 
 ## Command Reference & Shortcodes
@@ -282,26 +306,28 @@ Shelly reads the declarative manifest and coordinates the installation:
 
 Shelly shortcodes provide fast keyboard access for common administrative flows:
 
-| Action               | Shortcode            | Full Command Equivalent              |
-| :------------------- | :------------------- | :----------------------------------- |
-| **Upgrade All**      | `shelly -U`          | `shelly upgrade all`                 |
-| **Upgrade Standard** | `shelly -Us`         | `shelly upgrade standard`            |
-| **Upgrade AUR**      | `shelly -Ua`         | `shelly upgrade aur`                 |
-| **Upgrade Flatpaks** | `shelly -Uf`         | `shelly upgrade flatpak`             |
-| **Downgrade**        | `shelly -D <pkg>`    | `shelly downgrade <pkg>`             |
-| **Downgrade & Pin**  | `shelly -Di <pkg>`   | `shelly downgrade <pkg> --ignore`    |
-| **List Ignored**     | `shelly -Mgl`        | `shelly mark ignore --list`          |
-| **Add Ignored**      | `shelly -Mga <pkgs>` | `shelly mark ignore --add <pkgs>`    |
-| **Remove Ignored**   | `shelly -Mgr <pkgs>` | `shelly mark ignore --remove <pkgs>` |
-| **Mark Explicit**    | `shelly -Me <pkg>`   | `shelly mark explicit <pkg>`         |
-| **Mark Dependency**  | `shelly -Md <pkg>`   | `shelly mark dependency <pkg>`       |
-| **Export Backup**    | `shelly -Be`         | `shelly backup --export`             |
-| **Import Backup**    | `shelly -Bi`         | `shelly backup --import`             |
+| Action                  | Shortcode            | Full Command Equivalent              |
+| :---------------------- | :------------------- | :----------------------------------- |
+| **Upgrade All**         | `shelly -U`          | `shelly upgrade all`                 |
+| **Upgrade Standard**    | `shelly -Us`         | `shelly upgrade standard`            |
+| **Upgrade AUR**         | `shelly -Ua`         | `shelly upgrade aur`                 |
+| **Upgrade Flatpaks**    | `shelly -Uf`         | `shelly upgrade flatpak`             |
+| **Downgrade**           | `shelly -D <pkg>`    | `shelly downgrade <pkg>`             |
+| **Downgrade & Pin**     | `shelly -Di <pkg>`   | `shelly downgrade <pkg> --ignore`    |
+| **List Ignored**        | `shelly -Mgl`        | `shelly mark ignore --list`          |
+| **Add Ignored**         | `shelly -Mga <pkgs>` | `shelly mark ignore --add <pkgs>`    |
+| **Remove Ignored**      | `shelly -Mgr <pkgs>` | `shelly mark ignore --remove <pkgs>` |
+| **Mark Explicit**       | `shelly -Me <pkg>`   | `shelly mark explicit <pkg>`         |
+| **Mark Dependency**     | `shelly -Md <pkg>`   | `shelly mark dependency <pkg>`       |
+| **Export Package List** | `shelly -Be`         | `shelly backup --export`             |
+| **Import Package List** | `shelly -Bi`         | `shelly backup --import`             |
 
 ---
 
 ## Further Reading
 
+- [Native package configuration](/shelly-alpm/docs/native-configuration/) - Choose the correct configuration and repository paths for Devario or an Arch-based system.
+- [Shelly Package Management](/shelly-alpm/docs/packages/) - Graphical installation and full-system updates.
 - [System Maintenance & Keyring](/shelly-alpm/docs/maintenance/) - Cache cleaning, orphan removal, and PGP key
   maintenance.
 - [Building Packages](/shelly-alpm/docs/build/) - Building PKGBUILD recipes into package archives.

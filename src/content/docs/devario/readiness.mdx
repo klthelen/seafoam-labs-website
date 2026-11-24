@@ -6,57 +6,126 @@ sidebar:
   order: 3
 ---
 
-Devario has a bootable Community image, an Aqueous and Pearl desktop,
-Calamares installation, and Shelly package management. Hardware coverage and
-release validation are ongoing; the source configuration does not guarantee
-that every published image contains the latest changes.
+import { Aside } from "@astrojs/starlight/components";
 
-## Hardware and installation
+The Devario Community ISO boots into a live desktop with Aqueous and Pearl.
+Calamares handles installation, and Shelly manages packages. Check the hardware
+requirements below, then try the live USB before installing.
 
-| Area                   | Current setup                                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CPU                    | x86-64-v3 target for the Devario kernel and image                                                                                                                |
-| Firmware               | BIOS or UEFI for live boot; **64-bit UEFI required for installation**                                                                                            |
-| Secure Boot            | Not configured by the image                                                                                                                                      |
-| Intel and AMD graphics | Mesa and Vulkan drivers are included; check your hardware with the live desktop                                                                                  |
-| NVIDIA graphics        | Open kernel modules for supported Turing-and-newer GPUs; Calamares checks the packaged driver's PCI support list before partitioning                             |
-| Older NVIDIA GPUs      | Support depends on the image and driver branch; the current installer source includes a 580 path for supported Maxwell/Pascal/Volta GPUs. Nouveau is blacklisted |
-| External GPUs          | Bolt authorization tools and GPU hotplug handling are included; physical hotplug, display, and suspend/resume validation remain necessary                        |
+Hardware testing and release validation are ongoing. The ISO you download may
+not include the latest changes in the source.
+
+<span
+  id="hardware-and-installation"
+  aria-hidden="true"
+  style="display: block; margin: 0; scroll-margin-top: var(--sl-nav-height);"
+></span>
+
+## Hardware requirements
+
+| Category            | What you need                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Required to install | A CPU with **x86-64-v3** support (the target for the kernel and image), **64-bit UEFI**, and supported Vulkan-capable graphics. |
+| Recommended         | A 4-core CPU, 8 GB of RAM, and a 32 GB SSD or larger.                                                                           |
+| Installer checks    | 2 GiB of RAM and 12 GiB of storage. These are installer thresholds, not a tested minimum for a usable desktop.                  |
+
+<Aside type="caution" title="Legacy BIOS is unsupported">
+  Devario only supports installation in **64-bit UEFI** mode. The live USB can
+  still boot in legacy BIOS mode. If you booted that way, restart and select the
+  USB's **UEFI** entry in the boot menu before installing.
+</Aside>
+
+The image does not configure Secure Boot.
+
+## Graphics compatibility
+
+Driver support depends on the ISO you're using. The latest source policy does
+not certify an older ISO.
+
+| Graphics hardware                     | Support and checks                                                                                                                                                                                                      |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intel and AMD                         | Mesa and Vulkan drivers are included. Check your hardware with the live desktop.                                                                                                                                        |
+| NVIDIA (Turing and newer)             | The separate `nvidia-open-dkms` package supports eligible GPUs. Calamares checks the packaged driver's PCI support list before partitioning.                                                                            |
+| Older NVIDIA (Maxwell, Pascal, Volta) | The installer source provides a 580 driver path for supported GPUs on the installed system, not in the live session. Support depends on the image; Nouveau is blacklisted.                                              |
+| External GPUs                         | Bolt and GPU hotplug support are included. If you add an NVIDIA eGPU to a system installed without NVIDIA hardware, install a compatible driver explicitly. Test hotplug, displays and suspend/resume on your hardware. |
 
 For per-application GPU selection, Steam launch options and hybrid-laptop
-checks, see [NVIDIA and laptop GPUs](/devario/graphics/). Driver support must
-match your actual image; the latest source policy does not certify an older ISO.
+checks, see [NVIDIA and laptop GPUs](/devario/graphics/).
 
-## Software and release boundaries
+## Try Devario on your PC
 
-- The base installation is offline. Repository downloads and updates need
-  access to the configured software sources.
-- Shelly's native RLPM backend is the Devario package engine. The optional
-  AUR build toolchain is absent from the default desktop.
-- Development images and public release images have different repository
-  trust requirements. Public release builds require signed inputs.
-- Calamares currently remains installed on the target system.
-- Boot splash handoff, encrypted-root unlock, and hardware-specific behavior
-  still need image-level acceptance testing.
+[Boot the live USB](/devario/installation/#boot-the-live-desktop) and check your
+input devices, displays and networking before partitioning. If you install,
+check that the installer completes and that the installed system boots. A
+working live desktop doesn't confirm either of those steps.
 
-The [OS README](https://github.com/Seafoam-Labs/devario-os#development-limitations)
-tracks development limitations, and the
-[test suite](https://github.com/Seafoam-Labs/devario-os/tree/main/tests)
-covers image, installer, package, desktop, and boot behavior.
+<Aside type="tip" title="Below the recommended specs?">
+  Try the live USB and tell us what worked and what didn't in the [Seafoam Labs
+  community](https://fluxer.gg/vOjrMXcE). Include your CPU, RAM, GPU, and ISO
+  version. Let's see what can run Devario!
+</Aside>
 
-## Trying a live image or virtual machine
+<span
+  id="trying-a-live-image-or-virtual-machine"
+  aria-hidden="true"
+  style="display: block; margin: 0; scroll-margin-top: var(--sl-nav-height);"
+></span>
 
-Try input, displays and networking in the live desktop before partitioning.
-Then check the installer and a fresh boot separately.
+## Virtual machines
 
-For a VM, record the image checksum, hypervisor version, UEFI mode, CPU model,
-GPU/3D backend and memory. The image needs the CPU target above, installation
-needs 64-bit UEFI, and the virtual graphics path must support Vulkan. A generic
-“3D acceleration” checkbox does not guarantee this. There is no single tested
-Virtio/Venus setup or minimum VM memory recommendation here.
+Devario is designed for physical hardware, which is the current
+[development priority](https://web.fluxer.app/channels/1491098623729061280/1491098625683606948/1561096014658543616).
+VM support has a lower priority and may not work with your setup.
+
+[Zoey reported a successful QEMU installation on October 27, 2026](https://web.fluxer.app/channels/1491098623729061280/1491098625683606948/1564727213549428736).
+That report does not guarantee success on another host, hypervisor or later
+image. The cited discussions do not confirm successful VMware or VirtualBox
+installations. The current image still needs VM validation.
+
+### VM setup and sizing
+
+- **Firmware and CPU:** Use 64-bit UEFI and expose the image's x86-64-v3 CPU
+  features to the guest.
+- **RAM and vCPUs:** Zoey's [October 19 troubleshooting advice](https://web.fluxer.app/channels/1491098623729061280/1561630367343968256/1561721471561109504)
+  was **8 GB RAM and four virtual CPUs**. This is dated guidance, not a measured
+  universal minimum. The installer's resource checks don't establish usable VM
+  sizing or performance.
+- **Graphics:** The guest needs a Vulkan-capable graphics path. A generic
+  **3D acceleration** checkbox alone is insufficient; neither enabling nor
+  disabling it is a universal fix.
+
+For QEMU with Virtio/Venus, [Zoey's October 7 notes](https://web.fluxer.app/channels/1472973037999210525/1472996386160074782/1557183632852922368)
+specify `venus=true`, `blob=true`, nonzero `hostmem` and shared memfd RAM. If
+`vulkaninfo` is available in the guest, her suggested Venus check was
+`vulkaninfo --summary` showing `DRIVER_ID_MESA_VENUS`. These are dated
+configuration notes, not a launch recipe for the current image or proof of a
+working installation.
+
+See the [installation guide's VM section](/devario/installation/#try-devario-in-a-virtual-machine)
+for the installation workflow.
+
+### VM regressions and reporting
+
+An [October 28 discussion](https://web.fluxer.app/channels/1472973037999210525/1472996386160074782/1565067583500070912)
+records a VM greeter regression after an update. A workaround was suggested and
+a fix queued for build, but that discussion did not confirm the rebuilt package
+fixed the VM. Do not apply historical launch scripts or greeter overrides
+unchanged to a newer image.
+
+When reporting VM results, include the ISO checksum, hypervisor and package
+versions, UEFI mode, guest CPU, RAM/vCPU allocation and graphics backend.
+
+<span
+  id="diagnostics"
+  aria-hidden="true"
+  style="display: block; margin: 0; scroll-margin-top: var(--sl-nav-height);"
+></span>
+
+## Troubleshooting and diagnostics
 
 If both the desktop and installer disappear, collect crash diagnostics rather
-than assuming you were logged out.
+than assuming you were logged out. Use the table to find the next check for
+your symptom.
 
 | Symptom                                            | Next check                                                                                                                                                              |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -66,7 +135,7 @@ than assuming you were logged out.
 | Wrong layout or failed login                       | [Greeter recovery](/pearl/docs/greeter/#wrong-keyboard-layout-or-failed-login); check the layout again after an upgrade.                                                |
 | Freeze, game stall or logout hard-lock             | [Desktop failure collection](/pearl/docs/command-line/#when-something-fails), including the previous boot if available. No general logout hard-lock fix is established. |
 
-## Diagnostics
+### Collect a local report
 
 Open **Devario Report** from the application menu, or collect a local report
 in a terminal:
@@ -85,3 +154,51 @@ sharing it. The interactive tool can offer a public upload; `--no-upload`
 keeps collection local. See the
 [report implementation](https://github.com/Seafoam-Labs/devario-os/blob/main/packages/devario-base/devario-report.sh)
 for the collected fields and upload behavior.
+
+The tool may request administrator authentication to read restricted system logs.
+
+### Describe the problem
+
+Copy the template below and fill in what you know. If there is no error message
+or you cannot reproduce the problem, say so rather than guessing.
+
+```text
+What were you trying to do?
+What happened instead?
+Exact error message:
+Steps to reproduce, if known:
+Live USB or installed system?
+When did it start—after an update or another change?
+```
+
+Use the report for hardware and package details; you do not need to retype them.
+
+### Ask for help
+
+Post your description in the public [Seafoam Labs Fluxer community](https://fluxer.gg/vOjrMXcE).
+Include the reviewed report if it is relevant and you are comfortable sharing it.
+Review any copied error output for personal details too. If the report cannot be
+collected, include that error in your message instead.
+
+<span
+  id="software-and-release-boundaries"
+  aria-hidden="true"
+  style="display: block; margin: 0; scroll-margin-top: var(--sl-nav-height);"
+></span>
+
+## Release status and limitations
+
+- The base installation is offline. Repository downloads and updates need
+  access to the configured software sources.
+- Shelly's native RLPM backend is the Devario package engine. The optional
+  AUR build toolchain is absent from the default desktop.
+- Development images and public release images have different repository
+  trust requirements. Public release builds require signed inputs.
+- Calamares currently remains installed on the target system.
+- Boot splash handoff, encrypted-root unlock, and hardware-specific behavior
+  still need image-level acceptance testing.
+
+The [OS README](https://github.com/Seafoam-Labs/devario-os#development-limitations)
+tracks development limitations, and the
+[test suite](https://github.com/Seafoam-Labs/devario-os/tree/main/tests)
+covers image, installer, package, desktop, and boot behavior.

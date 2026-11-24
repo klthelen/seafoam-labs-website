@@ -6,16 +6,18 @@ sidebar:
   order: 1
 ---
 
-import { Badge } from "@astrojs/starlight/components";
-import { isoChecksumUrl, isoDownloadUrl } from "../../../consts";
-
 Devario's live image includes the desktop and installer together. Check the [hardware requirements](/devario/readiness/) for your image before
 starting.
 
-Download the <a href={isoDownloadUrl}>x86_64 ISO</a> <Badge text="Beta" variant="note" size="small" /> and verify it against
-the <a download href={isoChecksumUrl}>SHA-256 checksum</a>.
+Open the [Seafoam Labs homepage](https://www.seafoam-labs.org/). In the Devario
+section, use **Get the ISO** and
+**SHA-256** to download the image and matching checksum.
 
 ## Install the desktop
+
+For the full walkthrough, follow [Install Devario](/devario/installation/) from
+ISO verification and USB preparation through each installer screen and first
+login. The screenshots use the 2026.10.31 image.
 
 1. **Boot the image in 64-bit UEFI mode.** The live environment signs in as
    `liveuser` and starts Aqueous with Pearl. BIOS boot is available for trying
@@ -23,8 +25,8 @@ the <a download href={isoChecksumUrl}>SHA-256 checksum</a>.
 2. **Open Install Devario from the launcher.** Calamares provides the guided
    installer with Pearl appearance, dark and light palettes, and reduced-motion
    support.
-3. **Choose your language, region, keyboard, and disk layout.** Btrfs is the
-   default; ext4, XFS, and F2FS are available. Review the partition summary
+3. **Choose your language, region, keyboard, and disk layout.** The 2026.10.31
+   image defaults to ext4; Btrfs, XFS, and F2FS are also available. Review the partition summary
    carefully: applying it can erase data on the selected disk.
 4. **Create your local user and confirm installation.** Calamares copies the
    prepared desktop, configures hardware and services, and installs
@@ -73,7 +75,11 @@ options and checks.
 | Configure monitors, scaling, or input          | [Display settings](/aqueous/outputs/) and [input settings](/aqueous/input/)              |
 | Customize shortcuts and window behavior        | [Keybindings](/aqueous/keybindings/) and [window rules](/aqueous/window-rules/)          |
 | Install applications or update the system      | Shelly's Package and Update pages; see [package management](/shelly-alpm/docs/packages/) |
+| Try a different CPU scheduler                  | [CPU schedulers with sched_ext](/sched-ext/installation/)                                |
 | Mount an additional disk at startup            | [Pori's user guide](/pori/user-guide/)                                                   |
+
+Missing an application or library? [Request a package](/devario/package-requests/)
+to ask the Devario team to add it to the repositories.
 
 The default cursor is Vimix, with Papirus icons and Matugen available for
 color generation. Personal Aqueous settings live in `~/.config/aqueous/` and

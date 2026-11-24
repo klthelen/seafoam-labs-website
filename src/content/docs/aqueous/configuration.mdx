@@ -257,6 +257,13 @@ buffer_policy = "native" # native | integer-ceil
 buffer while retaining fractional logical geometry. Prefer a per-window rule
 when testing this higher-cost compatibility mode.
 
+On Vulkan-effects builds that include
+[PR #163](https://github.com/Seafoam-Labs/Aqueous/pull/163), the separate
+`scale_filter` setting goes under `[scaling]` in `wm.toml`. It accepts `auto`
+(default), `bilinear`, `nearest`, and `high-quality`. See
+[Troubleshoot soft text](/aqueous/compatibility/#troubleshoot-soft-text) for
+when to change it and how to override it for one app.
+
 ## System bell
 
 The `[bell]` section in `wm.toml` controls visual feedback, custom sounds, and

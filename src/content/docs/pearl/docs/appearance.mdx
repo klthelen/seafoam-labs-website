@@ -38,10 +38,8 @@ Contain afterwards. To restore an earlier image, choose it and apply again.
 The wallpaper also offers gradient and solid background modes with a color
 choice; gradient is the default for fresh configurations.
 
-The wallpaper is global: one image is shared across every display and fitted
-independently to each output's geometry. Per-output settings control bars and
-docks, not different images. Separate images per monitor remain tracked in
-[Pearl #19](https://github.com/Seafoam-Labs/pearl/issues/19).
+The global wallpaper is the default for each display. An output can override
+its image, fit, color and crop. The slideshow and dynamic colors remain global.
 
 Double-click the desktop background, or a thumbnail in the bar's **Wallpaper**
 pane, to open the crop editor. Its frame is locked to the output's aspect ratio,
@@ -53,6 +51,12 @@ shift dynamic colors. **Reset** restores the full frame.
 
 The active image file is watched: in-place edits, atomic replacements and
 deletion followed by recreation refresh the wallpaper automatically.
+
+### Wallpaper on one display
+
+Use the **Display** selector on the wallpaper
+card to edit one monitor's override or the global default. A monitor without
+an override follows the default. Slideshow and dynamic colors remain global.
 
 ### Slideshow
 

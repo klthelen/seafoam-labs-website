@@ -140,7 +140,9 @@ game. Use the game's own renderer information to check the game itself.
   `lspci -nnk` if installed, and any `nvidia-smi` error. The helper selects a GPU;
   it does not install drivers. Keep the driver branch supported by your GPU
   and image. The [installer policy](https://github.com/Seafoam-Labs/devario-os/blob/6df879a63baea479fa1ecc9ff0c8a1f65b9c1553/docs/nvidia-install-policy.md)
-  describes the current open and older 580 branches; older images may differ.
+  describes the open branch and the older 580 path for the installed system;
+  older images may differ. After a kernel change, check that the headers and
+  NVIDIA DKMS module match the kernel you actually booted (`uname -r`).
 - **The game still uses another GPU:** keep `%command%`, remove other GPU
   wrappers and retry the simple launch option on the game.
 - **The correct GPU is active but resolution is wrong:** check the game's

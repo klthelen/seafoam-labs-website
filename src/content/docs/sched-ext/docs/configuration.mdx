@@ -1,0 +1,106 @@
+---
+title: Configuration and profiles
+description: Configure scx.service, supply scheduler arguments, manage catalog profiles and test temporary service overrides.
+sidebar:
+  label: Configuration and profiles
+---
+
+Use this page when the [standard switching controls](/sched-ext/docs/usage/)
+are not enough. These settings apply to the whole system; keep a known working
+scheduler selection so you can return to it after testing.
+
+## Service and configuration
+
+`sched_ext` runs a CPU scheduler as a BPF program. The running kernel must have
+`CONFIG_SCHED_CLASS_EXT=y`; `/sys/kernel/sched_ext` exposes its state. Only one
+scx scheduler can be attached at a time. When it exits, the kernel returns to
+its own scheduler.
+
+`scxtui` delegates changes to `scxcli`, which updates the saved configuration
+and controls **`scx.service`** through `systemctl`.
+
+The persistent selection is in `/etc/default/scx`, for example:
+
+```ini title="/etc/default/scx"
+SCX_SCHEDULER=/usr/bin/scx_lavd
+SCX_FLAGS=""
+```
+
+`scxcli` manages these two keys and preserves other lines. Prefer switching
+through `scxtui` or `scxcli`. The no-ID `scxcli start` command validates the
+saved command even when run as root; custom options must exactly match an
+installed catalog profile. Otherwise, use `start ID` or repeat an
+administrator-authorized `run` command.
+
+For status output and service logs, see
+[diagnostics](/sched-ext/docs/troubleshooting/#read-the-current-state).
+
+## Custom options and profiles
+
+`start ID` uses the defaults or an administrator-approved catalog profile.
+Use `run` to supply your own scheduler options; it requires administrator
+authentication. For example:
+
+```sh
+pkexec scxcli run scx_lavd --performance
+```
+
+`run` also saves the configuration and enables the service at boot; it is not
+a temporary test. Restore a listed entry with `start ID` when you finish testing.
+Run `scx_lavd --help` to check the options supported by your installed version.
+
+To make custom options selectable through `scxtui`, an administrator can add
+a named profile to the catalog:
+
+```sh
+scxcli catalog show > catalog.json
+# Edit the exported catalog, then install it:
+sudo scxcli catalog save < catalog.json
+```
+
+The shipped catalog is `/usr/share/scx/catalog.json`. An override at
+`/etc/scx/catalog.json` **replaces the whole shipped file**, rather than merging
+with it, and does not automatically pick up later upstream recommendations.
+Use a root-owned `/etc/scx` directory (normally 0755) and a root-owned regular
+`catalog.json` file (normally 0644). Neither should be a symlink or writable
+by other users. The directory is trust-checked too, and an invalid override
+does not fall back to the shipped catalog. Saving validates the catalog but
+does not restart a scheduler; start the changed profile again.
+
+Preview a file before installing it:
+
+```sh
+scxcli list --catalog ./catalog.json
+scxtui --catalog ./catalog.json
+```
+
+Previewing does not authorize new profiles: starting still uses the installed
+catalog. To remove the override and return to the shipped catalog:
+
+```sh
+sudo scxcli catalog reset
+```
+
+## Temporary service overrides
+
+For service-level testing without editing `/etc/default/scx`, set an override,
+then restart the service:
+
+```sh
+sudo systemctl set-environment SCX_SCHEDULER_OVERRIDE=scx_lavd
+sudo systemctl set-environment SCX_FLAGS_OVERRIDE="--performance"
+sudo systemctl restart scx.service
+```
+
+Clear both overrides and restart to restore the saved configuration:
+
+```sh
+sudo systemctl unset-environment SCX_SCHEDULER_OVERRIDE SCX_FLAGS_OVERRIDE
+sudo systemctl restart scx.service
+```
+
+`scxcli get` and `scxtui` report active overrides. A subsequent `scxcli start ID`
+clears them as part of selecting that entry.
+
+For startup failures, authorization problems or unexpected status, see
+[Troubleshooting](/sched-ext/docs/troubleshooting/).

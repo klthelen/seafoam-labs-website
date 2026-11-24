@@ -2,7 +2,7 @@
 title: System Maintenance & Keyring
 sidebar:
   label: System Maintenance
-description: Keep your Arch Linux system clean, healthy, and secure with shelly purify, shelly news, and shelly keyring.
+description: Cache cleanup, Arch Linux news and signing-key tasks in Shelly, with distribution-specific paths and Devario guidance.
 ---
 
 import { Steps, Tabs, TabItem, Code } from "@astrojs/starlight/components";
@@ -10,6 +10,10 @@ import { Steps, Tabs, TabItem, Code } from "@astrojs/starlight/components";
 Maintaining a rolling-release distribution like Arch Linux requires periodic housekeeping: reclaiming disk space from
 package caches, removing orphaned dependencies, checking upstream news before updates, and ensuring your PGP keyrings
 are up to date.
+
+:::note[Devario and Arch-based systems]
+The package-cache and distribution-keyring examples below use **Arch-based** paths and trust sources. Devario uses Shelly's native RLPM backend with its own repositories and paths. For Devario, start with [native package configuration](/shelly-alpm/docs/native-configuration/) and [package management](/shelly-alpm/docs/packages/).
+:::
 
 Shelly provides three specialized subcommands for system health:
 
@@ -28,9 +32,11 @@ steps are separate from the package-cache cleanup described below.
 
 ## Cache & Storage Hygiene (`shelly purify`)
 
-Whenever you install or upgrade packages, ALPM stores the downloaded archives in `/var/cache/pacman/pkg/`. Over time,
+On **Arch-based systems**, ALPM stores downloaded package archives in `/var/cache/pacman/pkg/` by default. Over time,
 this cache grows and consumes gigabytes of disk space. Similarly, building AUR packages leaves compiled archives in
 Shelly's cache.
+
+Devario's default native package cache is `/var/cache/shelly/pkg/`, not the Pacman path above. Cache paths can be overridden; see [native package configuration](/shelly-alpm/docs/native-configuration/#choose-the-right-file). The standard-package and AUR cleanup examples below describe Arch-based installations. Flatpak cleanup requires that backend to be available.
 
 `shelly purify` analyzes your system and builds a structured cleanup plan for package caches, orphaned dependencies, and
 unused Flatpak runtimes.
@@ -92,8 +98,10 @@ shelly purify standard --orphans --aur-cache --cache 2
 On Arch Linux, major package transitions or upstream architectural changes occasionally require manual user
 intervention. The Arch Linux maintainers publish announcements on [archlinux.org/news](https://archlinux.org/news/).
 
-`shelly news` fetches the official news feed, displays unread announcements formatted cleanly in your terminal, and
+`shelly news` fetches the official **Arch Linux** news feed, displays unread announcements formatted cleanly in your terminal, and
 remembers which items you have already viewed.
+
+This is not a Devario announcements feed. For Devario update announcements, check the public [Seafoam Labs Fluxer community](https://fluxer.gg/vOjrMXcE); do not treat an Arch manual-intervention notice as a Devario instruction.
 
 ```sh
 # Show unread announcements
@@ -123,6 +131,8 @@ desynchronized or missing, updates or AUR builds may fail with signature verific
 Shelly integrates key management through `shelly keyring` (powered by `shelly-key`).
 
 ### 1. Fixing Keyring Errors
+
+These distribution-keyring steps are for **Arch-based installations** using Pacman paths and their distribution's installed keyrings. They are **not a Devario keyring reset procedure**. For Devario's keyring locations and repository setup, see [Devario software sources](/devario/platform/#shelly-and-software-sources).
 
 If you encounter `invalid or corrupted package (PGP signature)` errors during updates, repopulate the distribution
 keys. Note that `shelly keyring init` creates missing keyring structure but does **not** delete an existing keyring -
@@ -231,6 +241,8 @@ shelly -Na           # Equivalent to: shelly news --all
 
 ## Further Reading
 
+- [Native package configuration](/shelly-alpm/docs/native-configuration/) - Distribution-specific configuration, database and cache paths.
+- [Shelly Troubleshooting](/shelly-alpm/docs/troubleshooting/) - Upgrade-check cache and ownership errors, separate from the system package database.
 - [Building Packages](/shelly-alpm/docs/build/) - How Shelly builds and verifies packages.
 - [AUR Safety Practices](/shelly-alpm/docs/aur-safety/) - Reviewing build recipes and PGP verification.
 - [CLI Reference](/shelly-alpm/docs/cli-reference/) - Complete command syntax for Shelly.

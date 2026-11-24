@@ -128,17 +128,57 @@ backend and identity. Aqueous integrates X11 focus, transient relationships,
 fullscreen, maximize/minimize, floating geometry, and validated
 `_NET_WM_MOVERESIZE` interactions.
 
-XWayland scaling defaults to **legacy**. To try native scaling, add
-`-xwayland-scaling native` to your session's compositor launch options, then log
-out and back in. Use `aqueous-git` for the coexisting Git family; see
-[session/package paths](/aqueous/desktop-session/). Do not launch a second
-compositor inside the running session. Remove the option or use
-`-xwayland-scaling legacy` to undo it.
+XWayland scaling defaults to **legacy**. If you manage your session's compositor
+command, add `-xwayland-scaling native` to `aqueous` (or `aqueous-git` for the
+[separate Git session](/aqueous/desktop-session/)), then log out and back in.
+Adding the flag to the packaged `aqueous-wm` wrapper does not work: it does not
+forward arguments. Do not launch a second compositor inside the running
+session. Remove the flag or use `-xwayland-scaling legacy` to undo it.
 
 Native mode keeps XWayland on the renderer-selected GPU and projects it per
 output. Restart the app and check it on each display. Texture filtering is a
 separate setting and does not set an X11 app's DPI. `-no-xwayland` disables
 XWayland and its applications for that session.
+
+If a game opens on the wrong monitor, use a
+[window rule to choose its monitor](/aqueous/window-rules/#open-an-xwayland-game-on-a-specific-monitor).
+
+### Troubleshoot soft text
+
+1. Run `aqueousctl windows --json` and find the app by its window title.
+   `backend: "xwayland"` means XWayland; `"xdg"` means native Wayland. Match the
+   window's `output` to a monitor in `aqueousctl outputs --json` and check its
+   `scale` (`1` means 100%).
+2. If an XWayland app looks soft when enlarged on a scaled display, try the
+   app's native Wayland mode if available. Otherwise, try native XWayland
+   scaling as described above if you control the compositor command. Compare
+   the same app on the same monitor.
+
+On Vulkan-effects builds that include
+[PR #163](https://github.com/Seafoam-Labs/Aqueous/pull/163), the default
+[`scale_filter = "auto"`](/aqueous/configuration/#state-and-client-scaling)
+already uses high-quality filtering when shrinking a buffer. The setting is
+not available in Aqueous v1.1.0. It does not add detail when enlarging a window
+or when the buffer already matches the screen pixel for pixel.
+
+If you set the global filter to `bilinear` or `nearest`, you can restore
+high-quality downscaling for one XWayland app. Copy its actual `class` from
+`aqueousctl inspect --rule` and add this to `rules.toml` before broader matches,
+or add `scale_filter` to the app's existing rule:
+
+```toml
+[[window]]
+class = "ExampleClass"
+scale_filter = "high-quality"
+```
+
+Save to reload the rule, then compare the same view on the same monitor.
+Remove `scale_filter` from the rule to inherit the global filter again.
+
+In [#149](https://github.com/Seafoam-Labs/Aqueous/issues/149), Chromium was
+already running natively on Wayland at 100%. XWayland settings do not apply,
+and `integer-ceil` still requests scale 1 at 100%. There was no confirmed
+fix for that case.
 
 ## Games and application stalls
 
@@ -158,13 +198,13 @@ For crashes, freezes or low frame rates:
 4. Change one setting at a time and keep its previous value. For a total input
    freeze, arrange an independent recovery console before trying to reproduce it.
 
-These reports remain open as of 24 October 2026:
+These closed reports document earlier symptoms:
 
-| Symptom                                                             | Existing report                                                                                                            |
-| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| MPV playback slows the desktop                                      | [#44](https://github.com/Seafoam-Labs/Aqueous/issues/44): reported on Aqueous 0.4.8 with AMD Lucienne; still unreproduced. |
-| Fullscreen game freezes and input stops while other content updates | [#103](https://github.com/Seafoam-Labs/Aqueous/issues/103): immediate freeze versus focus-return trigger remains unclear.  |
-| Proton native-Wayland scRGB HDR colors spill into other channels    | [#104](https://github.com/Seafoam-Labs/Aqueous/issues/104): reported with Cyberpunk 2077.                                  |
+| Symptom                                                             | Existing report                                                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| MPV playback slows the desktop                                      | [#44](https://github.com/Seafoam-Labs/Aqueous/issues/44): closed without reproduction.                                         |
+| Fullscreen game freezes and input stops while other content updates | [#103](https://github.com/Seafoam-Labs/Aqueous/issues/103): the reporter no longer reproduced the freeze after a Steam update. |
+| Proton native-Wayland scRGB HDR colors spill into other channels    | [#104](https://github.com/Seafoam-Labs/Aqueous/issues/104): the reported scRGB path was fixed in Aqueous v1.0.19.              |
 
 An offscreen crash needs diagnosis before a keep-active rule. Focus, suspension,
 frame callbacks, rendering and process liveness are different states. No general
