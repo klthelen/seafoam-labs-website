@@ -458,20 +458,25 @@ is shared across themes and palettes; it does not change the logo's geometry.
 The gradient wave sits inside these masks, preserving the silhouette and
 dithering throughout the transition.
 
-The homepage footer uses the approved Seafoam Shore v2 artwork: daylight in
+The shared site footer uses the approved Seafoam Shore v2 artwork: daylight in
 light mode and twilight in dark mode, for both Classic and Sea Glass. Links,
 the appearance control, copyright, and separate CDN77 sponsorship and JetBrains
 support credits are real content above the illustration. The original shellheart
-identifies the brand. Other routes retain the compact footer and Starlight's
-footer content.
+identifies the brand. Pages with Starlight's documentation sidebar retain the
+compact Wiki footer. Starlight's metadata and pagination remain on all pages.
 
-The homepage footer groups Explore and Community beside the brand. A single
+[SiteFooter.astro](src/components/SiteFooter.astro) owns the shared footer.
+The [PageFrame override](src/components/overrides/PageFrame.astro) places it
+after the page content, outside the reading column and main landmark, on pages
+without a documentation sidebar. Its gutters match the homepage at each breakpoint.
+
+The shared footer groups Explore and Community beside the brand. A single
 Projects link returns to the homepage's project section; the header menu retains
 the individual project links. Sponsor and supporter credits share the next row.
 A final utility row places copyright beside a visibly labeled Appearance control,
 separated from the credits by one horizontal rule. The navigation and credits
 stack on narrow screens, and the utility row wraps without clipping its controls.
-Only the homepage enables the labeled appearance trigger; documentation keeps
+The shared footer enables the labeled appearance trigger; documentation keeps
 the compact icon trigger and the same preference menu behavior.
 
 The panoramic artwork is used at every viewport width. It scales from 1080px to

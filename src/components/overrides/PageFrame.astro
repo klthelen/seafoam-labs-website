@@ -1,0 +1,13 @@
+---
+import Default from "@astrojs/starlight/components/PageFrame.astro";
+import SiteFooter from "../SiteFooter.astro";
+
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+
+<Default>
+  <slot name="header" slot="header" />
+  <slot name="sidebar" slot="sidebar" />
+  <slot />
+  {!hasSidebar && <SiteFooter />}
+</Default>

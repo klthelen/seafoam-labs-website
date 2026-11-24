@@ -237,6 +237,7 @@ export default defineConfig({
         MobileMenuToggle: "./src/components/overrides/MobileMenuToggle.astro",
         Sidebar: "./src/components/overrides/Sidebar.astro",
         PageTitle: "./src/components/overrides/PageTitle.astro",
+        PageFrame: "./src/components/overrides/PageFrame.astro",
         SocialIcons: "./src/components/overrides/SocialIcons.astro",
         Footer: "./src/components/overrides/Footer.astro",
       },
