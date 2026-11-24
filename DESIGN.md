@@ -118,6 +118,15 @@ when entering and leaving hover. Press feedback uses 75ms. Navigation disclosure
 and footer appearance triggers use the same color timing. Focus outlines remain
 immediate, and reduced-motion preferences disable these transitions.
 
+Project-card “Learn more” links fill with a shallow wave on hover, rising and
+moving sideways over 360ms before resting fully filled. A single SVG mask reveals
+both the fill and an `aria-hidden` copy of the label so the text keeps its
+contrasting color at the waterline. Leaving hover reverses the transition from
+its current position. Reduced motion makes the fill immediate; touch devices,
+forced colors, and browsers without CSS masking retain the ordinary action
+treatment. Keyboard focus keeps the shared immediate outline. The effect is
+local to `ProjectCard.astro` and uses the existing card action colors.
+
 Use native `disabled` only for an unavailable button, with a visible explanation
 at the call site. Disabled buttons do not receive hover or pressed treatments.
 Navigation links remain usable; do not simulate a disabled link with these styles.
