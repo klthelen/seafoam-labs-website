@@ -530,7 +530,12 @@ Documentation keeps its existing content width, padding, and sidebar columns.
 
 The shared footer groups Explore and Community beside the brand. A single
 Projects link returns to the homepage's project section; the header menu retains
-the individual project links. Sponsor and supporter credits share the next row.
+the individual project links. Sponsor and supporter credits follow the navigation
+with 3rem of separation, increasing to 4rem from 64rem wide. Their grid fits as
+many columns as the available width permits, keeping each at least 20rem wide
+unless the container is narrower. The current two entries share a row where
+space permits; additional entries wrap into new rows. Credit content keeps its
+natural height so longer descriptions move the remaining footer content down.
 A final utility row places copyright beside a visibly labeled Appearance control,
 separated from the credits by one horizontal rule. The navigation and credits
 stack on narrow screens, and the utility row wraps without clipping its controls.

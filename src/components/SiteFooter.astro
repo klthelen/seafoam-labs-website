@@ -253,7 +253,9 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
   .footer-credits {
     grid-area: credits;
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
     gap: 1.5rem;
+    margin-block-start: 1rem;
   }
   .footer-credit {
     min-width: 0;
@@ -299,7 +301,6 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
   }
   @media (min-width: 48rem) {
     .footer-credits {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 2.5rem;
     }
   }
@@ -311,6 +312,9 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
       grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
       grid-template-areas: "brand explore community" "credits credits credits" "utilities utilities utilities";
       gap: 2.5rem;
+    }
+    .footer-credits {
+      margin-block-start: 1.5rem;
     }
     .footer-wordmark {
       font-size: 2.25rem;
