@@ -520,6 +520,14 @@ The [PageFrame override](src/components/overrides/PageFrame.astro) places it
 after the page content, outside the reading column and main landmark, on pages
 without a documentation sidebar. Its gutters match the homepage at each breakpoint.
 
+Standalone page content and footer links share `--sf-site-content-width`
+(77.5rem) and `--sf-site-gutter` (1rem, 1.5rem from 48rem, and 2rem from 64rem)
+from `global.css`. The non-sidebar content panels use those same dimensions,
+so page titles and section starts align with the footer. Top-level prose and
+ordinary lists retain a 75ch maximum reading measure inside that frame;
+structured content such as the About team grid can use its full width.
+Documentation keeps its existing content width, padding, and sidebar columns.
+
 The shared footer groups Explore and Community beside the brand. A single
 Projects link returns to the homepage's project section; the header menu retains
 the individual project links. Sponsor and supporter credits share the next row.

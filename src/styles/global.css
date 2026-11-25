@@ -202,6 +202,38 @@
   }
 }
 
+/* Standalone pages and their footer share an outer frame; prose keeps a reading measure. */
+:root {
+  --sf-site-content-width: 77.5rem;
+  --sf-site-gutter: 1rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --sf-site-gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --sf-site-gutter: 2rem;
+  }
+}
+
+:root:not([data-has-sidebar]) {
+  --sl-content-width: var(--sf-site-content-width);
+  --sl-content-pad-x: var(--sf-site-gutter);
+
+  .sl-container {
+    margin-inline: auto;
+  }
+
+  .sl-markdown-content > :is(p:not(.text-center), ul:not([role="list"]), ol) {
+    max-width: 75ch;
+    overflow-wrap: anywhere;
+  }
+}
+
 /* Shared treatments stay opt-in; Starlight's existing actions use the same rules. */
 .sf-action,
 .sf-icon-control,

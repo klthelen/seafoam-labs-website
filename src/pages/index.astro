@@ -81,8 +81,6 @@ import chel from "../assets/images/chel.png";
 
 <style is:global>
   :root:has(.site-header[data-homepage]) {
-    --sl-content-width: 77.5rem;
-    --sl-content-pad-x: 16px;
     --sl-main-pad: 0;
 
     .content-panel {
@@ -94,7 +92,7 @@ import chel from "../assets/images/chel.png";
     .hero,
     .sl-markdown-content {
       width: calc(100% - 2 * var(--sl-content-pad-x));
-      max-width: 77.5rem;
+      max-width: var(--sf-site-content-width);
       margin-inline: auto;
     }
     .hero {
@@ -169,7 +167,6 @@ import chel from "../assets/images/chel.png";
     }
 
     @media (min-width: 48rem) {
-      --sl-content-pad-x: 24px;
       .project-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 32px;
@@ -180,7 +177,6 @@ import chel from "../assets/images/chel.png";
       }
     }
     @media (min-width: 64rem) {
-      --sl-content-pad-x: 32px;
       .homepage-projects {
         margin-block-start: 4rem;
       }

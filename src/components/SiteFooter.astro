@@ -141,7 +141,6 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
 
 <style>
   .site-footer {
-    --footer-gutter: 1rem;
     margin-top: 3rem;
     color: var(--sf-text);
   }
@@ -152,8 +151,8 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas: "brand brand" "explore community" "credits credits" "utilities utilities";
     gap: 2rem 1rem;
-    width: calc(100% - 2 * var(--footer-gutter));
-    max-width: 77.5rem;
+    width: calc(100% - 2 * var(--sf-site-gutter));
+    max-width: var(--sf-site-content-width);
     margin-inline: auto;
     overflow-wrap: anywhere;
   }
@@ -299,9 +298,6 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
     );
   }
   @media (min-width: 48rem) {
-    .site-footer {
-      --footer-gutter: 1.5rem;
-    }
     .footer-credits {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 2.5rem;
@@ -309,7 +305,6 @@ import cdn77White from "../assets/icons/cdn77-white.svg";
   }
   @media (min-width: 64rem) {
     .site-footer {
-      --footer-gutter: 2rem;
       margin-top: 5rem;
     }
     .footer-content {
