@@ -1,3 +1,3 @@
 export const featureFlags = {
-  enableCustomPalettes: false,
+  enableCustomPalettes: true,
 };

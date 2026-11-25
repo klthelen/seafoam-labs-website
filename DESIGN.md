@@ -11,12 +11,14 @@ while the page is open, with light as the fallback.
 Without JavaScript, the site uses Classic and the device theme.
 
 The build-time `enableCustomPalettes` flag in
-[features.ts](src/config/features.ts) defaults to `false`. While disabled, the
-site always uses Classic, omits the **Color palette** controls, and ignores
-palette changes without reading or overwriting saved palette preferences.
-Theme selection and device-theme updates are unaffected. Set the flag to `true`
-and rebuild and deploy to restore **Classic (Default)** and **Sea Glass** choices
-and apply saved palettes again. Verify both flag states when changing this behavior.
+[features.ts](src/config/features.ts) defaults to `true`, exposing **Color palette**
+choices for **Classic (Default)** and **Sea Glass**. New visitors use Classic and
+the device theme; returning visitors retain their saved choices.
+Set the flag to `false` and rebuild and deploy to hide the palette controls and
+always use Classic without reading or overwriting saved palette preferences.
+Theme selection and device-theme updates are unaffected. Re-enabling the flag
+restores the controls and saved palettes. Verify both flag states when changing
+this behavior.
 
 Selections are stored under `seafoam-appearance` and `seafoam-palette`.
 Unrecognized values fall back to the defaults; legacy `starlight-theme` values

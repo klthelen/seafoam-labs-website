@@ -238,18 +238,19 @@ const { showLabel = false } = Astro.props;
     }
   }
 
+  /* Arrow keys can move radio focus without matching :focus-visible in WebKit. */
   summary:focus-visible,
-  label:has(input:focus-visible) {
+  label:focus-within {
     outline: 2px solid var(--sf-focus);
     outline-offset: 3px;
   }
 
-  label:has(input:focus-visible) {
+  label:focus-within {
     outline-offset: -2px;
   }
 
-  label:has(input:focus-visible):hover,
-  label:has(input:focus-visible):active {
+  label:focus-within:hover,
+  label:focus-within:active {
     outline-color: var(--sf-on-action);
   }
 
