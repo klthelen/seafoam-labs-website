@@ -497,16 +497,16 @@ gradient-text restriction. Reduced motion makes the fill immediate. Touch,
 forced colors, and browsers without the required CSS retain the solid title
 and monochrome fish; the decorative duplicate stays hidden from assistive technology.
 
-The official Devario logo is used as an alpha mask with black ink in light mode
-and white ink in dark mode, in both palettes. The existing 1253 × 839 PNG matches the
-[upstream logo](https://raw.githubusercontent.com/Seafoam-Labs/devario-os/refs/heads/main/iso/late-airootfs/usr/share/devario/fastfetch/devario-logo.png).
-The mask displays only its top 640 source pixels, retaining the fish and
-excluding the embedded DEVARIO wordmark without modifying the source asset.
-A separate luminance mask intersects that silhouette, keeping the upper fish
-solid and dissolving the lower portion into fine stippling. The static texture
-is shared across themes and palettes; it does not change the logo's geometry.
-The gradient wave sits inside these masks, preserving the silhouette and
-dithering throughout the transition.
+The fish uses a lossless WebP mask that preserves the dimensions and every alpha
+value of the 1253 × 839 [official Devario logo](https://raw.githubusercontent.com/Seafoam-Labs/devario-os/refs/heads/main/iso/late-airootfs/usr/share/devario/fastfetch/devario-logo.png).
+The full-color source is kept in `devario-logo.png`. The showcase displays the top
+640 rows of the mask so only the fish is visible. CSS supplies black ink in light
+mode and white ink in dark mode for both palettes.
+
+Astro encodes the 1774 × 887 dither texture as WebP at quality 85. This luminance
+mask keeps the upper fish solid and dissolves the lower portion into fine
+stippling. The gradient wave sits inside both masks, preserving the silhouette
+and dithering throughout the transition.
 
 The shared site footer uses the approved Seafoam Shore v2 artwork: daylight in
 light mode and twilight in dark mode, for both Classic and Sea Glass. Links,

@@ -3,13 +3,13 @@ import { Icon } from "@astrojs/starlight/components";
 import { getImage } from "astro:assets";
 import CopyChecksum from "./CopyChecksum.astro";
 import { isoDownloadUrl, isoSha256 } from "../consts";
-import logo from "../assets/images/devario-logo.png";
+import logo from "../assets/images/devario-fish-mask.webp";
 import ditherMask from "../assets/images/devario-dither-mask.png";
 import buttonWave from "../assets/images/button-wave.svg?url";
 
 // The fish ends above row 640; the embedded DEVARIO wordmark starts below it.
 const logoMarkHeight = 640;
-const dither = await getImage({ src: ditherMask, format: "webp", quality: 90 });
+const dither = await getImage({ src: ditherMask, format: "webp", quality: 85 });
 ---
 
 <section
