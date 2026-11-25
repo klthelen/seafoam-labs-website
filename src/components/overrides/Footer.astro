@@ -4,7 +4,7 @@ import { Image } from "astro:assets";
 import shellyChelAvif from "../../assets/images/shelly-chel.avif";
 import SitePreferences from "../SitePreferences.astro";
 
-const { hasSidebar, siteTitle } = Astro.locals.starlightRoute;
+const { hasSidebar, siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 
 const links = [
   {
@@ -32,25 +32,28 @@ const links = [
       © {new Date().getFullYear()} {siteTitle}
     </span>
     <a
-      class="order-last text-center text-(--sl-color-gray-5) select-none sm:order-0 sm:mx-6"
-      href={shellyChelAvif.src}
+      class="sf-link order-last inline-flex rounded-full text-center text-(--sl-color-gray-5) select-none sm:order-0 sm:mx-6"
+      href={siteTitleHref}
     >
       <Image
         class="inline-block rounded-full text-transparent"
         src={shellyChelAvif}
-        alt="Shelly Chel"
+        alt={`${siteTitle} home`}
         height={48}
         width={48}
         layout="fixed"
       />
     </a>
-    <nav class="order-first flex flex-wrap gap-x-2 sm:order-0">
+    <nav class="order-first flex flex-wrap items-center gap-x-2 sm:order-0">
       {links.map((link, index) => (
-        <>
-          {index === 0 ? (
-            ""
-          ) : (
-            <span class="text-(--sl-color-gray-5) select-none">·</span>
+        <span class="flex items-center gap-x-2">
+          {index > 0 && (
+            <span
+              aria-hidden="true"
+              class="text-(--sl-color-gray-5) select-none"
+            >
+              ·
+            </span>
           )}
           <a
             class="text-(--sl-color-accent) no-underline hover:underline"
@@ -58,7 +61,7 @@ const links = [
           >
             {link.title}
           </a>
-        </>
+        </span>
       ))}
     </nav>
     <SitePreferences />
