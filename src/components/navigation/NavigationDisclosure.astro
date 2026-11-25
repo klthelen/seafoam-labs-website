@@ -83,14 +83,15 @@ const { align = "start" } = Astro.props;
     };
 
     const updateDisclosure = () => {
-      panel.togglePopover(disclosure.open);
-      positionPanel();
+      // Let the owner reveal a translated header before measuring its popup.
       disclosure.dispatchEvent(
         new CustomEvent("navigation-disclosure-toggle", {
           bubbles: true,
           detail: { open: disclosure.open },
         }),
       );
+      panel.togglePopover(disclosure.open);
+      positionPanel();
     };
 
     disclosure.addEventListener("toggle", updateDisclosure);

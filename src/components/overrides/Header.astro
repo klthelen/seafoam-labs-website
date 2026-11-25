@@ -65,6 +65,14 @@ const currentPath = Astro.url.pathname.endsWith("/")
 </div>
 
 <script>
+  import {
+    clampScrollY,
+    createWikiHeaderState,
+    overlapsHeader,
+    updateWikiHeaderState,
+    wikiSidebarTop,
+  } from "../../utils/wiki-header-scroll";
+
   for (const header of document.querySelectorAll<HTMLElement>(".site-header")) {
     const frame = header.closest<HTMLElement>(".page > .header");
     const siteTriggers = [
@@ -91,6 +99,20 @@ const currentPath = Astro.url.pathname.endsWith("/")
       sidebar?.querySelector<HTMLButtonElement>(".sidebar-close");
     const docsButton =
       document.querySelector<HTMLButtonElement>(".docs-menu-toggle");
+    const headerContent = header.closest<HTMLElement>(".header-content");
+    const root = document.documentElement;
+    const wikiLayout = window.matchMedia(
+      "screen and (min-width: 72rem) and (height > 32rem)",
+    );
+    const isWiki = Boolean(headerContent?.hasAttribute("data-docs") && sidebar);
+    let wikiEnabled = false;
+    let headerHeight = frame.getBoundingClientRect().height;
+    let safeAreaTop = 0;
+    let capsuleBounds = { top: 0, right: 0, bottom: 0, left: 0 };
+    let wikiState = createWikiHeaderState(window.scrollY);
+    const activePointers = new Set<number>();
+    let pendingUpdate = 0;
+    let needsMeasurement = false;
 
     const closeDisclosures = (except?: HTMLDetailsElement) => {
       for (const disclosure of disclosures) {
@@ -100,21 +122,25 @@ const currentPath = Astro.url.pathname.endsWith("/")
 
     header.addEventListener("navigation-disclosure-toggle", (event) => {
       const disclosure = event.target;
-      if (!(disclosure instanceof HTMLDetailsElement) || !disclosure.open)
-        return;
-      closeDisclosures(disclosure);
-      search?.dispatchEvent(new Event("site-search-dismiss"));
-      if (sidebar?.matches(":popover-open")) sidebar.hidePopover();
+      if (!(disclosure instanceof HTMLDetailsElement)) return;
+      if (disclosure.open) {
+        closeDisclosures(disclosure);
+        search?.dispatchEvent(new Event("site-search-dismiss"));
+        if (sidebar?.matches(":popover-open")) sidebar.hidePopover();
+      }
+      updateScrollState(true, disclosure.open);
     });
 
     header.addEventListener("site-search-open", () => {
       header.setAttribute("data-search-open", "");
       closeDisclosures();
       if (sidebar?.matches(":popover-open")) sidebar.hidePopover();
+      updateScrollState(true, true);
     });
 
     header.addEventListener("site-search-close", () => {
       header.removeAttribute("data-search-open");
+      updateScrollState(true);
     });
 
     sidebar?.addEventListener("beforetoggle", (event) => {
@@ -180,15 +206,82 @@ const currentPath = Astro.url.pathname.endsWith("/")
     let navigationLayout = getComputedStyle(header)
       .getPropertyValue("--sf-navigation-layout")
       .trim();
-    const updateScrollState = () => {
-      const scrollOffset = Math.min(
-        Math.max(0, window.scrollY),
-        frame.offsetHeight,
+    const updateScrollState = (immediate = false, reveal = false) => {
+      const maxScrollY = root.scrollHeight - root.clientHeight;
+      const scrollY = clampScrollY(window.scrollY, maxScrollY);
+      const focused = document.activeElement;
+      const headerFocused = focused instanceof Node && header.contains(focused);
+      const externalFocus =
+        focused instanceof HTMLElement &&
+        focused !== document.body &&
+        focused !== root &&
+        !headerFocused;
+      const interactionActive =
+        headerFocused ||
+        activePointers.size > 0 ||
+        header.hasAttribute("data-search-open") ||
+        [...disclosures].some((disclosure) => disclosure.open);
+
+      if (reveal) wikiState = createWikiHeaderState(scrollY);
+      const scrollInput = {
+        enabled: wikiEnabled,
+        scrollY,
+        maxScrollY,
+        headerHeight,
+        interactionActive,
+        focusOverlaps: false,
+      };
+      const proposedState = updateWikiHeaderState(wikiState, scrollInput);
+      const scrollOffset = Math.min(scrollY, headerHeight);
+      // Test the position we intend to show, including an attached bar's scroll offset.
+      const focusOverlaps = Boolean(
+        wikiEnabled &&
+        !reveal &&
+        externalFocus &&
+        overlapsHeader(
+          focused.getBoundingClientRect(),
+          capsuleBounds,
+          proposedState.attached ? scrollOffset : 0,
+        ),
       );
+      if (focusOverlaps) {
+        wikiState = updateWikiHeaderState(wikiState, {
+          ...scrollInput,
+          focusOverlaps: true,
+        });
+      } else {
+        wikiState = proposedState;
+      }
+
+      if (!wikiEnabled || focusOverlaps || !activePointers.size) {
+        header.style.removeProperty("transform");
+      }
       frame.style.setProperty("--sf-header-scroll", `${scrollOffset}px`);
       frame.toggleAttribute("data-scrolled", scrollOffset > 0);
+      frame.toggleAttribute(
+        "data-wiki-header-attached",
+        wikiEnabled && wikiState.attached,
+      );
+      frame.toggleAttribute(
+        "data-wiki-header-instant",
+        wikiEnabled &&
+          (immediate ||
+            wikiState.attached ||
+            focusOverlaps ||
+            interactionActive),
+      );
+      frame.toggleAttribute(
+        "data-wiki-header-hidden",
+        wikiEnabled && wikiState.hidden,
+      );
+      if (wikiEnabled) {
+        root.style.setProperty(
+          "--sf-wiki-sidebar-top",
+          `${wikiSidebarTop(headerHeight, safeAreaTop, scrollY)}px`,
+        );
+      }
     };
-    const updateHeader = () => {
+    const updateHeader = (resetScroll = false) => {
       const nextLayout = getComputedStyle(header)
         .getPropertyValue("--sf-navigation-layout")
         .trim();
@@ -223,33 +316,105 @@ const currentPath = Astro.url.pathname.endsWith("/")
           docsButton.getBoundingClientRect().height + "px",
         );
       }
-      document.documentElement.style.setProperty(
-        "--sl-nav-height",
-        frame.getBoundingClientRect().height + "px",
-      );
-      updateScrollState();
+      headerHeight = frame.getBoundingClientRect().height;
+      const nextWikiEnabled = isWiki && wikiLayout.matches;
+      if (resetScroll || wikiEnabled !== nextWikiEnabled) {
+        wikiState = createWikiHeaderState(
+          clampScrollY(window.scrollY, root.scrollHeight - root.clientHeight),
+        );
+      }
+      wikiEnabled = nextWikiEnabled;
+      if (headerContent) {
+        const contentStyle = getComputedStyle(headerContent);
+        safeAreaTop =
+          Number.parseFloat(
+            contentStyle.getPropertyValue("--sf-header-safe-top"),
+          ) || 0;
+        const bounds = header.getBoundingClientRect();
+        const top =
+          headerContent.getBoundingClientRect().top +
+          Number.parseFloat(contentStyle.paddingTop);
+        // Measure the shown position even while the capsule is translated away.
+        capsuleBounds = {
+          top,
+          bottom: top + bounds.height,
+          left: bounds.left,
+          right: bounds.right,
+        };
+      }
+      root.style.setProperty("--sl-nav-height", `${headerHeight}px`);
+      root.toggleAttribute("data-wiki-scroll-header", wikiEnabled);
+      if (!wikiEnabled) root.style.removeProperty("--sf-wiki-sidebar-top");
+      updateScrollState(true);
     };
 
-    // Apply measured spacing after resize delivery; it can change the frame's size.
-    const headerResize = new ResizeObserver(() => {
-      requestAnimationFrame(updateHeader);
+    const scheduleUpdate = (measure = false) => {
+      needsMeasurement ||= measure;
+      if (pendingUpdate) return;
+      pendingUpdate = requestAnimationFrame(() => {
+        pendingUpdate = 0;
+        if (needsMeasurement) {
+          needsMeasurement = false;
+          updateHeader();
+        } else {
+          updateScrollState();
+        }
+      });
+    };
+
+    document.addEventListener("focusin", () => updateScrollState(true));
+    document.addEventListener("focusout", () => {
+      // A blur without a new focus target still releases the interaction hold.
+      queueMicrotask(() => updateScrollState(true));
     });
+    header.addEventListener("pointerdown", (event) => {
+      // Keep the pressed control under the pointer until the browser picks its release target.
+      if (wikiEnabled && !activePointers.size) {
+        header.style.transform = getComputedStyle(header).transform;
+      }
+      activePointers.add(event.pointerId);
+      updateScrollState(true, true);
+    });
+    const releasePointer = (event: PointerEvent) => {
+      activePointers.delete(event.pointerId);
+      updateScrollState(true);
+    };
+    document.addEventListener("pointerup", releasePointer);
+    document.addEventListener("pointercancel", releasePointer);
+    window.addEventListener("blur", () => {
+      activePointers.clear();
+      updateScrollState(true);
+    });
+
+    // Apply measured spacing after resize delivery; it can change the frame's size.
+    const headerResize = new ResizeObserver(() => scheduleUpdate(true));
     headerResize.observe(frame, { box: "border-box" });
     if (docsButton) headerResize.observe(docsButton, { box: "border-box" });
-    window.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("scroll", () => scheduleUpdate(), {
+      passive: true,
+    });
+    window.addEventListener("resize", () => scheduleUpdate(true));
+    window.addEventListener("pageshow", () => updateHeader(true));
+    wikiLayout.addEventListener("change", () => updateHeader(true));
     updateHeader();
   }
 </script>
 
 <style>
   .header-content {
-    padding: calc(16px + env(safe-area-inset-top))
-      max(16px, env(safe-area-inset-right)) 16px
+    --sf-header-safe-top: env(safe-area-inset-top, 0px);
+
+    padding: calc(0.25rem + var(--sf-header-safe-top))
+      max(16px, env(safe-area-inset-right)) 0.25rem
       max(16px, env(safe-area-inset-left));
   }
 
   .header-content[data-docs] {
     pointer-events: auto;
+  }
+
+  .site-header :global(.projects-trigger) {
+    padding-block: 0;
   }
 
   .site-header {
@@ -368,6 +533,70 @@ const currentPath = Astro.url.pathname.endsWith("/")
     }
   }
 
+  @media screen and (min-width: 72rem) and (height > 32rem) {
+    /* The backdrop occupies the header's reserved space and scrolls with the page. */
+    :global(:root[data-wiki-scroll-header] .page)::before {
+      content: "";
+      flex: none;
+      height: var(--sl-nav-height);
+      background: var(--sf-surface);
+    }
+
+    :global(:root[data-wiki-scroll-header] .page > .main-frame) {
+      padding-top: 0;
+    }
+
+    :global(:root[data-wiki-scroll-header]) .header-content[data-docs] {
+      background: transparent;
+      pointer-events: none;
+    }
+
+    :global(
+        :root[data-wiki-scroll-header]
+          .header[data-scrolled]:not([data-wiki-header-attached])
+      )
+      .header-content[data-docs]
+      .site-header {
+      box-shadow: var(--sl-shadow-sm);
+    }
+
+    :global(.header[data-wiki-header-hidden]:not([data-wiki-header-attached]))
+      .site-header {
+      transform: translateY(calc(-1 * (var(--sl-nav-height) + 16px)));
+    }
+
+    :global(.header[data-wiki-header-attached]) .site-header {
+      transform: translateY(calc(-1 * var(--sf-header-scroll, 0px)));
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      :global(:root[data-wiki-scroll-header]) .site-header {
+        transition: transform 150ms ease-out;
+      }
+    }
+
+    :global(.header[data-wiki-header-instant]) .site-header,
+    :global(:root[data-wiki-scroll-header]) .site-header:focus-within {
+      transition: none;
+    }
+
+    :global(:root[data-wiki-scroll-header]) .site-header:focus-within {
+      transform: none;
+    }
+
+    :global(:root[data-wiki-scroll-header] .page > .sidebar .sidebar-pane) {
+      inset-block-start: var(--sf-wiki-sidebar-top);
+      scroll-padding-block-start: calc(var(--sl-nav-height) + 8px);
+    }
+
+    :global(:root[data-wiki-scroll-header] .right-sidebar) {
+      top: var(--sf-wiki-sidebar-top);
+      height: calc(100dvh - var(--sf-wiki-sidebar-top));
+      padding-top: 0;
+      scroll-padding-block-start: calc(var(--sl-nav-height) + 8px);
+    }
+  }
+
   @container site-navigation (min-width: 24rem) {
     .site-header {
       padding-inline: 12px;
@@ -392,9 +621,8 @@ const currentPath = Astro.url.pathname.endsWith("/")
 
   @container site-navigation (min-width: 64rem) {
     .header-content {
-      padding: calc(24px + env(safe-area-inset-top))
-        max(24px, env(safe-area-inset-right)) 24px
-        max(24px, env(safe-area-inset-left));
+      padding-inline: max(24px, env(safe-area-inset-left))
+        max(24px, env(safe-area-inset-right));
     }
 
     .site-header {
@@ -402,7 +630,6 @@ const currentPath = Astro.url.pathname.endsWith("/")
       --sf-navigation-gutter: 24px;
 
       gap: 1rem;
-      min-block-size: 6rem;
       padding-inline: 2rem;
     }
 
@@ -454,21 +681,16 @@ const currentPath = Astro.url.pathname.endsWith("/")
     .header-content {
       position: relative;
       isolation: isolate;
-      padding-block: calc(0.75rem + env(safe-area-inset-top)) 0.75rem;
       background: transparent;
     }
 
-    .header-content::before {
+    :global(:root:not([data-wiki-scroll-header])) .header-content::before {
       content: "";
       position: absolute;
       z-index: -1;
       inset: 0;
       background: var(--sf-surface);
       pointer-events: none;
-    }
-
-    .site-header {
-      min-block-size: 4.5rem;
     }
 
     @media (height > 32rem) {
@@ -501,7 +723,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
   }
 
   :global(:root) {
-    --sl-nav-height: calc(6rem + env(safe-area-inset-top));
+    --sl-nav-height: calc(4.5rem + env(safe-area-inset-top));
   }
 
   :global(.page > .header) {
@@ -515,19 +737,7 @@ const currentPath = Astro.url.pathname.endsWith("/")
 
   @media (width < 50rem) {
     :global(:root[data-has-sidebar]) {
-      --sl-nav-height: calc(9.25rem + env(safe-area-inset-top));
-    }
-  }
-
-  @media (min-width: 64rem) {
-    :global(:root) {
-      --sl-nav-height: calc(9rem + env(safe-area-inset-top));
-    }
-  }
-
-  @media (min-width: 80rem) {
-    :global(:root) {
-      --sl-nav-height: calc(6rem + env(safe-area-inset-top));
+      --sl-nav-height: calc(8.5rem + env(safe-area-inset-top));
     }
   }
 

@@ -195,7 +195,8 @@ Escape still closes the popup and returns focus to its trigger.
 Opening preserves trigger focus. Escape closes and returns focus to the trigger;
 outside pointer presses and focus departure close without redirecting focus.
 The component emits a bubbling `navigation-disclosure-toggle` event with
-`detail.open`. The owning Header coordinates other disclosures and Search; it
+`detail.open` before placing the popup, so the owning Header can first reveal
+its floating capsule. The Header coordinates other disclosures and Search; it
 can close a disclosure by setting its native `open` property to `false`. When a
 navigation arrangement changes on resize, that owner closes hidden menus and
 places any affected focus on a visible control.
@@ -211,8 +212,8 @@ documentation within a project, do not mark an overview as the current page.
 
 The Projects label inherits DM Sans 600 from the shared disclosure trigger,
 matching the header's text links, at 1.25rem with a 1.5rem line height in both
-compact and desktop headers. Its content adds 0.25rem vertical and 0.5rem
-horizontal padding to the shared trigger, giving 12px vertical
+compact and desktop headers. In the header, its content adds 0.5rem
+horizontal padding to the shared trigger, giving 8px vertical
 and 16px horizontal padding at the default text size. The label and 32px
 chevron form a centered group with a 0.5rem gap. The chevron points down when
 closed and up when open, following the native disclosure state. Rows retain the
@@ -341,28 +342,69 @@ or desktop link. Focus within Projects moves to the hamburger when narrowing
 and to the standalone Projects trigger when widening. The rem breakpoint responds
 to enlarged text, and controls can still wrap when that text needs more space.
 
-From a container width of 64rem, it shows the inline
-page and social links, uses a 6rem minimum height and 2rem horizontal padding,
-and centers within a 77.5rem maximum width to match the homepage content. Desktop
+From a container width of 64rem, it shows the inline page and social links,
+uses 2rem horizontal padding, and centers within a 77.5rem maximum width to
+match the homepage content. Desktop
 text links and the search input use 1.25rem text. The logo grows to 2.5rem, and
 search and social icons use 1.5rem glyphs in targets of at least 3rem.
 
 From a container width of 80rem, the surface spans the full viewport and sits
 flush against the top edge when the page is at the top, with safe-area clearance
-where needed. A centered pill sits over that backdrop, using a 77.5rem maximum
-width, a 4.5rem minimum height, and 0.75rem space above and below. As the page
+where needed. A centered pill sits over that backdrop with a 77.5rem maximum
+width. As the page
 scrolls, only the full-width backdrop moves away; the pill keeps its position,
 size, and rounded shape. A restrained shadow separates it from the content.
 Returning to the top brings the backdrop back behind the pill. The reserved
-height stays at 6rem so the page does not jump. Only the shadow fades, over 200ms;
+height stays at 4.5rem so the page does not jump. Only the shadow fades, over 200ms;
 reduced motion disables that transition.
 
-Wiki and documentation pages keep the full-width backdrop fixed at the top
-while scrolling. Their header does not detach or gain the floating-pill shadow,
-so it remains visually connected to the documentation navigation.
+All pages use the same compact header at every width:
+a 4rem minimum capsule with 0.25rem outer spacing above and below. The Projects
+trigger omits its inner vertical padding, retaining its label, caret, and 48px
+target at the default text size. A single-row header is 4.5rem tall;
+wrapped or enlarged controls can increase its height. Below 50rem, documentation
+pages also reserve space for the separate Documentation control. The initial CSS
+offset matches these dimensions, and the resize observer keeps it synchronized
+with the actual frame.
 
-Below that width, the header retains its pill shape and outer spacing, including
-in narrow or split-screen desktop windows.
+On Wiki pages, the header also detaches when the viewport is at least 72rem
+wide and more than 32rem tall, after the script initializes. Downward document
+scrolling from the top moves the capsule and full-width backdrop away together,
+from the first pixel, with no exit transition or wait threshold. After 12px of
+upward travel, the capsule returns as floating navigation. Later downward travel
+hides that floating capsule after 24px; small reversals do not repeatedly toggle
+it. A revealed capsule stays floating when approaching the top and reattaches
+only at scroll position zero. Mid-page initialization also starts floating.
+Narrower Wiki layouts retain the fixed header and mobile controls.
+
+The side columns follow the remaining original header space until it scrolls
+away, then stay at the top safe-area inset. Revealing the floating capsule does
+not move either column or the article. The reserved `--sl-nav-height` continues
+to hold the full measured height for article placement and anchor clearance;
+`--sf-wiki-sidebar-top` controls the independent column offset. Starlight keeps
+its existing conservative current-section tracking line.
+
+Header focus and open Search/disclosures keep the capsule visible. During a
+pointer press, the capsule holds its current position so the same control can
+receive the release. Releasing an interaction starts a fresh downward-travel count.
+The hidden capsule remains in the keyboard order and accessibility tree, and
+focus reveals it immediately. If it would cover a focused page or sidebar
+control, it yields without moving focus or the columns; the overlap check
+includes 8px around the focused target for its outline. This also handles the
+first sidebar link when the sidebar cannot scroll any farther upward.
+
+Only floating capsule hide/reveal transitions animate, over 150ms. The initial
+attached departure uses the backdrop's exact scroll offset without easing or a
+floating shadow. Focus and
+explicit opening are immediate, as are all changes with reduced motion. The
+enhancement resets when leaving its viewport range and on page restoration.
+No hidden state is saved. Print and no-JavaScript layouts retain their existing
+behavior. Run `node --test tests/wiki-header-scroll.test.ts` for the focused
+direction, interaction, geometry, and overlap tests; browser checks are still
+needed for actual focus, popup placement, and scrolling.
+
+Below a container width of 80rem, non-Wiki headers retain their pill shape and
+outer spacing, including in narrow or split-screen desktop windows.
 
 Home, Projects, Wiki, Blog, and About each have 1rem horizontal padding and
 a 1rem gap between controls. The page-links group inherits the header's gap
@@ -386,8 +428,9 @@ site-menu trigger. When the compact menu disappears, its focused Home entry
 transfers focus to the desktop Home link.
 
 All pages use Starlight's fixed header frame; a resize observer supplies its
-measured height to `--sl-nav-height` so the content, table of contents, and sidebar
-remain below it. CSS supplies the initial offsets. Without JavaScript, the header
+measured height to `--sl-nav-height` for content and anchor spacing. The eligible
+Wiki columns use the independent offset described above. CSS supplies the
+initial offsets. Without JavaScript, the header
 stays in normal flow so native disclosures can expand without covering page
 content. The short-viewport layout also keeps the header in normal flow to leave
 room for reading.
